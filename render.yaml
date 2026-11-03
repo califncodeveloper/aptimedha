@@ -20,4 +20,6 @@ services:
         value: file
       - key: DB_CONNECTION
         value: sqlite
+      - key: QUEUE_CONNECTION
+        value: sync
 

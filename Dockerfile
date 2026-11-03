@@ -19,7 +19,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip bcmath opcache \
+    sqlite3 \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring zip bcmath opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer

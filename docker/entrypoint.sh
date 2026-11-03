@@ -16,28 +16,48 @@ cat << 'EOF' > /etc/apache2/conf-available/laravel.conf
 EOF
 a2enconf laravel
 
-# Ensure permissions for storage and bootstrap/cache
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# 1. Guarantee .env file exists in container
+if [ ! -f /var/www/html/.env ]; then
+    cp /var/www/html/.env.example /var/www/html/.env
+fi
 
-# Generate APP_KEY if not provided
-if [ -z "$APP_KEY" ]; then
+# 2. Inject safe standalone production defaults if not set by environment
+grep -q '^SESSION_DRIVER=' /var/www/html/.env && sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=cookie/' /var/www/html/.env || echo 'SESSION_DRIVER=cookie' >> /var/www/html/.env
+grep -q '^CACHE_STORE=' /var/www/html/.env && sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' /var/www/html/.env || echo 'CACHE_STORE=file' >> /var/www/html/.env
+grep -q '^QUEUE_CONNECTION=' /var/www/html/.env && sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' /var/www/html/.env || echo 'QUEUE_CONNECTION=sync' >> /var/www/html/.env
+
+# Default to SQLite if no external DB host is set
+if [ -z "$DB_HOST" ]; then
+    sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' /var/www/html/.env
+    sed -i 's/^DB_DATABASE=.*/DB_DATABASE=\/var\/www\/html\/database\/database.sqlite/' /var/www/html/.env
+fi
+
+# 3. Ensure SQLite database file exists and is writable
+mkdir -p /var/www/html/database
+touch /var/www/html/database/database.sqlite
+chown -R www-data:www-data /var/www/html/database
+chmod -R 775 /var/www/html/database
+
+# 4. Ensure APP_KEY exists in .env
+if ! grep -q '^APP_KEY=base64:' /var/www/html/.env; then
     php artisan key:generate --force
 fi
 
-# Run database setup if SQLite is used
-if [ "${DB_CONNECTION}" = "sqlite" ]; then
-    if [ ! -f /var/www/html/database/database.sqlite ]; then
-        touch /var/www/html/database/database.sqlite
-    fi
-    chown www-data:www-data /var/www/html/database/database.sqlite
-    php artisan migrate --force || true
-fi
+# 5. Ensure storage permissions
+mkdir -p /var/www/html/storage/framework/{sessions,views,cache} /var/www/html/storage/logs
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Cache configurations for production performance
-php artisan config:cache || true
-php artisan route:cache || true
-php artisan view:cache || true
+# 6. Run database migrations safely
+php artisan migrate --force || true
+
+# 7. Create storage link
+php artisan storage:link --force || true
+
+# 8. Clear and cache config/views
+php artisan config:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
 exec apache2-foreground
-
