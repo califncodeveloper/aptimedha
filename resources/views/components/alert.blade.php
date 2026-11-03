@@ -1,0 +1,22 @@
+@props([
+    'type' => 'info',
+])
+
+@php
+$styles = [
+    'info' => 'bg-blue-50 border-blue-200 text-blue-800',
+    'success' => 'bg-green-50 border-green-200 text-green-800',
+    'warning' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    'error' => 'bg-red-50 border-red-200 text-red-800',
+];
+@endphp
+
+<div {{ $attributes->merge(['class' => 'rounded-lg border px-4 py-3 text-sm ' . ($styles[$type] ?? $styles['info'])]) }}
+     x-data="{ show: true }" x-show="show" x-transition>
+    <div class="flex items-center justify-between">
+        <div>{{ $slot }}</div>
+        <button @click="show = false" class="ml-4 opacity-50 hover:opacity-100">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+|--------------------------------------------------------------------------
+| AptiMedha Design System
+|--------------------------------------------------------------------------
+| Primary Navy: #153B70
+| Secondary Teal: #087F82
+| Background: #F7F9FC
+| White: #FFFFFF
+| Text: #243247
+*/
+
+@theme {
+    --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-primary: #153B70;
+    --color-primary-light: #1d4f96;
+    --color-primary-dark: #0e2a52;
+
+    --color-secondary: #087F82;
+    --color-secondary-light: #0a9fa3;
+    --color-secondary-dark: #066668;
+
+    --color-background: #F7F9FC;
+    --color-surface: #FFFFFF;
+    --color-text: #243247;
+    --color-text-light: #64748b;
+    --color-text-muted: #94a3b8;
+
+    --color-border: #e2e8f0;
+    --color-border-light: #f1f5f9;
+}
+
+/* Base styles */
+@layer base {
+    body {
+        @apply bg-background text-text antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-semibold text-inherit;
+    }
+}
+
+/* Scrollbar styling */
+@layer utilities {
+    .scrollbar-thin {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 3px;
+    }
+}

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="AptiMedha - Sharpen your aptitude, reasoning and subject skills to crack placement exams and interviews.">
+
+    <title>{{ $title ?? 'AptiMedha - MCQ Practice & Placement Preparation' }}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Vite Assets -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-[#F7F9FC] text-[#243247] font-sans antialiased flex flex-col justify-between"
+      x-data="{ mobileMenu: false, searchOpen: false }">
+
+    {{-- Main Navbar (White background matching client mockup) --}}
+    <header class="sticky top-0 z-50 bg-white border-b border-gray-200/80 shadow-xs backdrop-blur-md bg-white/95">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-18 items-center justify-between">
+                
+                {{-- Brand Logo --}}
+                <div class="flex items-center gap-6">
+                    <a href="{{ url('/') }}" class="group transition-transform active:scale-95">
+                        <x-application-logo />
+                    </a>
+                </div>
+
+                {{-- Desktop Navigation Links --}}
+                <nav class="hidden lg:flex items-center space-x-1 font-medium text-sm">
+                    <a href="{{ url('/') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('/'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->is('/'),
+                       ])>
+                        Home
+                    </a>
+                    <a href="{{ route('categories.show', 'arithmetic-aptitude') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/arithmetic-aptitude*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/arithmetic-aptitude*'),
+                       ])>
+                        Aptitude
+                    </a>
+                    <a href="{{ route('categories.show', 'logical-reasoning') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/logical-reasoning*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/logical-reasoning*'),
+                       ])>
+                        Reasoning
+                    </a>
+                    <a href="{{ route('categories.show', 'programming') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/programming*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/programming*'),
+                       ])>
+                        Programming
+                    </a>
+                    <a href="{{ route('mcq.index') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('mcq.*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('mcq.*'),
+                       ])>
+                        MCQ Practice
+                    </a>
+                    <a href="{{ route('placement.index') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('placement*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('placement*'),
+                       ])>
+                        Placement Prep
+                    </a>
+                    <a href="{{ route('blog.index') }}"
+                       @class([
+                           'px-3 py-2 transition-colors relative',
+                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('blog.*'),
+                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('blog.*'),
+                       ])>
+                        Blog
+                    </a>
+                </nav>
+
+                {{-- Right Actions (Search & Auth) --}}
+                <div class="flex items-center space-x-3">
+                    {{-- Search Icon Button matching mockup --}}
+                    <button @click="searchOpen = true" 
+                            type="button" 
+                            class="p-2 text-[#243247] hover:text-[#087F82] hover:bg-gray-100 rounded-full transition-colors"
+                            title="Search Topics and Questions">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+
+                    @guest
+                        <div class="hidden sm:flex items-center space-x-2">
+                            <a href="{{ route('login') }}"
+                               class="px-4 py-2 text-sm font-semibold text-[#153B70] hover:text-[#087F82] hover:bg-gray-50 rounded-lg transition-colors">
+                                Log in
+                            </a>
+                            <a href="{{ route('register') }}"
+                               class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-[#087F82] hover:bg-[#066668] rounded-lg shadow-xs transition-colors">
+                                Sign up
+                            </a>
+                        </div>
+                    @else
+                        <div x-data="{ userMenu: false }" class="relative">
+                            <button @click="userMenu = !userMenu"
+                                    type="button"
+                                    class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-[#153B70] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+                                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                                </div>
+                                <span class="hidden md:inline text-sm font-medium text-[#243247] max-w-[120px] truncate">
+                                    {{ Auth::user()->name }}
+                                </span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                            </button>
+
+                            <div x-show="userMenu"
+                                 @click.away="userMenu = false"
+                                 x-transition
+                                 class="absolute right-0 mt-2 w-52 rounded-xl bg-white shadow-xl ring-1 ring-black/5 py-1 z-50 divide-y divide-gray-100"
+                                 x-cloak>
+                                <div class="px-4 py-3">
+                                    <p class="text-xs text-gray-500">Signed in as</p>
+                                    <p class="text-sm font-semibold text-[#243247] truncate">{{ Auth::user()->email }}</p>
+                                </div>
+                                <div class="py-1">
+                                    <a href="{{ route('user.dashboard') }}" class="flex items-center px-4 py-2 text-sm text-[#243247] hover:bg-[#F7F9FC] hover:text-[#087F82]">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2.5 text-gray-400"></i>
+                                        User Dashboard
+                                    </a>
+                                    <a href="{{ route('user.bookmarks') }}" class="flex items-center px-4 py-2 text-sm text-[#243247] hover:bg-[#F7F9FC] hover:text-[#087F82]">
+                                        <i data-lucide="bookmark" class="w-4 h-4 mr-2.5 text-gray-400"></i>
+                                        My Bookmarks
+                                    </a>
+                                    @if(Auth::user()->isAdmin ?? false)
+                                        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-sm font-semibold text-[#153B70] hover:bg-blue-50">
+                                            <i data-lucide="shield-check" class="w-4 h-4 mr-2.5 text-[#153B70]"></i>
+                                            Admin Panel
+                                        </a>
+                                    @endif
+                                </div>
+                                <div class="py-1">
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                            <i data-lucide="log-out" class="w-4 h-4 mr-2.5 text-red-500"></i>
+                                            Log out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endguest
+
+                    {{-- Mobile Hamburger --}}
+                    <button @click="mobileMenu = !mobileMenu"
+                            type="button"
+                            class="lg:hidden p-2 text-[#243247] hover:bg-gray-100 rounded-lg transition-colors">
+                        <i x-show="!mobileMenu" data-lucide="menu" class="w-6 h-6"></i>
+                        <i x-show="mobileMenu" data-lucide="x" class="w-6 h-6" x-cloak></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Mobile Slide-down Navigation Menu --}}
+        <div x-show="mobileMenu"
+             x-transition
+             class="lg:hidden border-t border-gray-200 bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg"
+             x-cloak>
+            <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Home</a>
+            <a href="{{ route('categories.show', 'arithmetic-aptitude') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Aptitude</a>
+            <a href="{{ route('categories.show', 'logical-reasoning') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Reasoning</a>
+            <a href="{{ route('categories.show', 'programming') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Programming</a>
+            <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">All Categories</a>
+            <a href="{{ route('mcq.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">MCQ Practice</a>
+            <a href="{{ route('placement.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Placement Preparation</a>
+            <a href="{{ route('blog.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Blog & Guides</a>
+            <a href="{{ route('about') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">About Us</a>
+            <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Contact</a>
+
+            <div class="border-t border-gray-100 pt-4 mt-3">
+                @guest
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="{{ route('login') }}" class="text-center px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-semibold text-[#153B70] hover:bg-gray-50">Log in</a>
+                        <a href="{{ route('register') }}" class="text-center px-4 py-2.5 rounded-lg bg-[#087F82] text-sm font-semibold text-white hover:bg-[#066668]">Sign up</a>
+                    </div>
+                @else
+                    <a href="{{ route('user.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-[#087F82] bg-teal-50">Go to Dashboard</a>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                        @csrf
+                        <button type="submit" class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">Log out</button>
+                    </form>
+                @endguest
+            </div>
+        </div>
+    </header>
+
+    {{-- Interactive Search Modal (Alpine.js) --}}
+    <div x-show="searchOpen"
+         @keydown.escape.window="searchOpen = false"
+         class="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 md:p-20"
+         x-cloak>
+        <div x-show="searchOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             @click="searchOpen = false"></div>
+
+        <div x-show="searchOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="relative mx-auto max-w-xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden"
+             x-data="{ query: '' }">
+            <div class="flex items-center px-4 border-b border-gray-200">
+                <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                <input type="text"
+                       x-model="query"
+                       placeholder="Search subjects, topics (e.g. Percentages, Python, Profit & Loss)..."
+                       class="w-full border-0 py-4 pl-3 pr-4 text-[#243247] placeholder-gray-400 focus:outline-none focus:ring-0 text-sm">
+                <button @click="searchOpen = false" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded">ESC</button>
+            </div>
+
+            <div class="p-4 max-h-80 overflow-y-auto">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Popular Practice Topics</p>
+                <div class="space-y-1">
+                    <a href="{{ route('mcq.index', ['topic' => 'percentages']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Percentages</span>
+                        <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
+                    </a>
+                    <a href="{{ route('mcq.index', ['topic' => 'profit-and-loss']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Profit and Loss</span>
+                        <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
+                    </a>
+                    <a href="{{ route('mcq.index', ['topic' => 'number-series']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Number Series & Puzzles</span>
+                        <span class="text-xs text-gray-400">Logical Reasoning</span>
+                    </a>
+                    <a href="{{ route('mcq.index', ['topic' => 'python']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Python Programming</span>
+                        <span class="text-xs text-gray-400">Programming</span>
+                    </a>
+                    <a href="{{ route('mcq.index', ['topic' => 'time-and-work']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Time and Work</span>
+                        <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
+                    </a>
+                    <a href="{{ route('placement.index') }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                        <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">HR & Technical Interview Questions</span>
+                        <span class="text-xs text-[#087F82] font-semibold">Placement Prep</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- System Alert Messages --}}
+    @if(session('success'))
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+            <x-alert type="success">{{ session('success') }}</x-alert>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+            <x-alert type="error">{{ session('error') }}</x-alert>
+        </div>
+    @endif
+
+    {{-- Main Content --}}
+    <main class="flex-1">
+        {{ $slot }}
+    </main>
+
+    {{-- Footer matching client mockup (#153B70 background) --}}
+    <footer class="bg-[#153B70] text-white mt-20 border-t border-white/10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+                
+                {{-- Column 1: Brand & About --}}
+                <div class="lg:col-span-2">
+                    <a href="{{ url('/') }}" class="inline-block mb-4">
+                        <x-application-logo variant="light" size="lg" />
+                    </a>
+                    <p class="text-sm text-white/75 leading-relaxed max-w-sm mb-6">
+                        Practise Smart. Get Placement Ready. AptiMedha brings aptitude practice, technical learning, and career preparation together in one place.
+                    </p>
+                    <div class="flex items-center space-x-3 text-white/70">
+                        <a href="https://linkedin.com" target="_blank" rel="noopener" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#087F82] hover:text-white flex items-center justify-center transition-colors" title="LinkedIn">
+                            <i data-lucide="linkedin" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#087F82] hover:text-white flex items-center justify-center transition-colors" title="Twitter / X">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://github.com" target="_blank" rel="noopener" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#087F82] hover:text-white flex items-center justify-center transition-colors" title="GitHub">
+                            <i data-lucide="github" class="w-4 h-4"></i>
+                        </a>
+                        <a href="mailto:contact@aptimedha.com" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#087F82] hover:text-white flex items-center justify-center transition-colors" title="Email Us">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Column 2: Subjects & MCQs --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#087F82] mb-4">Practice Subjects</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('categories.show', 'arithmetic-aptitude') }}" class="text-white/70 hover:text-white transition-colors">Arithmetic Aptitude</a></li>
+                        <li><a href="{{ route('categories.show', 'data-interpretation') }}" class="text-white/70 hover:text-white transition-colors">Data Interpretation</a></li>
+                        <li><a href="{{ route('categories.show', 'logical-reasoning') }}" class="text-white/70 hover:text-white transition-colors">Logical Reasoning</a></li>
+                        <li><a href="{{ route('categories.show', 'verbal-ability') }}" class="text-white/70 hover:text-white transition-colors">Verbal Ability</a></li>
+                        <li><a href="{{ route('categories.show', 'english') }}" class="text-white/70 hover:text-white transition-colors">English Grammar</a></li>
+                        <li><a href="{{ route('categories.show', 'programming') }}" class="text-white/70 hover:text-white transition-colors">Programming (C, Java, Python)</a></li>
+                        <li><a href="{{ route('categories.show', 'engineering') }}" class="text-white/70 hover:text-white transition-colors">Engineering MCQs</a></li>
+                    </ul>
+                </div>
+
+                {{-- Column 3: Placement & Learning --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#087F82] mb-4">Placement Prep</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('placement.index') }}#hr-interviews" class="text-white/70 hover:text-white transition-colors">HR Interview Questions</a></li>
+                        <li><a href="{{ route('placement.index') }}#technical-interviews" class="text-white/70 hover:text-white transition-colors">Technical Interviews</a></li>
+                        <li><a href="{{ route('placement.index') }}#group-discussions" class="text-white/70 hover:text-white transition-colors">Group Discussions</a></li>
+                        <li><a href="{{ route('placement.index') }}#resume-guide" class="text-white/70 hover:text-white transition-colors">Resume Guide</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-white/70 hover:text-white transition-colors">Articles & Tips</a></li>
+                        <li><a href="{{ route('categories.index') }}" class="text-white/70 hover:text-white transition-colors">Explore All Categories</a></li>
+                    </ul>
+                </div>
+
+                {{-- Column 4: Company & Legal --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#087F82] mb-4">Information & Legal</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('about') }}" class="text-white/70 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="{{ route('contact') }}" class="text-white/70 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="{{ route('disclaimer') }}" class="text-white/70 hover:text-white transition-colors">Disclaimer</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-white/70 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="{{ route('copyright') }}" class="text-white/70 hover:text-white transition-colors">Copyright Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Bottom copyright line matching mockup --}}
+            <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-white/50 gap-4">
+                <p>&copy; {{ date('Y') }} AptiMedha.com. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <a href="{{ route('disclaimer') }}" class="hover:text-white transition-colors">Disclaimer</a>
+                    <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms</a>
+                    <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="{{ route('copyright') }}" class="hover:text-white transition-colors">Copyright</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {{-- Initialize Lucide Icons --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>
