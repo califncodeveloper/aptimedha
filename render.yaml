@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: aptimedha
+    env: docker
+    plan: free
+    region: oregon
+    branch: main
+    envVars:
+      - key: APP_NAME
+        value: AptiMedha
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_STORE
+        value: file
+      - key: DB_CONNECTION
+        value: sqlite
