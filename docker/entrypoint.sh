@@ -22,6 +22,8 @@ if [ ! -f /var/www/html/.env ]; then
 fi
 
 # 2. Inject safe standalone production defaults if not set by environment
+APP_HOST_URL="${RENDER_EXTERNAL_URL:-https://aptimedha.onrender.com}"
+sed -i "s|^APP_URL=.*|APP_URL=${APP_HOST_URL}|" /var/www/html/.env
 grep -q '^SESSION_DRIVER=' /var/www/html/.env && sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=cookie/' /var/www/html/.env || echo 'SESSION_DRIVER=cookie' >> /var/www/html/.env
 grep -q '^CACHE_STORE=' /var/www/html/.env && sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' /var/www/html/.env || echo 'CACHE_STORE=file' >> /var/www/html/.env
 grep -q '^QUEUE_CONNECTION=' /var/www/html/.env && sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' /var/www/html/.env || echo 'QUEUE_CONNECTION=sync' >> /var/www/html/.env
