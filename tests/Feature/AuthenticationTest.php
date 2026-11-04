@@ -4,9 +4,12 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Models\UserProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
@@ -360,10 +363,113 @@ class AuthenticationTest extends TestCase
         ->assertExitCode(1);
     }
 
-    public function test_google_oauth_pending_route(): void
+    public function test_google_oauth_redirect_when_unconfigured(): void
     {
+        Config::set('services.google.client_id', null);
+        Config::set('services.google.redirect', null);
+
         $response = $this->get('/auth/google');
         $response->assertRedirect(route('login'));
         $response->assertSessionHas('error');
+    }
+
+    public function test_google_oauth_redirect_to_google(): void
+    {
+        Config::set('services.google.client_id', 'mock-google-client-id');
+        Config::set('services.google.redirect', 'https://aptimedha.onrender.com/auth/google/callback');
+
+        $response = $this->get('/auth/google');
+        $response->assertStatus(302);
+
+        $targetUrl = $response->headers->get('Location');
+        $this->assertStringStartsWith('https://accounts.google.com/o/oauth2/v2/auth', $targetUrl);
+        $this->assertStringContainsString('client_id=mock-google-client-id', $targetUrl);
+        $this->assertStringContainsString('response_type=code', $targetUrl);
+        $this->assertNotNull(session('google_oauth_state'));
+    }
+
+    public function test_google_oauth_callback_fails_with_invalid_state(): void
+    {
+        $response = $this->withSession(['google_oauth_state' => 'valid-state'])
+            ->get('/auth/google/callback?state=tampered-state&code=any-code');
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('error', 'Invalid or expired OAuth state. Please try signing in again.');
+        $this->assertGuest();
+    }
+
+    public function test_google_oauth_callback_creates_new_user_and_authenticates(): void
+    {
+        Config::set('services.google.client_id', 'mock-client-id');
+        Config::set('services.google.client_secret', 'mock-client-secret');
+        Config::set('services.google.redirect', 'https://aptimedha.onrender.com/auth/google/callback');
+
+        Http::fake([
+            'https://oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'mock-google-access-token',
+                'expires_in' => 3600,
+            ], 200),
+            'https://www.googleapis.com/oauth2/v3/userinfo' => Http::response([
+                'sub' => 'google-user-id-9988',
+                'name' => 'Kavya Patel',
+                'email' => 'kavya.patel@gmail.com',
+                'picture' => 'https://lh3.googleusercontent.com/avatar/kavya.png',
+            ], 200),
+        ]);
+
+        $response = $this->withSession(['google_oauth_state' => 'csrf-secret-state'])
+            ->get('/auth/google/callback?state=csrf-secret-state&code=valid-auth-code');
+
+        $response->assertRedirect(route('user.dashboard'));
+        $this->assertAuthenticated();
+
+        $user = User::where('email', 'kavya.patel@gmail.com')->first();
+        $this->assertNotNull($user);
+        $this->assertEquals('Kavya Patel', $user->name);
+        $this->assertEquals(UserRole::User, $user->role);
+
+        $this->assertDatabaseHas('user_providers', [
+            'user_id' => $user->id,
+            'provider' => 'google',
+            'provider_id' => 'google-user-id-9988',
+            'avatar' => 'https://lh3.googleusercontent.com/avatar/kavya.png',
+        ]);
+    }
+
+    public function test_google_oauth_callback_links_existing_user(): void
+    {
+        Config::set('services.google.client_id', 'mock-client-id');
+        Config::set('services.google.client_secret', 'mock-client-secret');
+        Config::set('services.google.redirect', 'https://aptimedha.onrender.com/auth/google/callback');
+
+        $existingUser = User::factory()->create([
+            'name' => 'Existing Student',
+            'username' => 'existing_student',
+            'email' => 'existing@gmail.com',
+        ]);
+
+        Http::fake([
+            'https://oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'mock-token',
+            ], 200),
+            'https://www.googleapis.com/oauth2/v3/userinfo' => Http::response([
+                'sub' => 'google-id-12345',
+                'name' => 'Existing Student',
+                'email' => 'existing@gmail.com',
+                'picture' => 'https://avatar.google.com/pic.jpg',
+            ], 200),
+        ]);
+
+        $response = $this->withSession(['google_oauth_state' => 'random-state'])
+            ->get('/auth/google/callback?state=random-state&code=code123');
+
+        $response->assertRedirect(route('user.dashboard'));
+        $this->assertAuthenticatedAs($existingUser);
+
+        $this->assertDatabaseHas('user_providers', [
+            'user_id' => $existingUser->id,
+            'provider' => 'google',
+            'provider_id' => 'google-id-12345',
+        ]);
     }
 }

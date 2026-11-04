@@ -97,4 +97,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Blog::class, 'author_id');
     }
+
+    /**
+     * User's linked OAuth / social identity providers.
+     */
+    public function providers(): HasMany
+    {
+        return $this->hasMany(UserProvider::class);
+    }
 }
