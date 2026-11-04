@@ -8,10 +8,12 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'username', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -41,10 +43,58 @@ class User extends Authenticatable
     }
 
     /**
+     * Accessor for isAdmin attribute.
+     */
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    /**
      * Check if the user has the given role.
      */
     public function hasRole(UserRole $role): bool
     {
         return $this->role === $role;
+    }
+
+    /**
+     * User's bookmarks.
+     */
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    /**
+     * Bookmarked questions relation.
+     */
+    public function bookmarkedQuestions(): BelongsToMany
+    {
+        return $this->belongsToMany(Question::class, 'bookmarks')->withPivot('created_at');
+    }
+
+    /**
+     * User's discussions.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(Discussion::class);
+    }
+
+    /**
+     * User's submitted question reports.
+     */
+    public function reports(): HasMany
+    {
+        return $this->hasMany(QuestionReport::class);
+    }
+
+    /**
+     * User's authored blog articles.
+     */
+    public function blogs(): HasMany
+    {
+        return $this->hasMany(Blog::class, 'author_id');
     }
 }

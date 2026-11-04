@@ -1,27 +1,28 @@
 <x-layouts.app>
     <x-slot:title>Placement Preparation Roadmap & Guides - AptiMedha</x-slot:title>
 
-    {{-- Hero Section --}}
-    <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-14 sm:py-18">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    {{-- Hero Section (Premium Gradient + White Grid Overlay) --}}
+    <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-16 sm:py-20 relative overflow-hidden">
+        <div data-motion-parallax data-motion-parallax-speed="0.1" class="absolute inset-0 bg-grid-white opacity-15 pointer-events-none"></div>
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="max-w-3xl">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/20 mb-4">
-                    <i data-lucide="graduation-cap" class="w-4 h-4 mr-1.5"></i> Campus to Corporate Complete Guide
+                <span data-motion="fade-down" class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/20 mb-4 shadow-2xs backdrop-blur-md">
+                    <i data-lucide="graduation-cap" class="w-4 h-4 mr-2"></i> Campus to Corporate Complete Guide
                 </span>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                <h1 data-motion-text="words" class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
                     Comprehensive Placement Preparation
                 </h1>
-                <p class="mt-4 text-base sm:text-lg text-white/80 leading-relaxed">
+                <p data-motion="fade-up" data-motion-delay="0.2" class="mt-4 text-base sm:text-lg text-white/85 leading-relaxed">
                     From resume building and aptitude rounds to technical interviews, group discussions, and HR questions — everything you need to crack your dream placement.
                 </p>
-                <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="#placement-roadmap" class="px-5 py-2.5 rounded-xl bg-white text-[#153B70] font-bold text-sm shadow-md hover:bg-gray-100 transition-colors">
-                        View 4-Stage Roadmap
+                <div data-motion="fade-up" data-motion-delay="0.3" class="mt-8 flex flex-wrap gap-3.5">
+                    <a href="#placement-roadmap" data-motion-spring class="px-6 py-3 rounded-xl bg-white text-[#153B70] font-bold text-sm shadow-md hover:bg-gray-100 transition-all hover:-translate-y-0.5">
+                        View 4-Stage Roadmap &rarr;
                     </a>
-                    <a href="#hr-interviews" class="px-5 py-2.5 rounded-xl bg-[#087F82] text-white font-bold text-sm border border-white/20 hover:bg-[#066668] transition-colors">
+                    <a href="#hr-interviews" data-motion-spring class="px-6 py-3 rounded-xl bg-[#087F82] text-white font-bold text-sm border border-white/20 hover:bg-[#066668] transition-all hover:-translate-y-0.5">
                         HR Interview Questions
                     </a>
-                    <a href="#resume-guide" class="px-5 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition-colors">
+                    <a href="#resume-guide" data-motion-spring class="px-6 py-3 rounded-xl bg-white/15 text-white font-bold text-sm hover:bg-white/25 transition-all">
                         Resume Guide
                     </a>
                 </div>
@@ -31,18 +32,20 @@
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 space-y-16">
         
-        {{-- Section 1: 4-Stage Placement Roadmap --}}
+        {{-- Section 1: 4-Stage Placement Roadmap with Scroll Parallax Card Effect --}}
         <section id="placement-roadmap" class="scroll-mt-24">
-            <div class="mb-8">
+            <div data-motion="fade-up" class="mb-8">
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#153B70]">4-Stage Placement Preparation Roadmap</h2>
                 <p class="text-sm sm:text-base text-gray-600 mt-1">A structured step-by-step path from your pre-final year to corporate onboarding.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div data-motion-stagger data-motion-stagger-delay="0.08" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                {{-- Stage 1 --}}
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#153B70] font-black text-lg flex items-center justify-center mb-4">
+                {{-- Stage 1 with Parallax Card Effect --}}
+                <div data-motion-item
+                     data-motion-parallax-card
+                     class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#153B70] font-black text-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         01
                     </div>
                     <h3 class="text-lg font-bold text-[#153B70] mb-2">Profile & Resume</h3>
@@ -56,9 +59,11 @@
                     </ul>
                 </div>
 
-                {{-- Stage 2 --}}
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 rounded-xl bg-teal-50 text-[#087F82] font-black text-lg flex items-center justify-center mb-4">
+                {{-- Stage 2 with Parallax Card Effect --}}
+                <div data-motion-item
+                     data-motion-parallax-card
+                     class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 rounded-xl bg-teal-50 text-[#087F82] font-black text-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         02
                     </div>
                     <h3 class="text-lg font-bold text-[#153B70] mb-2">Aptitude & Online Test</h3>
@@ -72,9 +77,11 @@
                     </ul>
                 </div>
 
-                {{-- Stage 3 --}}
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 font-black text-lg flex items-center justify-center mb-4">
+                {{-- Stage 3 with Parallax Card Effect --}}
+                <div data-motion-item
+                     data-motion-parallax-card
+                     class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 font-black text-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         03
                     </div>
                     <h3 class="text-lg font-bold text-[#153B70] mb-2">Technical & Coding</h3>
@@ -88,9 +95,11 @@
                     </ul>
                 </div>
 
-                {{-- Stage 4 --}}
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 font-black text-lg flex items-center justify-center mb-4">
+                {{-- Stage 4 with Parallax Card Effect --}}
+                <div data-motion-item
+                     data-motion-parallax-card
+                     class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 font-black text-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         04
                     </div>
                     <h3 class="text-lg font-bold text-[#153B70] mb-2">GD & HR Round</h3>
@@ -108,7 +117,7 @@
         </section>
 
         {{-- Section 2: HR Interview Questions & Model Answers --}}
-        <section id="hr-interviews" class="scroll-mt-24 bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-10" x-data="{ openQ: 1 }">
+        <section data-motion="fade-up" id="hr-interviews" class="scroll-mt-24 bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-10" x-data="{ openQ: 1 }">
             <div class="max-w-2xl mb-8">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#087F82]">Behavioral Preparation</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#153B70] mt-1">Frequently Asked HR Interview Questions</h2>
@@ -118,7 +127,6 @@
             </div>
 
             <div class="space-y-4">
-                
                 {{-- Question 1 --}}
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button @click="openQ = (openQ === 1 ? null : 1)" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-gray-50/70 hover:bg-gray-100/70 transition-colors">
@@ -163,12 +171,11 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
         {{-- Section 3: Resume Preparation Illustrated Guide --}}
-        <section id="resume-guide" class="scroll-mt-24">
+        <section data-motion="scale-up" id="resume-guide" class="scroll-mt-24">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-r from-teal-50 to-blue-50/50 rounded-2xl p-8 sm:p-12 border border-teal-100">
                 <div class="lg:col-span-7 space-y-4">
                     <span class="text-xs font-bold uppercase tracking-wider text-[#087F82]">Illustrated Guide</span>
@@ -177,10 +184,10 @@
                         A modern recruiter spends fewer than 10 seconds on a preliminary resume screen. Learn how to format education, project bullet points using the STAR method (Situation, Task, Action, Result), technical skill clusters, and internship achievements.
                     </p>
                     <div class="pt-2 flex flex-wrap gap-3">
-                        <a href="{{ route('contact') }}?subject=Resume+Template+Request" class="inline-flex items-center px-5 py-2.5 bg-[#087F82] text-white font-bold text-xs rounded-xl hover:bg-[#066668] transition-colors shadow-xs">
+                        <a href="{{ route('contact') }}?subject=Resume+Template+Request" data-motion-spring class="inline-flex items-center px-5 py-2.5 bg-[#087F82] text-white font-bold text-xs rounded-xl hover:bg-[#066668] transition-colors shadow-xs">
                             <i data-lucide="download" class="w-4 h-4 mr-1.5"></i> Download Clean Resume DOCX Template
                         </a>
-                        <a href="{{ route('blog.show', 'how-to-prepare-for-aptitude-tests-in-placements') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-[#153B70] border border-gray-300 font-bold text-xs rounded-xl hover:bg-gray-50 transition-colors">
+                        <a href="{{ route('blog.show', 'how-to-prepare-for-aptitude-tests-in-placements') }}" data-motion-spring class="inline-flex items-center px-5 py-2.5 bg-white text-[#153B70] border border-gray-300 font-bold text-xs rounded-xl hover:bg-gray-50 transition-colors">
                             Read Guide Article
                         </a>
                     </div>
@@ -213,7 +220,7 @@
         </section>
 
         {{-- Section 4: Top Company Practice Sets --}}
-        <section class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-10">
+        <section data-motion="fade-up" class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-10">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-[#087F82]">Recruiter Patterns</span>
@@ -225,12 +232,12 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div data-motion-stagger data-motion-stagger-delay="0.05" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 @php
                     $companies = ['TCS NQT', 'Infosys', 'Wipro Elite', 'Accenture', 'Cognizant', 'Capgemini'];
                 @endphp
                 @foreach($companies as $company)
-                    <a href="{{ route('mcq.index') }}" class="p-4 rounded-xl border border-gray-200 text-center hover:border-[#087F82] hover:bg-teal-50/20 group transition-all">
+                    <a href="{{ route('mcq.index') }}" data-motion-item class="p-4 rounded-xl border border-gray-200 text-center hover:border-[#087F82] hover:bg-teal-50/20 group transition-all">
                         <div class="w-10 h-10 rounded-lg bg-gray-50 group-hover:bg-[#153B70] text-[#153B70] group-hover:text-white flex items-center justify-center mx-auto mb-2 transition-colors">
                             <i data-lucide="building" class="w-5 h-5"></i>
                         </div>

@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 /**
@@ -24,13 +30,28 @@ class RegisterController
      */
     public function register(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => ['required', 'string', 'max:60', 'alpha_dash', 'unique:users,username'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', Password::min(8), 'confirmed'],
+            'terms' => ['sometimes', 'accepted'],
         ]);
 
-        // TODO: Implement user creation and login logic.
+        // Explicitly set the role to User to prevent privilege escalation
+        $user = User::create([
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => UserRole::User,
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        $request->session()->regenerate();
 
         return redirect()->route('user.dashboard');
     }

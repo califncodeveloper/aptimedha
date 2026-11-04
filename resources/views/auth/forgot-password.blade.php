@@ -1,25 +1,38 @@
 <x-layouts.app>
     <x-slot:title>Forgot Password - AptiMedha</x-slot:title>
 
-    <div class="py-12 sm:py-16">
-        <div class="mx-auto max-w-md px-4 sm:px-6">
-            <x-card title="Reset Your Password">
-                <p class="text-sm text-gray-600 mb-6">
-                    Enter your email address and we'll send you a password reset link.
-                </p>
+    <div class="py-14 sm:py-20 bg-grid-pattern relative flex items-center justify-center">
+        <div class="mx-auto w-full max-w-md px-4 sm:px-6">
+            <div class="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-6 sm:p-8">
+                
+                {{-- Header with Logo --}}
+                <div class="text-center mb-6">
+                    <a href="{{ url('/') }}" class="inline-block mb-3">
+                        <x-application-logo size="lg" />
+                    </a>
+                    <h2 class="text-2xl font-extrabold text-[#153B70]">Reset Password</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Enter your registered email and we'll send a password reset link.</p>
+                </div>
 
-                <form action="{{ route('password.email') }}" method="POST" class="space-y-5">
+                <form action="{{ route('password.email') }}" method="POST" class="space-y-4">
                     @csrf
 
                     @if (session('status'))
-                        <x-alert type="success">
-                            {{ session('status') }}
-                        </x-alert>
+                        <div class="mb-4">
+                            <x-alert type="success">
+                                <p>{{ session('status') }}</p>
+                                @if(config('mail.default') === 'log')
+                                    <div class="mt-2.5 pt-2.5 border-t border-green-200 text-xs text-green-900 leading-relaxed font-sans">
+                                        <span class="font-bold">Development Mode Notice:</span> Mail driver is configured to <code class="bg-green-100 px-1 py-0.5 rounded text-green-800">log</code>. Password reset links are written to <code class="bg-green-100 px-1 py-0.5 rounded text-green-800">storage/logs/laravel.log</code>.
+                                    </div>
+                                @endif
+                            </x-alert>
+                        </div>
                     @endif
 
                     @if (isset($errors) && $errors->any())
                         <x-alert type="error">
-                            <ul class="list-disc list-inside">
+                            <ul class="list-disc list-inside text-xs">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -27,25 +40,30 @@
                         </x-alert>
                     @endif
 
-                    <x-input
-                        label="Email Address"
-                        name="email"
-                        type="email"
-                        value="{{ old('email') }}"
-                        required
-                        placeholder="you@example.com"
-                    />
+                    <div>
+                        <label for="email" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Registered Email Address
+                        </label>
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               value="{{ old('email') }}"
+                               required
+                               placeholder="you@example.com"
+                               class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/20 focus:outline-none transition-colors">
+                    </div>
 
-                    <x-button type="submit" variant="primary" class="w-full">
+                    <button type="submit"
+                            class="w-full py-3 px-4 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white font-bold text-sm shadow-md transition-colors cursor-pointer mt-2">
                         Send Password Reset Link
-                    </x-button>
+                    </button>
 
-                    <div class="text-center text-sm text-gray-600 pt-2 border-t border-gray-100">
+                    <div class="text-center text-xs text-gray-500 pt-4 border-t border-gray-100">
                         Remember your password?
-                        <a href="{{ route('login') }}" class="font-medium text-[#087F82] hover:underline">Back to login</a>
+                        <a href="{{ route('login') }}" class="font-bold text-[#153B70] hover:underline">Back to sign in</a>
                     </div>
                 </form>
-            </x-card>
+            </div>
         </div>
     </div>
 </x-layouts.app>

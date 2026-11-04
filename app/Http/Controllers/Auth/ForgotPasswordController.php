@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
@@ -28,8 +30,17 @@ class ForgotPasswordController
             'email' => ['required', 'email'],
         ]);
 
-        // TODO: Implement password reset link sending logic.
+        $status = Password::broker()->sendResetLink(
+            $request->only('email')
+        );
 
-        return back()->with('status', 'Password reset link sent.');
+        if ($status === Password::RESET_THROTTLED) {
+            throw ValidationException::withMessages([
+                'email' => [trans($status)],
+            ]);
+        }
+
+        // Safe feedback without revealing whether the email is registered
+        return back()->with('status', trans(Password::RESET_LINK_SENT));
     }
 }

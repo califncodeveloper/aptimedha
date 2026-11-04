@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Admin' }} - AptiMedha Admin</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/aptimedha-logo.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -47,8 +48,8 @@
         {{-- Sidebar Header --}}
         <div class="flex h-16 items-center justify-between px-4 border-b border-white/10">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2" x-show="sidebarOpen || mobileSidebar">
-                <span class="text-lg font-bold text-white">Apti<span class="text-[#087F82]">Medha</span></span>
-                <span class="text-xs font-medium text-white/50 bg-white/10 px-2 py-0.5 rounded">Admin</span>
+                <x-application-logo variant="light" size="sm" />
+                <span class="text-xs font-medium text-white/70 bg-white/10 px-2 py-0.5 rounded">Admin</span>
             </a>
             <a href="{{ route('admin.dashboard') }}" x-show="!sidebarOpen && !mobileSidebar" class="mx-auto" x-cloak>
                 <span class="text-lg font-bold text-white">A</span>
@@ -69,10 +70,11 @@
                     ['label' => 'Subjects', 'icon' => 'book-open', 'route' => 'admin.subjects.index', 'pattern' => 'admin.subjects*'],
                     ['label' => 'Topics', 'icon' => 'tag', 'route' => 'admin.topics.index', 'pattern' => 'admin.topics*'],
                     ['label' => 'Import MCQs', 'icon' => 'upload', 'route' => 'admin.mcqs.import.form', 'pattern' => 'admin.mcqs.import*'],
-                    ['label' => 'Blog Management', 'icon' => 'file-text', 'route' => 'admin.blogs.index', 'pattern' => 'admin.blogs*'],
+                    ['label' => 'Blog Management', 'icon' => 'file-text', 'route' => 'admin.blogs.index', 'pattern' => 'admin.blog*'],
                     ['label' => 'User Management', 'icon' => 'users', 'route' => 'admin.users.index', 'pattern' => 'admin.users*'],
                     ['label' => 'Discussions', 'icon' => 'message-square', 'route' => 'admin.discussions.index', 'pattern' => 'admin.discussions*'],
                     ['label' => 'Reports', 'icon' => 'flag', 'route' => 'admin.reports.index', 'pattern' => 'admin.reports*'],
+                    ['label' => 'Contact Messages', 'icon' => 'mail', 'route' => 'admin.contacts.index', 'pattern' => 'admin.contacts*'],
                     ['label' => 'Pages', 'icon' => 'file', 'route' => 'admin.pages.index', 'pattern' => 'admin.pages*'],
                     ['label' => 'Settings', 'icon' => 'settings', 'route' => 'admin.settings.index', 'pattern' => 'admin.settings*'],
                 ];

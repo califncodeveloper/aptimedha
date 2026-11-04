@@ -1,50 +1,128 @@
 <x-layouts.admin>
     <x-slot:title>Edit Topic - AptiMedha Admin</x-slot:title>
-    <x-slot:header>Edit Topic: Percentages</x-slot:header>
+    <x-slot:header>Edit Topic: {{ $topic->name }}</x-slot:header>
 
-    <div class="space-y-6 max-w-2xl">
+    <div class="space-y-6 max-w-2xl" x-data="{
+        selectedCategory: '{{ old('category_id', $topic->category_id) }}',
+        selectedSubject: '{{ old('subject_id', $topic->subject_id) }}',
+        allSubjects: {{ $subjects->toJson() }},
+        get filteredSubjects() {
+            return this.allSubjects.filter(s => s.category_id == this.selectedCategory);
+        }
+    }">
         <div class="flex items-center justify-between">
             <a href="{{ route('admin.topics.index') }}" class="text-xs font-bold text-[#153B70] hover:underline flex items-center">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Topics
             </a>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Published</span>
+            @if($topic->is_active)
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Active</span>
+            @else
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600">Inactive</span>
+            @endif
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-8">
-            <form action="{{ route('admin.topics.update', 1) }}" method="POST" class="space-y-5">
+            <form action="{{ route('admin.topics.update', $topic->id) }}" method="POST" class="space-y-5">
                 @csrf
                 @method('PUT')
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Parent Subject <span class="text-rose-500">*</span></label>
-                    <select name="subject_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
-                        <option value="1" selected>Commercial Arithmetic (Arithmetic Aptitude)</option>
-                        <option value="2">Number & Algebra (Arithmetic Aptitude)</option>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Parent Category <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="category_id"
+                            x-model="selectedCategory"
+                            required
+                            class="w-full px-3.5 py-2.5 rounded-xl border @error('category_id') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
                     </select>
+                    @error('category_id')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Leaf Topic Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" value="Percentages" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Parent Subject / Branch <span class="text-gray-400 font-normal lowercase">(optional for direct category topics)</span>
+                    </label>
+                    <select name="subject_id"
+                            x-model="selectedSubject"
+                            class="w-full px-3.5 py-2.5 rounded-xl border @error('subject_id') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                        <option value="">-- Direct Category Topic (No Intermediate Subject) --</option>
+                        <template x-for="subj in filteredSubjects" :key="subj.id">
+                            <option :value="subj.id" x-text="subj.name" :selected="subj.id == selectedSubject"></option>
+                        </template>
+                    </select>
+                    @error('subject_id')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">URL Slug</label>
-                    <input type="text" name="slug" value="percentages" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none font-mono text-xs">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Leaf Topic Name <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text"
+                           name="name"
+                           value="{{ old('name', $topic->name) }}"
+                           required
+                           class="w-full px-3.5 py-2.5 rounded-xl border @error('name') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                    @error('name')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        URL Slug
+                    </label>
+                    <input type="text"
+                           name="slug"
+                           value="{{ old('slug', $topic->slug) }}"
+                           class="w-full px-3.5 py-2.5 rounded-xl border @error('slug') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none font-mono text-xs">
+                    @error('slug')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Display Order</label>
-                        <input type="number" name="display_order" value="1" min="1" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Display Order
+                        </label>
+                        <input type="number"
+                               name="display_order"
+                               value="{{ old('display_order', $topic->display_order) }}"
+                               min="0"
+                               class="w-full px-3.5 py-2.5 rounded-xl border @error('display_order') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                        @error('display_order')
+                            <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Status</label>
-                        <select name="status" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
-                            <option value="published" selected>Published</option>
-                            <option value="draft">Draft</option>
-                        </select>
+                    <div class="flex items-center pt-6">
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox"
+                                   name="is_active"
+                                   value="1"
+                                   {{ old('is_active', $topic->is_active) ? 'checked' : '' }}
+                                   class="w-4 h-4 rounded text-[#087F82] focus:ring-[#087F82]">
+                            <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Active</span>
+                        </label>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Short Description
+                    </label>
+                    <textarea name="description"
+                              rows="3"
+                              class="w-full p-3 rounded-xl border @error('description') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">{{ old('description', $topic->description) }}</textarea>
+                    @error('description')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">

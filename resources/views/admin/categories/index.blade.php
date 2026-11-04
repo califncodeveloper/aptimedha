@@ -2,27 +2,44 @@
     <x-slot:title>Category Management - AptiMedha Admin</x-slot:title>
     <x-slot:header>Category Taxonomy</x-slot:header>
 
-    <div class="space-y-6" x-data="{
-        categories: [
-            { id: 1, name: 'Arithmetic Aptitude', slug: 'arithmetic-aptitude', icon: 'calculator', subjectsCount: 4, questionsCount: 1250, order: 1, status: 'Active' },
-            { id: 2, name: 'Data Interpretation', slug: 'data-interpretation', icon: 'bar-chart-2', subjectsCount: 2, questionsCount: 840, order: 2, status: 'Active' },
-            { id: 3, name: 'Logical Reasoning', slug: 'logical-reasoning', icon: 'puzzle', subjectsCount: 3, questionsCount: 1120, order: 3, status: 'Active' },
-            { id: 4, name: 'Verbal Ability', slug: 'verbal-ability', icon: 'message-square', subjectsCount: 3, questionsCount: 950, order: 4, status: 'Active' },
-            { id: 5, name: 'English', slug: 'english', icon: 'file-text', subjectsCount: 1, questionsCount: 680, order: 5, status: 'Active' },
-            { id: 6, name: 'General Knowledge', slug: 'general-knowledge', icon: 'globe', subjectsCount: 2, questionsCount: 1400, order: 6, status: 'Active' },
-            { id: 7, name: 'Programming', slug: 'programming', icon: 'code', subjectsCount: 2, questionsCount: 1600, order: 7, status: 'Active' },
-            { id: 8, name: 'Engineering', slug: 'engineering', icon: 'cpu', subjectsCount: 1, questionsCount: 1100, order: 8, status: 'Active' }
-        ]
-    }">
+    <div class="space-y-6">
+        @if(session('success'))
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between">
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold flex items-center justify-between">
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h2 class="text-xl font-bold text-[#153B70]">Categories (<span x-text="categories.length"></span>)</h2>
-                <p class="text-xs text-gray-500">Top-level primary learning areas displayed on homepage and navigation.</p>
+                <h2 class="text-xl font-bold text-[#153B70]">Categories ({{ $categories->total() }})</h2>
+                <p class="text-xs text-gray-500">Top-level primary learning tracks displayed on homepage and public navigation.</p>
             </div>
 
             <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center px-4 py-2 text-xs font-bold rounded-xl text-white bg-[#153B70] hover:bg-[#0e2a52] transition-colors shadow-xs">
                 <i data-lucide="plus" class="w-4 h-4 mr-1.5"></i> Add New Category
             </a>
+        </div>
+
+        {{-- Search Toolbar --}}
+        <div class="bg-white p-4 rounded-2xl border border-gray-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <form action="{{ route('admin.categories.index') }}" method="GET" class="relative w-full max-w-md">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-2.5"></i>
+                <input type="text"
+                       name="search"
+                       value="{{ $search ?? '' }}"
+                       placeholder="Search category name or slug..."
+                       class="w-full pl-9 pr-20 py-2 border border-gray-200 rounded-xl text-xs sm:text-sm focus:border-[#087F82] focus:outline-none">
+                @if(!empty($search))
+                    <a href="{{ route('admin.categories.index') }}" class="absolute right-12 top-2 text-xs text-gray-400 hover:text-gray-600">Clear</a>
+                @endif
+                <button type="submit" class="absolute right-2 top-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Filter</button>
+            </form>
         </div>
 
         {{-- Categories Table --}}
@@ -35,44 +52,69 @@
                             <th class="px-6 py-3.5">Category Name</th>
                             <th class="px-6 py-3.5">URL Slug</th>
                             <th class="px-6 py-3.5">Subjects</th>
-                            <th class="px-6 py-3.5">Questions</th>
+                            <th class="px-6 py-3.5">Topics</th>
+                            <th class="px-6 py-3.5">MCQs</th>
                             <th class="px-6 py-3.5">Status</th>
                             <th class="px-6 py-3.5 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <template x-for="cat in categories" :key="cat.id">
+                        @forelse($categories as $cat)
                             <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4 font-bold text-gray-400" x-text="cat.order"></td>
+                                <td class="px-6 py-4 font-bold text-gray-400">{{ $cat->display_order }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-lg bg-teal-50 text-[#087F82] flex items-center justify-center font-bold">
-                                            <i data-lucide="folder" class="w-4 h-4"></i>
+                                            <i data-lucide="{{ $cat->icon ?: 'folder' }}" class="w-4 h-4"></i>
                                         </div>
-                                        <span class="font-bold text-[#243247]" x-text="cat.name"></span>
+                                        <span class="font-bold text-[#243247]">{{ $cat->name }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 font-mono text-xs text-gray-500" x-text="cat.slug"></td>
-                                <td class="px-6 py-4 font-semibold text-gray-700" x-text="cat.subjectsCount + ' Subjects'"></td>
-                                <td class="px-6 py-4 font-bold text-[#087F82]" x-text="cat.questionsCount.toLocaleString() + ' MCQs'"></td>
+                                <td class="px-6 py-4 font-mono text-xs text-gray-500">{{ $cat->slug }}</td>
+                                <td class="px-6 py-4 font-semibold text-gray-700">{{ $cat->subjects_count }} Subjects</td>
+                                <td class="px-6 py-4 font-semibold text-gray-700">{{ $cat->topics_count }} Topics</td>
+                                <td class="px-6 py-4 font-bold text-[#087F82]">{{ number_format($cat->questions_count) }} MCQs</td>
                                 <td class="px-6 py-4">
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800" x-text="cat.status"></span>
+                                    @if($cat->is_active)
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Active</span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Inactive</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a :href="'{{ url('admin/categories') }}/' + cat.id + '/edit'" class="p-1.5 text-gray-500 hover:text-[#087F82] rounded-lg hover:bg-teal-50 transition-colors" title="Edit Category">
+                                        <a href="{{ route('admin.categories.edit', $cat->id) }}" class="p-1.5 text-gray-500 hover:text-[#087F82] rounded-lg hover:bg-teal-50 transition-colors" title="Edit Category">
                                             <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
-                                        <a :href="'{{ url('categories') }}/' + cat.slug" target="_blank" class="p-1.5 text-gray-500 hover:text-[#153B70] rounded-lg hover:bg-blue-50 transition-colors" title="View Public Page">
+                                        <a href="{{ route('categories.show', $cat->slug) }}" target="_blank" class="p-1.5 text-gray-500 hover:text-[#153B70] rounded-lg hover:bg-blue-50 transition-colors" title="View Public Page">
                                             <i data-lucide="external-link" class="w-4 h-4"></i>
                                         </a>
+                                        <form action="{{ route('admin.categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete category &quot;{{ $cat->name }}&quot;? Deletion will be rejected if child subjects or topics exist.');" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Delete Category">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
-                        </template>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-6 py-8 text-center text-gray-400">
+                                    No categories found.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
+
+            @if($categories->hasPages())
+                <div class="px-6 py-4 border-t border-gray-100">
+                    {{ $categories->links() }}
+                </div>
+            @endif
         </div>
     </div>
 </x-layouts.admin>

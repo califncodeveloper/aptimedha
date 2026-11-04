@@ -31,9 +31,11 @@ use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\McqImportController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DiscussionController as AdminDiscussionController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\SettingController;
 
@@ -85,6 +87,9 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+    Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
@@ -102,10 +107,13 @@ Route::middleware('auth')->prefix('dashboard')->name('user.')->group(function ()
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks');
+    Route::post('/bookmarks/toggle/{question?}', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
     Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
 
     Route::get('/discussions', [UserDiscussionController::class, 'index'])->name('discussions');
     Route::post('/discussions', [UserDiscussionController::class, 'store'])->name('discussions.store');
+    Route::put('/discussions/{discussion}', [UserDiscussionController::class, 'update'])->name('discussions.update');
+    Route::delete('/discussions/{discussion}', [UserDiscussionController::class, 'destroy'])->name('discussions.destroy');
 
     Route::get('/reported-questions', [UserReportController::class, 'index'])->name('reports');
     Route::post('/reported-questions', [UserReportController::class, 'store'])->name('reports.store');
@@ -120,23 +128,38 @@ Route::middleware('auth')->prefix('dashboard')->name('user.')->group(function ()
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
 
+    Route::patch('mcqs/{mcq}/toggle-status', [AdminMcqController::class, 'toggleStatus'])->name('mcqs.toggle-status');
     Route::resource('mcqs', AdminMcqController::class)->except(['show']);
     Route::get('mcqs-import', [McqImportController::class, 'showForm'])->name('mcqs.import.form');
     Route::post('mcqs-import', [McqImportController::class, 'import'])->name('mcqs.import');
+    Route::post('mcqs-import/preview', [McqImportController::class, 'preview'])->name('mcqs.import.preview');
+    Route::post('mcqs-import/confirm', [McqImportController::class, 'confirm'])->name('mcqs.import.confirm');
+    Route::post('mcqs-import/cancel', [McqImportController::class, 'cancel'])->name('mcqs.import.cancel');
+    Route::get('mcqs-import/export-errors/{batch}', [McqImportController::class, 'exportErrors'])->name('mcqs.import.export-errors');
+    Route::get('mcqs-import/template', [McqImportController::class, 'downloadTemplate'])->name('mcqs.import.template');
 
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
     Route::resource('subjects', SubjectController::class)->except(['show']);
     Route::resource('topics', TopicController::class)->except(['show']);
+    Route::patch('blogs/{blog}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
+    Route::get('blogs/{blog}/preview', [AdminBlogController::class, 'preview'])->name('blogs.preview');
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
+    Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
 
     Route::resource('users', UserController::class)->except(['create', 'store']);
 
     Route::get('discussions', [AdminDiscussionController::class, 'index'])->name('discussions.index');
+    Route::patch('discussions/{discussion}/status', [AdminDiscussionController::class, 'updateStatus'])->name('discussions.status');
     Route::delete('discussions/{discussion}', [AdminDiscussionController::class, 'destroy'])->name('discussions.destroy');
 
     Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
     Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
     Route::put('reports/{report}', [AdminReportController::class, 'update'])->name('reports.update');
+
+    Route::get('contacts', [AdminContactController::class, 'index'])->name('contacts.index');
+    Route::get('contacts/{contact}', [AdminContactController::class, 'show'])->name('contacts.show');
+    Route::patch('contacts/{contact}/read', [AdminContactController::class, 'markRead'])->name('contacts.mark-read');
+    Route::delete('contacts/{contact}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
 
     Route::get('pages', [AdminPageController::class, 'index'])->name('pages.index');
     Route::get('pages/{page}/edit', [AdminPageController::class, 'edit'])->name('pages.edit');

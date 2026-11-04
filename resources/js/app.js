@@ -2,14 +2,16 @@
  * AptiMedha - MCQ Practice & Placement Preparation Platform
  *
  * Main JavaScript entry point.
- * Alpine.js and Lucide Icons are loaded via CDN in layouts.
+ * Powered by Vite, Tailwind CSS 4, Alpine.js, and Framer Motion.
  */
 
-// Import CSS
 import '../css/app.css';
+import { initMotion } from './animations';
 
-// Flash message auto-dismiss
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Framer Motion animation engine
+    initMotion();
+
     // Auto-dismiss flash messages after 5 seconds
     const flashMessages = document.querySelectorAll('[data-auto-dismiss]');
     flashMessages.forEach((el) => {

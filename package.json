@@ -15,5 +15,8 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "motion": "^14.9.1"
     }
 }

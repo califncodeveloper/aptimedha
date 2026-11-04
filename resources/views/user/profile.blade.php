@@ -43,7 +43,7 @@
                         <input type="text"
                                name="name"
                                id="name"
-                               value="{{ old('name', Auth::user()->name ?? 'Rahul Sharma') }}"
+                               value="{{ old('name', Auth::user()->name) }}"
                                required
                                class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
                     </div>
@@ -53,7 +53,7 @@
                         <input type="text"
                                name="username"
                                id="username"
-                               value="{{ old('username', Auth::user()->username ?? 'rahul_s') }}"
+                               value="{{ old('username', Auth::user()->username) }}"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
                     </div>
 
@@ -62,7 +62,7 @@
                         <input type="email"
                                name="email"
                                id="email"
-                               value="{{ old('email', Auth::user()->email ?? 'rahul@example.com') }}"
+                               value="{{ old('email', Auth::user()->email) }}"
                                required
                                class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
                     </div>

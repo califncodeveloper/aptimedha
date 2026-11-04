@@ -14,29 +14,86 @@
                 @csrf
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Category Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" required placeholder="e.g. Arithmetic Aptitude" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Category Name <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text"
+                           name="name"
+                           value="{{ old('name') }}"
+                           required
+                           placeholder="e.g. Arithmetic Aptitude"
+                           class="w-full px-3.5 py-2.5 rounded-xl border @error('name') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                    @error('name')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">URL Slug</label>
-                    <input type="text" name="slug" placeholder="e.g. arithmetic-aptitude" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none font-mono text-xs">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        URL Slug <span class="text-gray-400 font-normal lowercase">(leave blank to auto-generate)</span>
+                    </label>
+                    <input type="text"
+                           name="slug"
+                           value="{{ old('slug') }}"
+                           placeholder="e.g. arithmetic-aptitude"
+                           class="w-full px-3.5 py-2.5 rounded-xl border @error('slug') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none font-mono text-xs">
+                    @error('slug')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Lucide Icon</label>
-                        <input type="text" name="icon" value="calculator" placeholder="calculator / puzzle / code" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Lucide Icon
+                        </label>
+                        <input type="text"
+                               name="icon"
+                               value="{{ old('icon', 'folder') }}"
+                               placeholder="calculator / puzzle / code / globe"
+                               class="w-full px-3.5 py-2.5 rounded-xl border @error('icon') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                        @error('icon')
+                            <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Display Order</label>
-                        <input type="number" name="display_order" value="9" min="1" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Display Order
+                        </label>
+                        <input type="number"
+                               name="display_order"
+                               value="{{ old('display_order', $nextOrder ?? 1) }}"
+                               min="0"
+                               class="w-full px-3.5 py-2.5 rounded-xl border @error('display_order') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">
+                        @error('display_order')
+                            <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Short Description</label>
-                    <textarea name="description" rows="3" placeholder="Brief summary of what this category covers..." class="w-full p-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:outline-none"></textarea>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        Short Description
+                    </label>
+                    <textarea name="description"
+                              rows="3"
+                              placeholder="Brief summary of what this category covers..."
+                              class="w-full p-3 rounded-xl border @error('description') border-rose-500 @else border-gray-300 @enderror text-sm focus:border-[#087F82] focus:outline-none">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="text-xs text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="checkbox"
+                           name="is_active"
+                           id="is_active"
+                           value="1"
+                           {{ old('is_active', '1') ? 'checked' : '' }}
+                           class="w-4 h-4 rounded text-[#087F82] focus:ring-[#087F82]">
+                    <label for="is_active" class="text-xs font-bold text-gray-700 uppercase tracking-wider select-none cursor-pointer">
+                        Active (Visible on public portal)
+                    </label>
                 </div>
 
                 <div class="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">

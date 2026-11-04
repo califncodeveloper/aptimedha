@@ -1,18 +1,22 @@
 <x-layouts.app>
-    <x-slot:title>About Us - AptiMedha: Practise Smart. Get Placement Ready.</x-slot:title>
+    <x-slot:title>{{ $page->meta_title ?? ($page->title ?? 'About Us - AptiMedha: Practise Smart. Get Placement Ready.') }}</x-slot:title>
+    @if(!empty($page?->meta_description))
+        <x-slot:metaDescription>{{ $page->meta_description }}</x-slot:metaDescription>
+    @endif
 
-    {{-- Hero Section --}}
-    <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-14 sm:py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    {{-- Hero Section with Background Grid Overlay --}}
+    <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-16 sm:py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid-white opacity-15 pointer-events-none"></div>
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="max-w-3xl">
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/20 mb-4">
-                    About AptiMedha
+                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/20 mb-4 shadow-2xs backdrop-blur-md">
+                    <i data-lucide="info" class="w-4 h-4 mr-2"></i> About AptiMedha
                 </span>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
                     Practise Smart. Get Placement Ready.
                 </h1>
-                <p class="mt-4 text-base sm:text-lg text-white/80 leading-relaxed">
-                    AptiMedha brings aptitude practice, technical learning and career preparation together in one place, helping learners move through their preparation with greater clarity and confidence.
+                <p class="mt-4 text-base sm:text-lg text-white/85 leading-relaxed">
+                    AptiMedha brings quantitative practice, reasoning development, technical fundamentals, and career preparation together in one place, helping learners prepare with clarity and confidence.
                 </p>
             </div>
         </div>

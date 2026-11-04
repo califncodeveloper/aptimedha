@@ -4,9 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="AptiMedha - Sharpen your aptitude, reasoning and subject skills to crack placement exams and interviews.">
-
     <title>{{ $title ?? 'AptiMedha - MCQ Practice & Placement Preparation' }}</title>
+    @if(!empty($metaDescription))
+        <meta name="description" content="{{ $metaDescription }}">
+    @else
+        <meta name="description" content="AptiMedha - Sharpen your aptitude, reasoning and subject skills to crack placement exams and interviews.">
+    @endif
+    <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/aptimedha-logo.png') }}">
+    {{ $meta ?? '' }}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -28,96 +34,96 @@
 <body class="min-h-screen bg-[#F7F9FC] text-[#243247] font-sans antialiased flex flex-col justify-between"
       x-data="{ mobileMenu: false, searchOpen: false }">
 
-    {{-- Main Navbar (White background matching client mockup) --}}
-    <header class="sticky top-0 z-50 bg-white border-b border-gray-200/80 shadow-xs backdrop-blur-md bg-white/95">
+    {{-- Main Navbar (Clean, Premium, Properly Spaced matching Client Mockup) --}}
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-18 items-center justify-between">
+            <div class="flex h-16 sm:h-18 items-center justify-between gap-4 lg:gap-8">
                 
                 {{-- Brand Logo --}}
-                <div class="flex items-center gap-6">
-                    <a href="{{ url('/') }}" class="group transition-transform active:scale-95">
+                <div class="flex-shrink-0">
+                    <a href="{{ url('/') }}" class="group transition-transform active:scale-95 block">
                         <x-application-logo />
                     </a>
                 </div>
 
                 {{-- Desktop Navigation Links --}}
-                <nav class="hidden lg:flex items-center space-x-1 font-medium text-sm">
+                <nav class="hidden lg:flex items-center gap-1 xl:gap-2 font-medium text-sm">
                     <a href="{{ url('/') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('/'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->is('/'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->is('/'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->is('/'),
                        ])>
                         Home
                     </a>
                     <a href="{{ route('categories.show', 'arithmetic-aptitude') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/arithmetic-aptitude*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/arithmetic-aptitude*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->is('categories/arithmetic-aptitude*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->is('categories/arithmetic-aptitude*'),
                        ])>
                         Aptitude
                     </a>
                     <a href="{{ route('categories.show', 'logical-reasoning') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/logical-reasoning*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/logical-reasoning*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->is('categories/logical-reasoning*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->is('categories/logical-reasoning*'),
                        ])>
                         Reasoning
                     </a>
                     <a href="{{ route('categories.show', 'programming') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->is('categories/programming*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->is('categories/programming*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->is('categories/programming*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->is('categories/programming*'),
                        ])>
                         Programming
                     </a>
                     <a href="{{ route('mcq.index') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('mcq.*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('mcq.*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->routeIs('mcq.*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->routeIs('mcq.*'),
                        ])>
                         MCQ Practice
                     </a>
                     <a href="{{ route('placement.index') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('placement*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('placement*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->routeIs('placement*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->routeIs('placement*'),
                        ])>
                         Placement Prep
                     </a>
                     <a href="{{ route('blog.index') }}"
                        @class([
-                           'px-3 py-2 transition-colors relative',
-                           'text-[#087F82] font-semibold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-[#087F82]' => request()->routeIs('blog.*'),
-                           'text-[#243247] hover:text-[#087F82]' => !request()->routeIs('blog.*'),
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->routeIs('blog.*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->routeIs('blog.*'),
                        ])>
                         Blog
                     </a>
                 </nav>
 
                 {{-- Right Actions (Search & Auth) --}}
-                <div class="flex items-center space-x-3">
-                    {{-- Search Icon Button matching mockup --}}
+                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    {{-- Clean Search Icon Button matching mockup --}}
                     <button @click="searchOpen = true" 
                             type="button" 
-                            class="p-2 text-[#243247] hover:text-[#087F82] hover:bg-gray-100 rounded-full transition-colors"
-                            title="Search Topics and Questions">
+                            class="p-2 text-[#243247]/80 hover:text-[#087F82] hover:bg-teal-50/70 rounded-full transition-colors cursor-pointer"
+                            title="Search Topics (Ctrl+K)">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
 
                     @guest
-                        <div class="hidden sm:flex items-center space-x-2">
+                        <div class="hidden sm:flex items-center gap-2">
                             <a href="{{ route('login') }}"
-                               class="px-4 py-2 text-sm font-semibold text-[#153B70] hover:text-[#087F82] hover:bg-gray-50 rounded-lg transition-colors">
+                               class="px-3.5 py-2 text-sm font-semibold text-[#153B70] hover:text-[#087F82] hover:bg-gray-50 rounded-xl transition-colors whitespace-nowrap">
                                 Log in
                             </a>
                             <a href="{{ route('register') }}"
-                               class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-[#087F82] hover:bg-[#066668] rounded-lg shadow-xs transition-colors">
+                               class="inline-flex items-center px-4.5 py-2 text-sm font-bold text-white bg-[#087F82] hover:bg-[#066668] rounded-xl shadow-xs transition-all whitespace-nowrap hover:shadow-sm active:scale-95">
                                 Sign up
                             </a>
                         </div>
@@ -383,12 +389,46 @@
         </div>
     </footer>
 
-    {{-- Initialize Lucide Icons --}}
+    {{-- Back to Top Floating Button (Spring Interactive & Accessible) --}}
+    <div x-data="{ showTop: false }"
+         @scroll.window="showTop = (window.pageYOffset > 400)"
+         class="fixed bottom-6 right-6 z-40">
+        <button x-show="showTop"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 translate-y-3 scale-90"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                x-transition:leave-end="opacity-0 translate-y-3 scale-90"
+                @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+                data-motion-spring
+                type="button"
+                class="w-11 h-11 rounded-xl bg-white/95 backdrop-blur-md border border-gray-200 shadow-md text-[#153B70] hover:text-[#087F82] hover:border-[#087F82] flex items-center justify-center transition-all cursor-pointer group"
+                title="Back to top"
+                x-cloak>
+            <i data-lucide="arrow-up" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
+        </button>
+    </div>
+
+    {{-- Initialize Lucide Icons & Global Shortcuts --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+
+            // Keyboard shortcut Ctrl+K / Cmd+K for search modal
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    if (window.Alpine) {
+                        const bodyEl = document.querySelector('body');
+                        if (bodyEl && bodyEl._x_dataStack && bodyEl._x_dataStack[0]) {
+                            bodyEl._x_dataStack[0].searchOpen = true;
+                        }
+                    }
+                }
+            });
         });
     </script>
 </body>

@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Dashboard' }} - AptiMedha</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/aptimedha-logo.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -31,8 +32,8 @@
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-between">
                 {{-- Logo --}}
-                <a href="{{ url('/') }}" class="text-xl font-bold text-white tracking-tight">
-                    Apti<span class="text-[#087F82]">Medha</span>
+                <a href="{{ url('/') }}" class="inline-flex items-center">
+                    <x-application-logo variant="light" size="sm" />
                 </a>
 
                 {{-- Desktop Nav --}}

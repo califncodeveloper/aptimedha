@@ -2,56 +2,120 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Handles user management in the admin panel.
+ * Handles user management in the admin panel with real database records.
  */
 class UserController
 {
     /**
      * Display a listing of users.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('admin.users.index');
+        $search = trim((string) $request->input('search', ''));
+        $roleFilter = trim((string) $request->input('role', ''));
+
+        $query = User::query()
+            ->withCount(['bookmarks', 'discussions', 'reports']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('username', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($roleFilter !== '') {
+            $query->where('role', $roleFilter);
+        }
+
+        $users = $query->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString();
+
+        $totalUsers = User::count();
+        $adminCount = User::where('role', UserRole::Admin->value)->count();
+        $studentCount = User::where('role', UserRole::User->value)->count();
+
+        return view('admin.users.index', compact(
+            'users',
+            'search',
+            'roleFilter',
+            'totalUsers',
+            'adminCount',
+            'studentCount'
+        ));
     }
 
     /**
      * Display the specified user.
      */
-    public function show(string $user): View
+    public function show(User $user): View
     {
-        return view('admin.users.show');
+        $user->loadCount(['bookmarks', 'discussions', 'reports', 'blogs']);
+
+        $recentDiscussions = $user->discussions()
+            ->with('question')
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        $recentReports = $user->reports()
+            ->with('question')
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        return view('admin.users.show', compact('user', 'recentDiscussions', 'recentReports'));
     }
 
     /**
      * Show the form for editing the specified user.
      */
-    public function edit(string $user): View
+    public function edit(User $user): View
     {
-        return view('admin.users.edit');
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
      * Update the specified user.
      */
-    public function update(Request $request, string $user): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
-        // TODO: Implement user update logic.
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:50', 'alpha_dash', Rule::unique('users', 'username')->ignore($user->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', Rule::enum(UserRole::class)],
+        ]);
 
-        return redirect()->route('admin.users.index');
+        $user->update($validated);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "User '{$user->name}' was successfully updated.");
     }
 
     /**
      * Remove the specified user.
      */
-    public function destroy(string $user): RedirectResponse
+    public function destroy(Request $request, User $user): RedirectResponse
     {
-        // TODO: Implement user deletion logic.
+        if ($request->user() && $request->user()->id === $user->id) {
+            return back()->with('error', 'You cannot delete your own administrative account.');
+        }
 
-        return redirect()->route('admin.users.index');
+        $userName = $user->name;
+        $user->delete();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "User '{$userName}' was successfully removed.");
     }
 }

@@ -3,13 +3,23 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Models\Category;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ArchitectureVerificationTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_public_pages_render_successfully(): void
     {
+        Category::create([
+            'name' => 'Sample Category',
+            'slug' => 'sample-category',
+            'is_active' => true,
+        ]);
+
         $this->get('/')->assertStatus(200);
         $this->get('/categories')->assertStatus(200);
         $this->get('/categories/sample-category')->assertStatus(200);

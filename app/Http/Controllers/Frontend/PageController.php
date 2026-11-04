@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use Illuminate\Http\Request;
+use App\Models\ContactMessage;
+use App\Models\StaticPage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Handles static and informational pages.
+ * Handles static and informational pages backed by CMS content.
  */
 class PageController
 {
@@ -16,7 +18,9 @@ class PageController
      */
     public function about(): View
     {
-        return view('frontend.pages.about');
+        $page = StaticPage::where('slug', 'about')->first();
+
+        return view('frontend.pages.about', compact('page'));
     }
 
     /**
@@ -24,24 +28,45 @@ class PageController
      */
     public function contact(): View
     {
-        return view('frontend.pages.contact');
+        $page = StaticPage::where('slug', 'contact')->first();
+
+        return view('frontend.pages.contact', compact('page'));
     }
 
     /**
-     * Handle contact form submission.
+     * Handle contact form submission and persist to database.
      */
     public function submitContact(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:150',
-            'enquiry_type' => 'required|string',
-            'subject' => 'required|string|max:200',
-            'page_url' => 'nullable|url|max:255',
-            'message' => 'required|string|max:3000',
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150'],
+            'enquiry_type' => ['nullable', 'string', 'max:100'],
+            'subject' => ['required', 'string', 'max:200'],
+            'page_url' => ['nullable', 'url', 'max:255'],
+            'message' => ['required', 'string', 'max:3000'],
         ]);
 
-        return back()->with('success', 'Thank you for contacting AptiMedha. Your message has been received. We will review your enquiry and reply where a response is needed.');
+        $subject = trim($validated['subject']);
+        if (!empty($validated['enquiry_type'])) {
+            $subject = '[' . ucfirst($validated['enquiry_type']) . '] ' . $subject;
+        }
+
+        $messageContent = trim($validated['message']);
+        if (!empty($validated['page_url'])) {
+            $messageContent .= "\n\nReferenced URL: " . $validated['page_url'];
+        }
+
+        ContactMessage::create([
+            'name' => trim($validated['name']),
+            'email' => trim($validated['email']),
+            'subject' => $subject,
+            'message' => $messageContent,
+            'ip_address' => $request->ip(),
+            'is_read' => false,
+        ]);
+
+        return back()->with('success', 'Thank you for contacting AptiMedha! Your message has been received and our support team will review it.');
     }
 
     /**
@@ -49,7 +74,9 @@ class PageController
      */
     public function disclaimer(): View
     {
-        return view('frontend.pages.disclaimer');
+        $page = StaticPage::where('slug', 'disclaimer')->first();
+
+        return view('frontend.pages.disclaimer', compact('page'));
     }
 
     /**
@@ -57,7 +84,11 @@ class PageController
      */
     public function terms(): View
     {
-        return view('frontend.pages.terms');
+        $page = StaticPage::where('slug', 'terms-and-conditions')
+            ->orWhere('slug', 'terms')
+            ->first();
+
+        return view('frontend.pages.terms', compact('page'));
     }
 
     /**
@@ -65,7 +96,11 @@ class PageController
      */
     public function privacy(): View
     {
-        return view('frontend.pages.privacy');
+        $page = StaticPage::where('slug', 'privacy-policy')
+            ->orWhere('slug', 'privacy')
+            ->first();
+
+        return view('frontend.pages.privacy', compact('page'));
     }
 
     /**
@@ -73,6 +108,8 @@ class PageController
      */
     public function copyright(): View
     {
-        return view('frontend.pages.copyright');
+        $page = StaticPage::where('slug', 'copyright')->first();
+
+        return view('frontend.pages.copyright', compact('page'));
     }
 }
