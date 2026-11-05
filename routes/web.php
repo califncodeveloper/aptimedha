@@ -72,7 +72,7 @@ Route::get('/blog/{post}', [FrontendBlogController::class, 'show'])->name('blog.
 
 Route::get('/about', [FrontendPageController::class, 'about'])->name('about');
 Route::get('/contact', [FrontendPageController::class, 'contact'])->name('contact');
-Route::post('/contact', [FrontendPageController::class, 'submitContact'])->name('contact.submit');
+Route::post('/contact', [FrontendPageController::class, 'submitContact'])->name('contact.submit')->middleware('throttle:contact');
 Route::get('/disclaimer', [FrontendPageController::class, 'disclaimer'])->name('disclaimer');
 Route::get('/terms-and-conditions', [FrontendPageController::class, 'terms'])->name('terms');
 Route::get('/terms', fn () => redirect()->route('terms'));
@@ -91,13 +91,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:registration');
 
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:password-email');
 
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update')->middleware('throttle:password-reset');
 
     Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -118,16 +118,16 @@ Route::middleware('auth')->prefix('dashboard')->name('user.')->group(function ()
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks');
-    Route::post('/bookmarks/toggle/{question?}', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
+    Route::post('/bookmarks/toggle/{question?}', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle')->middleware('throttle:bookmarks');
     Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
 
     Route::get('/discussions', [UserDiscussionController::class, 'index'])->name('discussions');
-    Route::post('/discussions', [UserDiscussionController::class, 'store'])->name('discussions.store');
+    Route::post('/discussions', [UserDiscussionController::class, 'store'])->name('discussions.store')->middleware('throttle:discussions');
     Route::put('/discussions/{discussion}', [UserDiscussionController::class, 'update'])->name('discussions.update');
     Route::delete('/discussions/{discussion}', [UserDiscussionController::class, 'destroy'])->name('discussions.destroy');
 
     Route::get('/reported-questions', [UserReportController::class, 'index'])->name('reports');
-    Route::post('/reported-questions', [UserReportController::class, 'store'])->name('reports.store');
+    Route::post('/reported-questions', [UserReportController::class, 'store'])->name('reports.store')->middleware('throttle:reports');
 });
 
 /*

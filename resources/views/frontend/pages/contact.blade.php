@@ -193,6 +193,9 @@
                         We will use the details you provide to respond to your enquiry, as explained in our <a href="{{ route('privacy') }}" class="text-[#087F82] underline font-semibold">Privacy Policy</a>. Please do not include passwords, Aadhaar numbers, bank details or other sensitive information.
                     </div>
 
+                    {{-- Cloudflare Turnstile Security Verification --}}
+                    <x-turnstile action="contact" />
+
                     {{-- Submit Button --}}
                     <button type="submit"
                             class="w-full py-3.5 px-6 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white font-bold text-sm shadow-md shadow-[#087F82]/20 transition-all cursor-pointer">

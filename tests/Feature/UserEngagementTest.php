@@ -13,6 +13,7 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class UserEngagementTest extends TestCase
@@ -460,17 +461,25 @@ class UserEngagementTest extends TestCase
      */
     public function test_contact_form_validation_and_storage(): void
     {
-        // 1. Validation error on empty submission
+        // 1. Validation error on empty submission (including required turnstile verification)
         $invalidResponse = $this->post(route('contact.submit'), []);
-        $invalidResponse->assertSessionHasErrors(['name', 'email', 'subject', 'message']);
+        $invalidResponse->assertSessionHasErrors(['name', 'email', 'subject', 'message', 'cf-turnstile-response']);
 
         // 2. Successful submission persists to database
+        Http::fake([
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                'success' => true,
+                'action' => 'contact',
+            ]),
+        ]);
+
         $validResponse = $this->post(route('contact.submit'), [
             'name' => 'Priya Sharma',
             'email' => 'priya@example.com',
             'enquiry_type' => 'suggestion',
             'subject' => 'Please add more Python OOP questions',
             'message' => 'Would love to see more practice sets on inheritance and decorators.',
+            'cf-turnstile-response' => 'mock-valid-turnstile-token',
         ]);
 
         $validResponse->assertSessionHas('success');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Models\ContactMessage;
 use App\Models\StaticPage;
+use App\Rules\TurnstileRule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -45,6 +46,9 @@ class PageController
             'subject' => ['required', 'string', 'max:200'],
             'page_url' => ['nullable', 'url', 'max:255'],
             'message' => ['required', 'string', 'max:3000'],
+            'cf-turnstile-response' => ['required', 'string', new TurnstileRule('contact')],
+        ], [
+            'cf-turnstile-response.required' => 'Please complete the security verification to send your message.',
         ]);
 
         $subject = trim($validated['subject']);

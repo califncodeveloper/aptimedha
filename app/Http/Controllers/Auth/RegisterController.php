@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Rules\TurnstileRule;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,9 @@ class RegisterController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', Password::min(8), 'confirmed'],
             'terms' => ['sometimes', 'accepted'],
+            'cf-turnstile-response' => ['required', 'string', new TurnstileRule('register')],
+        ], [
+            'cf-turnstile-response.required' => 'Please complete the security verification to register.',
         ]);
 
         // Explicitly set the role to User to prevent privilege escalation

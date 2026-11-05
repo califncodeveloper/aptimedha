@@ -19,6 +19,13 @@ class AuthenticationTest extends TestCase
 
     public function test_successful_registration(): void
     {
+        Http::fake([
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                'success' => true,
+                'action' => 'register',
+            ]),
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Aditi Sharma',
             'username' => 'aditi_s',
@@ -26,6 +33,7 @@ class AuthenticationTest extends TestCase
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
             'terms' => 'on',
+            'cf-turnstile-response' => 'mock-valid-turnstile-token',
         ]);
 
         $response->assertRedirect(route('user.dashboard'));
@@ -228,6 +236,13 @@ class AuthenticationTest extends TestCase
 
     public function test_public_registration_cannot_create_admin(): void
     {
+        Http::fake([
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                'success' => true,
+                'action' => 'register',
+            ]),
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Sneaky Hacker',
             'username' => 'sneaky_hacker',
@@ -235,6 +250,7 @@ class AuthenticationTest extends TestCase
             'password' => 'HackerPass123!',
             'password_confirmation' => 'HackerPass123!',
             'role' => 'admin',
+            'cf-turnstile-response' => 'mock-valid-turnstile-token',
         ]);
 
         $response->assertRedirect(route('user.dashboard'));

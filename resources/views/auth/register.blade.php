@@ -162,6 +162,9 @@
                         </label>
                     </div>
 
+                    {{-- Cloudflare Turnstile Security Verification --}}
+                    <x-turnstile action="register" />
+
                     <button type="submit"
                             class="w-full py-3.5 px-4 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white font-bold text-sm shadow-md shadow-[#087F82]/20 transition-all cursor-pointer mt-2 min-h-[46px] flex items-center justify-center">
                         Create Free Account
