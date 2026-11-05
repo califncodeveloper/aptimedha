@@ -241,7 +241,11 @@
                                     {{-- Optional Question Image --}}
                                     @if($mcq->has_image && $mcq->image_url)
                                         <div class="mb-5 rounded-xl border border-gray-200 overflow-hidden max-w-full sm:max-w-md bg-gray-50 p-2">
-                                            <img src="{{ $mcq->image_url }}" alt="Question {{ $mcq->question_number }} Diagram" class="w-full h-auto rounded-lg object-contain">
+                                            <img src="{{ $mcq->image_url }}"
+                                                 alt="{{ $mcq->question_image_alt ?: ('Question ' . $mcq->question_number . ' Diagram') }}"
+                                                 loading="lazy"
+                                                 onerror="this.parentElement.style.display='none'"
+                                                 class="w-full h-auto rounded-lg object-contain">
                                         </div>
                                     @endif
 
@@ -258,9 +262,9 @@
                                                         'border-gray-200 hover:border-gray-300 hover:bg-gray-50/80': !revealed
                                                     }">
                                                 
-                                                <div class="flex items-center gap-3 sm:gap-3.5 min-w-0">
+                                                <div class="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
                                                     {{-- Radio circle indicator matching mockup --}}
-                                                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors"
+                                                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors mt-0.5 sm:mt-0"
                                                          :class="{
                                                              'border-emerald-500 bg-emerald-500 text-white': revealed && isCorrect('{{ $optKey }}'),
                                                              'border-rose-500 bg-rose-500 text-white': revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}'),
@@ -271,9 +275,20 @@
                                                         <i x-show="revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}')" data-lucide="x" class="w-3.5 h-3.5 stroke-[3]"></i>
                                                     </div>
 
-                                                    <span class="text-sm sm:text-base font-medium text-[#243247] break-words">
-                                                        <span class="font-bold text-gray-400 mr-1.5">{{ $optKey }}.</span> {{ $optVal }}
-                                                    </span>
+                                                    <div class="space-y-1.5 min-w-0">
+                                                        <span class="text-sm sm:text-base font-medium text-[#243247] break-words block">
+                                                            <span class="font-bold text-gray-400 mr-1.5">{{ $optKey }}.</span> {{ $optVal }}
+                                                        </span>
+                                                        @if($mcq->hasOptionImage($optKey))
+                                                            <div class="rounded-lg border border-gray-200/90 bg-white p-1 max-w-[180px] overflow-hidden">
+                                                                <img src="{{ $mcq->getOptionImageUrl($optKey) }}"
+                                                                     alt="Option {{ $optKey }} Diagram"
+                                                                     loading="lazy"
+                                                                     onerror="this.parentElement.style.display='none'"
+                                                                     class="max-h-20 w-auto object-contain">
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
 
                                                 {{-- Correct Checkmark Badge on far right matching mockup --}}
@@ -294,16 +309,29 @@
                                         </p>
                                     </div>
 
-                                    {{-- Step-by-Step Explanation matching mockup --}}
-                                    @if($mcq->explanation)
-                                        <div x-show="revealed" x-transition class="mt-3 p-3.5 sm:p-5 rounded-xl bg-[#F7F9FC] border border-gray-200/90 text-xs sm:text-sm text-[#243247] leading-relaxed break-words" x-cloak>
-                                            <div class="flex items-center gap-2 font-bold text-[#153B70] mb-1.5">
+                                    {{-- Step-by-Step Explanation & Explanation Diagram --}}
+                                    @if($mcq->explanation || $mcq->has_explanation_image)
+                                        <div x-show="revealed" x-transition class="mt-3 p-3.5 sm:p-5 rounded-xl bg-[#F7F9FC] border border-gray-200/90 text-xs sm:text-sm text-[#243247] leading-relaxed break-words space-y-2.5" x-cloak>
+                                            <div class="flex items-center gap-2 font-bold text-[#153B70]">
                                                 <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
                                                 <span>Explanation:</span>
                                             </div>
-                                            <p class="text-gray-700 font-medium pl-2 sm:pl-6 whitespace-pre-line break-words">
-                                                {{ $mcq->explanation }}
-                                            </p>
+                                            @if($mcq->explanation)
+                                                <p class="text-gray-700 font-medium pl-2 sm:pl-6 whitespace-pre-line break-words">
+                                                    {{ $mcq->explanation }}
+                                                </p>
+                                            @endif
+                                            @if($mcq->has_explanation_image && $mcq->explanation_image_url)
+                                                <div class="pl-2 sm:pl-6">
+                                                    <div class="rounded-xl border border-gray-200 overflow-hidden bg-white p-2 max-w-full sm:max-w-sm">
+                                                        <img src="{{ $mcq->explanation_image_url }}"
+                                                             alt="Explanation Diagram for Question {{ $mcq->question_number }}"
+                                                             loading="lazy"
+                                                             onerror="this.parentElement.style.display='none'"
+                                                             class="w-full h-auto rounded-lg object-contain">
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     @endif
 

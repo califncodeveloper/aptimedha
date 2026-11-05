@@ -162,12 +162,12 @@ class HtmlSanitizer
                 }
             }
 
-            // Validate src values
+            // Validate src values (only https://, http://, relative URLs; never allow data: base64 or script schemes)
             if ($attrName === 'src') {
                 $lower = strtolower($attrValue);
                 if (str_starts_with($lower, 'javascript:') ||
                     str_starts_with($lower, 'vbscript:') ||
-                    (str_starts_with($lower, 'data:') && !str_starts_with($lower, 'data:image/'))) {
+                    str_starts_with($lower, 'data:')) {
                     $attrsToRemove[] = $attr->nodeName;
                     continue;
                 }

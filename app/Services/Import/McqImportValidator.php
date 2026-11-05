@@ -317,6 +317,10 @@ class McqImportValidator
     {
         $clean = ltrim($path, '/\\');
 
+        if (str_starts_with($clean, 'http://') || str_starts_with($clean, 'https://') || str_starts_with($clean, 'aptimedha/')) {
+            return true;
+        }
+
         if (file_exists(public_path($clean))) {
             return true;
         }

@@ -29,10 +29,22 @@ class QuestionRequest extends FormRequest
             ]);
         }
 
-        if ($this->has('remove_image')) {
-            $this->merge([
-                'remove_image' => filter_var($this->input('remove_image'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? ($this->input('remove_image') == '1'),
-            ]);
+        $removals = [
+            'remove_image',
+            'remove_question_image',
+            'remove_option_a_image',
+            'remove_option_b_image',
+            'remove_option_c_image',
+            'remove_option_d_image',
+            'remove_explanation_image',
+        ];
+
+        foreach ($removals as $removalKey) {
+            if ($this->has($removalKey)) {
+                $this->merge([
+                    $removalKey => filter_var($this->input($removalKey), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? ($this->input($removalKey) == '1'),
+                ]);
+            }
         }
     }
 
@@ -61,14 +73,26 @@ class QuestionRequest extends FormRequest
             ],
             'section_number' => ['nullable', 'integer', 'min:1'],
             'question_text' => ['required', 'string'],
-            'question_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'question_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'question_image_alt' => ['nullable', 'string', 'max:255'],
             'remove_image' => ['nullable', 'boolean'],
+            'remove_question_image' => ['nullable', 'boolean'],
             'option_a' => ['required', 'string'],
+            'option_a_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'remove_option_a_image' => ['nullable', 'boolean'],
             'option_b' => ['required', 'string'],
+            'option_b_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'remove_option_b_image' => ['nullable', 'boolean'],
             'option_c' => ['required', 'string'],
+            'option_c_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'remove_option_c_image' => ['nullable', 'boolean'],
             'option_d' => ['required', 'string'],
+            'option_d_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'remove_option_d_image' => ['nullable', 'boolean'],
             'correct_option' => ['required', 'string', 'in:A,B,C,D'],
             'explanation' => ['nullable', 'string'],
+            'explanation_image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            'remove_explanation_image' => ['nullable', 'boolean'],
             'difficulty' => ['nullable', 'string', 'in:easy,medium,hard'],
             'is_active' => ['nullable', 'boolean'],
         ];

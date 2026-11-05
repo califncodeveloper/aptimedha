@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\CloudinaryTestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -175,6 +176,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('topics', TopicController::class)->except(['show']);
     Route::patch('blogs/{blog}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
     Route::get('blogs/{blog}/preview', [AdminBlogController::class, 'preview'])->name('blogs.preview');
+    Route::post('blogs/upload-image', [AdminBlogController::class, 'uploadEmbeddedImage'])->name('blogs.upload-image');
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
 
@@ -199,4 +201,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Cloudinary Core Service Test (Admin only)
+    Route::get('cloudinary-test', [CloudinaryTestController::class, 'index'])->name('cloudinary-test.index');
+    Route::post('cloudinary-test/upload', [CloudinaryTestController::class, 'upload'])->name('cloudinary-test.upload');
+    Route::post('cloudinary-test/verify-live', [CloudinaryTestController::class, 'runAutomatedCheck'])->name('cloudinary-test.verify-live');
+    Route::delete('cloudinary-test/delete', [CloudinaryTestController::class, 'delete'])->name('cloudinary-test.delete');
 });

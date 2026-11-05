@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Services\CloudinaryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,14 @@ use Illuminate\View\View;
  */
 class McqController
 {
+    public function __construct(
+        protected ?CloudinaryService $cloudinaryService = null
+    ) {}
+
+    protected function getCloudinaryService(): CloudinaryService
+    {
+        return $this->cloudinaryService ?? app(CloudinaryService::class);
+    }
     /**
      * Display a listing of MCQs.
      */
@@ -109,12 +118,30 @@ class McqController
     public function store(QuestionRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $uploadedAssets = [];
 
-        $imagePath = null;
+        // Upload Question Image
         if ($request->hasFile('question_image')) {
-            $image = $request->file('question_image');
-            $imagePath = $image->store('questions', 'public');
-            $validated['question_image'] = $imagePath;
+            $path = $this->uploadMcqAsset($request->file('question_image'), CloudinaryService::FOLDER_MCQ_QUESTIONS);
+            $validated['question_image'] = $path;
+            $uploadedAssets[] = $path;
+        }
+
+        // Upload Option Images
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $field = "option_{$opt}_image";
+            if ($request->hasFile($field)) {
+                $path = $this->uploadMcqAsset($request->file($field), CloudinaryService::FOLDER_MCQ_OPTIONS);
+                $validated[$field] = $path;
+                $uploadedAssets[] = $path;
+            }
+        }
+
+        // Upload Explanation Image
+        if ($request->hasFile('explanation_image')) {
+            $path = $this->uploadMcqAsset($request->file('explanation_image'), CloudinaryService::FOLDER_MCQ_ANSWERS);
+            $validated['explanation_image'] = $path;
+            $uploadedAssets[] = $path;
         }
 
         if (!isset($validated['is_active'])) {
@@ -152,9 +179,9 @@ class McqController
                 Topic::where('id', $question->topic_id)->increment('total_questions_count');
             });
         } catch (\Throwable $e) {
-            // Clean up uploaded image if transaction failed
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            // Clean up uploaded assets if transaction failed
+            foreach ($uploadedAssets as $assetPath) {
+                $this->deleteImageIfUnreferenced($assetPath);
             }
             throw $e;
         }
@@ -190,18 +217,43 @@ class McqController
         $oldTopicId = $mcq->topic_id;
         $newTopicId = (int) $validated['topic_id'];
 
-        // Handle image removal if requested
-        if (!empty($validated['remove_image'])) {
+        // Handle Question Image removal
+        if (!empty($validated['remove_image']) || !empty($validated['remove_question_image'])) {
             $this->deleteImageIfUnreferenced($mcq->question_image, $mcq->id);
             $validated['question_image'] = null;
         }
 
-        // Handle image upload replacement
+        // Handle Question Image upload replacement
         if ($request->hasFile('question_image')) {
             $this->deleteImageIfUnreferenced($mcq->question_image, $mcq->id);
-            $image = $request->file('question_image');
-            $path = $image->store('questions', 'public');
-            $validated['question_image'] = $path;
+            $validated['question_image'] = $this->uploadMcqAsset($request->file('question_image'), CloudinaryService::FOLDER_MCQ_QUESTIONS);
+        }
+
+        // Handle Option Images removal & replacement
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $field = "option_{$opt}_image";
+            $removeField = "remove_option_{$opt}_image";
+
+            if (!empty($validated[$removeField])) {
+                $this->deleteImageIfUnreferenced($mcq->{$field}, $mcq->id);
+                $validated[$field] = null;
+            }
+
+            if ($request->hasFile($field)) {
+                $this->deleteImageIfUnreferenced($mcq->{$field}, $mcq->id);
+                $validated[$field] = $this->uploadMcqAsset($request->file($field), CloudinaryService::FOLDER_MCQ_OPTIONS);
+            }
+        }
+
+        // Handle Explanation Image removal & replacement
+        if (!empty($validated['remove_explanation_image'])) {
+            $this->deleteImageIfUnreferenced($mcq->explanation_image, $mcq->id);
+            $validated['explanation_image'] = null;
+        }
+
+        if ($request->hasFile('explanation_image')) {
+            $this->deleteImageIfUnreferenced($mcq->explanation_image, $mcq->id);
+            $validated['explanation_image'] = $this->uploadMcqAsset($request->file('explanation_image'), CloudinaryService::FOLDER_MCQ_ANSWERS);
         }
 
         if (empty($validated['subject_id'])) {
@@ -252,7 +304,13 @@ class McqController
                 ->with('warning', 'Question has active user bookmarks, discussions, or reports. To preserve user data, the question was deactivated instead of permanently deleted.');
         }
 
+        // Clean up all question images if unreferenced
         $this->deleteImageIfUnreferenced($mcq->question_image, $mcq->id);
+        $this->deleteImageIfUnreferenced($mcq->option_a_image, $mcq->id);
+        $this->deleteImageIfUnreferenced($mcq->option_b_image, $mcq->id);
+        $this->deleteImageIfUnreferenced($mcq->option_c_image, $mcq->id);
+        $this->deleteImageIfUnreferenced($mcq->option_d_image, $mcq->id);
+        $this->deleteImageIfUnreferenced($mcq->explanation_image, $mcq->id);
 
         $topicId = $mcq->topic_id;
         $mcq->delete();
@@ -264,11 +322,27 @@ class McqController
     }
 
     /**
+     * Upload an MCQ media asset (Cloudinary with local fallback).
+     */
+    protected function uploadMcqAsset($file, string $folder): string
+    {
+        $cloudinary = $this->getCloudinaryService();
+        if ($cloudinary->isConfigured()) {
+            $result = $cloudinary->uploadImage($file, $folder);
+            if (!empty($result['success']) && !empty($result['secure_url'])) {
+                return $result['secure_url'];
+            }
+        }
+
+        return $file->store('questions', 'public');
+    }
+
+    /**
      * Safely delete an image file from storage ONLY if no other question references it.
      */
     protected function deleteImageIfUnreferenced(?string $imagePath, ?int $excludeQuestionId = null): void
     {
-        if (!$imagePath || !str_starts_with($imagePath, 'questions/')) {
+        if (empty($imagePath)) {
             return;
         }
 
@@ -283,7 +357,22 @@ class McqController
             })
             ->exists();
 
-        if (!$isStillInUse && Storage::disk('public')->exists($imagePath)) {
+        if ($isStillInUse) {
+            return;
+        }
+
+        // Cloudinary asset check
+        $cloudinary = $this->getCloudinaryService();
+        $publicId = $cloudinary->getPublicId($imagePath);
+        if ($publicId && (str_starts_with($imagePath, 'http://') || str_starts_with($imagePath, 'https://') || str_starts_with($imagePath, 'aptimedha/'))) {
+            if ($cloudinary->isConfigured()) {
+                $cloudinary->deleteAsset($publicId);
+            }
+            return;
+        }
+
+        // Local storage asset check
+        if (str_starts_with($imagePath, 'questions/') && Storage::disk('public')->exists($imagePath)) {
             Storage::disk('public')->delete($imagePath);
         }
     }

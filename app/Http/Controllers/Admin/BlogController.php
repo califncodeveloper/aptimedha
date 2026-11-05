@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Services\CloudinaryService;
 use App\Services\HtmlSanitizer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +20,14 @@ use Illuminate\View\View;
  */
 class BlogController
 {
+    public function __construct(
+        protected ?CloudinaryService $cloudinaryService = null
+    ) {}
+
+    protected function getCloudinaryService(): CloudinaryService
+    {
+        return $this->cloudinaryService ?? app(CloudinaryService::class);
+    }
     /**
      * Display a listing of blog posts.
      */
@@ -108,10 +118,7 @@ class BlogController
 
         // Image upload handling
         if ($request->hasFile('featured_image')) {
-            $file = $request->file('featured_image');
-            $filename = Str::random(24) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('blogs', $filename, 'public');
-            $validated['featured_image'] = $path;
+            $validated['featured_image'] = $this->uploadFeaturedImage($request->file('featured_image'));
         }
 
         $blog = Blog::create($validated);
@@ -144,7 +151,8 @@ class BlogController
             'published_at' => ['nullable', 'date'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'body' => ['required', 'string'],
-            'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'remove_featured_image' => ['nullable', 'boolean'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
@@ -168,17 +176,16 @@ class BlogController
         // Sanitize rich-text HTML
         $validated['body'] = HtmlSanitizer::clean($validated['body']);
 
+        // Handle image removal
+        if ($request->boolean('remove_featured_image')) {
+            $this->deleteFeaturedImageIfUnreferenced($blog->featured_image, $blog->id);
+            $validated['featured_image'] = null;
+        }
+
         // Handle image replacement
         if ($request->hasFile('featured_image')) {
-            // Delete old file if exists and local
-            if ($blog->featured_image && Storage::disk('public')->exists($blog->featured_image)) {
-                Storage::disk('public')->delete($blog->featured_image);
-            }
-
-            $file = $request->file('featured_image');
-            $filename = Str::random(24) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('blogs', $filename, 'public');
-            $validated['featured_image'] = $path;
+            $this->deleteFeaturedImageIfUnreferenced($blog->featured_image, $blog->id);
+            $validated['featured_image'] = $this->uploadFeaturedImage($request->file('featured_image'));
         }
 
         $blog->update($validated);
@@ -195,20 +202,96 @@ class BlogController
         $title = $blog->title;
 
         // Safely delete image if not referenced elsewhere
-        if ($blog->featured_image && Storage::disk('public')->exists($blog->featured_image)) {
-            $otherUsage = Blog::where('featured_image', $blog->featured_image)
-                ->where('id', '!=', $blog->id)
-                ->exists();
-
-            if (!$otherUsage) {
-                Storage::disk('public')->delete($blog->featured_image);
-            }
-        }
+        $this->deleteFeaturedImageIfUnreferenced($blog->featured_image, $blog->id);
 
         $blog->delete();
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'Article "' . $title . '" deleted successfully.');
+    }
+
+    /**
+     * Upload an embedded image for Quill editor inside blog content.
+     */
+    public function uploadEmbeddedImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:5120'],
+        ]);
+
+        $file = $request->file('image');
+
+        $cloudinary = $this->getCloudinaryService();
+        if ($cloudinary->isConfigured()) {
+            $result = $cloudinary->uploadImage($file, CloudinaryService::FOLDER_BLOGS_CONTENT);
+            if (!empty($result['success']) && !empty($result['secure_url'])) {
+                return response()->json([
+                    'success' => true,
+                    'url' => $result['secure_url'],
+                    'public_id' => $result['public_id'],
+                ]);
+            }
+        }
+
+        // Fallback to local storage if Cloudinary is not configured or upload fails
+        $filename = Str::random(24) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('blogs/content', $filename, 'public');
+
+        return response()->json([
+            'success' => true,
+            'url' => Storage::disk('public')->url($path),
+            'public_id' => $path,
+        ]);
+    }
+
+    /**
+     * Upload featured image with Cloudinary and local fallback.
+     */
+    protected function uploadFeaturedImage($file): string
+    {
+        $cloudinary = $this->getCloudinaryService();
+        if ($cloudinary->isConfigured()) {
+            $result = $cloudinary->uploadImage($file, CloudinaryService::FOLDER_BLOGS_FEATURED);
+            if (!empty($result['success']) && !empty($result['secure_url'])) {
+                return $result['secure_url'];
+            }
+        }
+
+        $filename = Str::random(24) . '.' . $file->getClientOriginalExtension();
+        return $file->storeAs('blogs', $filename, 'public');
+    }
+
+    /**
+     * Delete a featured image if no other article references it.
+     */
+    protected function deleteFeaturedImageIfUnreferenced(?string $imagePath, ?int $excludeBlogId = null): void
+    {
+        if (empty($imagePath)) {
+            return;
+        }
+
+        $isStillInUse = Blog::when($excludeBlogId, fn ($q) => $q->where('id', '!=', $excludeBlogId))
+            ->where('featured_image', $imagePath)
+            ->exists();
+
+        if ($isStillInUse) {
+            return;
+        }
+
+        // Cloudinary asset
+        $cloudinary = $this->getCloudinaryService();
+        $publicId = $cloudinary->getPublicId($imagePath);
+        if ($publicId && (str_starts_with($imagePath, 'http://') || str_starts_with($imagePath, 'https://') || str_starts_with($imagePath, 'aptimedha/'))) {
+            if ($cloudinary->isConfigured()) {
+                $cloudinary->deleteAsset($publicId);
+            }
+            return;
+        }
+
+        // Local storage asset
+        if (Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
     }
 
     /**

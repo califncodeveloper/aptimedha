@@ -129,12 +129,18 @@
                     </div>
 
                     @if($blog->featured_image_url)
-                        <div class="flex items-center space-x-4 p-2 bg-white rounded-lg border border-gray-200">
-                            <img src="{{ $blog->featured_image_url }}" alt="{{ $blog->featured_image_alt ?? $blog->title }}" class="w-20 h-14 object-cover rounded-md border border-gray-200">
-                            <div class="text-xs">
-                                <span class="font-bold text-gray-700">Current Featured Image</span>
-                                <p class="text-gray-400 font-mono text-[10px] break-all">{{ $blog->featured_image }}</p>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-4">
+                                <img src="{{ $blog->featured_image_url }}" alt="{{ $blog->featured_image_alt ?? $blog->title }}" class="w-20 h-14 object-cover rounded-md border border-gray-200">
+                                <div class="text-xs">
+                                    <span class="font-bold text-gray-700">Current Featured Image</span>
+                                    <p class="text-gray-400 font-mono text-[10px] break-all">{{ $blog->featured_image }}</p>
+                                </div>
                             </div>
+                            <label class="inline-flex items-center text-xs text-rose-600 font-bold cursor-pointer bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-100 transition-colors">
+                                <input type="checkbox" name="remove_featured_image" value="1" class="rounded text-rose-600 focus:ring-rose-500">
+                                <span class="ml-1.5">Remove image</span>
+                            </label>
                         </div>
                     @endif
 
@@ -189,6 +195,7 @@
                             </span>
                             <span class="ql-formats">
                                 <button class="ql-link"></button>
+                                <button class="ql-image" type="button" title="Upload & Insert Image"></button>
                                 <button class="ql-clean"></button>
                             </span>
                         </div>
@@ -246,6 +253,56 @@
                     toolbar: '#quill-toolbar'
                 },
                 theme: 'snow'
+            });
+
+            // Custom image handler: uploads to Cloudinary via admin endpoint
+            const toolbar = quill.getModule('toolbar');
+            toolbar.addHandler('image', function () {
+                const fileInput = document.createElement('input');
+                fileInput.setAttribute('type', 'file');
+                fileInput.setAttribute('accept', 'image/jpeg,image/png,image/jpg,image/webp,image/gif');
+                fileInput.click();
+
+                fileInput.onchange = async function () {
+                    const file = fileInput.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    try {
+                        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        const response = await fetch('{{ route("admin.blogs.upload-image") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+                        if (data.success && data.url) {
+                            const range = quill.getSelection(true);
+                            quill.insertEmbed(range.index, 'image', data.url);
+                            quill.setSelection(range.index + 1);
+                        } else {
+                            alert(data.message || data.error || 'Failed to upload image. Please try again.');
+                        }
+                    } catch (err) {
+                        alert('Network or server error while uploading image: ' + err.message);
+                    }
+                };
+            });
+
+            // Prevent pasting of base64 images into the editor
+            quill.clipboard.addMatcher('IMG', function (node, delta) {
+                const src = node.getAttribute('src');
+                if (src && src.startsWith('data:')) {
+                    alert('Direct pasting of Base64 images is disabled. Please use the toolbar image button to upload.');
+                    return new (Quill.import('delta'))();
+                }
+                return delta;
             });
 
             // Sync editor content to hidden input on submit

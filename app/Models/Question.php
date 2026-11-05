@@ -199,23 +199,97 @@ class Question extends Model
     }
 
     /**
+     * Helper to resolve public URL for any image path/URL.
+     */
+    public function resolveImageUrl(?string $path): ?string
+    {
+        if (empty($path)) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        if (file_exists(public_path($path))) {
+            return asset($path);
+        }
+
+        return Storage::disk('public')->url($path);
+    }
+
+    /**
      * Resolves public URL for question image.
      */
     public function getImageUrlAttribute(): ?string
     {
-        if (empty($this->question_image)) {
-            return null;
-        }
+        return $this->resolveImageUrl($this->question_image);
+    }
 
-        if (str_starts_with($this->question_image, 'http://') || str_starts_with($this->question_image, 'https://')) {
-            return $this->question_image;
-        }
+    /**
+     * Resolves public URL for option A image.
+     */
+    public function getOptionAImageUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->option_a_image);
+    }
 
-        if (file_exists(public_path($this->question_image))) {
-            return asset($this->question_image);
-        }
+    /**
+     * Resolves public URL for option B image.
+     */
+    public function getOptionBImageUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->option_b_image);
+    }
 
-        return Storage::disk('public')->url($this->question_image);
+    /**
+     * Resolves public URL for option C image.
+     */
+    public function getOptionCImageUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->option_c_image);
+    }
+
+    /**
+     * Resolves public URL for option D image.
+     */
+    public function getOptionDImageUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->option_d_image);
+    }
+
+    /**
+     * Resolves public URL for explanation image.
+     */
+    public function getExplanationImageUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->explanation_image);
+    }
+
+    /**
+     * Check if question has an explanation diagram.
+     */
+    public function getHasExplanationImageAttribute(): bool
+    {
+        return !empty($this->explanation_image);
+    }
+
+    /**
+     * Check if a specific option has an image.
+     */
+    public function hasOptionImage(string $option): bool
+    {
+        $opt = strtolower($option);
+        return !empty($this->{"option_{$opt}_image"});
+    }
+
+    /**
+     * Get image URL for a specific option letter (A, B, C, D).
+     */
+    public function getOptionImageUrl(string $option): ?string
+    {
+        $opt = strtolower($option);
+        return $this->resolveImageUrl($this->{"option_{$opt}_image"} ?? null);
     }
 
     /**

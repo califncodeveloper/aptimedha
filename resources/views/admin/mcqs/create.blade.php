@@ -8,6 +8,11 @@
         selectedTopic: '{{ old('topic_id', $selectedTopicId) }}',
         correctOption: '{{ old('correct_option', 'A') }}',
         imagePreview: null,
+        optAPreview: null,
+        optBPreview: null,
+        optCPreview: null,
+        optDPreview: null,
+        expPreview: null,
         allSubjects: {{ $subjects->toJson() }},
         allTopics: {{ $topics->toJson() }},
         get filteredSubjects() {
@@ -31,11 +36,15 @@
         },
         handleImage(event) {
             const file = event.target.files[0];
-            if (file) {
-                this.imagePreview = URL.createObjectURL(file);
-            } else {
-                this.imagePreview = null;
-            }
+            this.imagePreview = file ? URL.createObjectURL(file) : null;
+        },
+        handleOptionImage(event, opt) {
+            const file = event.target.files[0];
+            this['opt' + opt + 'Preview'] = file ? URL.createObjectURL(file) : null;
+        },
+        handleExpImage(event) {
+            const file = event.target.files[0];
+            this.expPreview = file ? URL.createObjectURL(file) : null;
         }
     }">
         <div class="flex items-center justify-between">
@@ -184,30 +193,45 @@
                     @enderror
                 </div>
 
-                {{-- Optional Question Image --}}
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                        Optional Question Diagram / Figure Image
-                    </label>
-                    <div class="flex items-center gap-4">
-                        <input type="file"
-                               name="question_image"
-                               @change="handleImage"
-                               accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
-                               class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-[#153B70] hover:file:bg-gray-200">
-                        <template x-if="imagePreview">
-                            <div class="w-20 h-20 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center p-1">
-                                <img :src="imagePreview" alt="Upload Preview" class="w-full h-full object-contain">
-                            </div>
-                        </template>
+                {{-- Optional Question Image & Alt Text --}}
+                <div class="space-y-3 p-4 rounded-xl border border-gray-200/80 bg-gray-50/60">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Optional Question Diagram / Figure Image
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <input type="file"
+                                   name="question_image"
+                                   @change="handleImage"
+                                   accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                   class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-[#153B70] hover:file:bg-gray-200">
+                            <template x-if="imagePreview">
+                                <div class="w-20 h-20 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center p-1">
+                                    <img :src="imagePreview" alt="Upload Preview" class="w-full h-full object-contain">
+                                </div>
+                            </template>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Accepted types: JPG, PNG, WEBP, GIF. Max file size: 5MB.</p>
+                        @error('question_image')
+                            <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <p class="text-[11px] text-gray-400 mt-1">Accepted types: JPG, PNG, WEBP, GIF. Max file size: 5MB.</p>
-                    @error('question_image')
-                        <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
-                    @enderror
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-600 mb-1">
+                            Image ALT Text (Accessibility & Diagram Description)
+                        </label>
+                        <input type="text"
+                               name="question_image_alt"
+                               value="{{ old('question_image_alt') }}"
+                               placeholder="e.g. Geometry figure showing right triangle with hypotenuse 10cm"
+                               class="w-full text-xs px-3 py-2 rounded-lg border border-gray-200 focus:border-[#087F82] focus:outline-none">
+                        @error('question_image_alt')
+                            <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                {{-- Four Selectable Options with Radio for Correct Option --}}
+                {{-- Four Selectable Options with Radio for Correct Option & Option Diagrams --}}
                 <div class="space-y-3 pt-4 border-t border-gray-100">
                     <div class="flex items-center justify-between">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -218,9 +242,9 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {{-- Option A --}}
-                        <div class="p-3 rounded-xl border transition-colors"
+                        <div class="p-3.5 rounded-xl border transition-colors space-y-2.5"
                              :class="correctOption === 'A' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200'">
-                            <div class="flex items-center gap-2 mb-1.5">
+                            <div class="flex items-center gap-2">
                                 <input type="radio"
                                        name="correct_option"
                                        value="A"
@@ -236,14 +260,26 @@
                                    placeholder="Option A text..."
                                    class="w-full text-xs sm:text-sm px-3 py-2 rounded-lg border border-gray-200 focus:border-[#087F82] focus:outline-none">
                             @error('option_a')
-                                <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                <p class="text-[11px] text-rose-500 mt-0.5 font-semibold">{{ $message }}</p>
                             @enderror
+                            {{-- Option A Diagram --}}
+                            <div class="pt-1.5 border-t border-gray-100">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Optional Diagram (Option A)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="file" name="option_a_image" @change="handleOptionImage($event, 'A')" accept="image/*" class="text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-gray-100 file:text-[#153B70]">
+                                    <template x-if="optAPreview">
+                                        <div class="w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white p-0.5 flex-shrink-0">
+                                            <img :src="optAPreview" alt="Option A preview" class="w-full h-full object-contain">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Option B --}}
-                        <div class="p-3 rounded-xl border transition-colors"
+                        <div class="p-3.5 rounded-xl border transition-colors space-y-2.5"
                              :class="correctOption === 'B' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200'">
-                            <div class="flex items-center gap-2 mb-1.5">
+                            <div class="flex items-center gap-2">
                                 <input type="radio"
                                        name="correct_option"
                                        value="B"
@@ -259,14 +295,26 @@
                                    placeholder="Option B text..."
                                    class="w-full text-xs sm:text-sm px-3 py-2 rounded-lg border border-gray-200 focus:border-[#087F82] focus:outline-none">
                             @error('option_b')
-                                <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                <p class="text-[11px] text-rose-500 mt-0.5 font-semibold">{{ $message }}</p>
                             @enderror
+                            {{-- Option B Diagram --}}
+                            <div class="pt-1.5 border-t border-gray-100">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Optional Diagram (Option B)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="file" name="option_b_image" @change="handleOptionImage($event, 'B')" accept="image/*" class="text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-gray-100 file:text-[#153B70]">
+                                    <template x-if="optBPreview">
+                                        <div class="w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white p-0.5 flex-shrink-0">
+                                            <img :src="optBPreview" alt="Option B preview" class="w-full h-full object-contain">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Option C --}}
-                        <div class="p-3 rounded-xl border transition-colors"
+                        <div class="p-3.5 rounded-xl border transition-colors space-y-2.5"
                              :class="correctOption === 'C' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200'">
-                            <div class="flex items-center gap-2 mb-1.5">
+                            <div class="flex items-center gap-2">
                                 <input type="radio"
                                        name="correct_option"
                                        value="C"
@@ -282,14 +330,26 @@
                                    placeholder="Option C text..."
                                    class="w-full text-xs sm:text-sm px-3 py-2 rounded-lg border border-gray-200 focus:border-[#087F82] focus:outline-none">
                             @error('option_c')
-                                <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                <p class="text-[11px] text-rose-500 mt-0.5 font-semibold">{{ $message }}</p>
                             @enderror
+                            {{-- Option C Diagram --}}
+                            <div class="pt-1.5 border-t border-gray-100">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Optional Diagram (Option C)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="file" name="option_c_image" @change="handleOptionImage($event, 'C')" accept="image/*" class="text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-gray-100 file:text-[#153B70]">
+                                    <template x-if="optCPreview">
+                                        <div class="w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white p-0.5 flex-shrink-0">
+                                            <img :src="optCPreview" alt="Option C preview" class="w-full h-full object-contain">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Option D --}}
-                        <div class="p-3 rounded-xl border transition-colors"
+                        <div class="p-3.5 rounded-xl border transition-colors space-y-2.5"
                              :class="correctOption === 'D' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200'">
-                            <div class="flex items-center gap-2 mb-1.5">
+                            <div class="flex items-center gap-2">
                                 <input type="radio"
                                        name="correct_option"
                                        value="D"
@@ -305,8 +365,20 @@
                                    placeholder="Option D text..."
                                    class="w-full text-xs sm:text-sm px-3 py-2 rounded-lg border border-gray-200 focus:border-[#087F82] focus:outline-none">
                             @error('option_d')
-                                <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                <p class="text-[11px] text-rose-500 mt-0.5 font-semibold">{{ $message }}</p>
                             @enderror
+                            {{-- Option D Diagram --}}
+                            <div class="pt-1.5 border-t border-gray-100">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Optional Diagram (Option D)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="file" name="option_d_image" @change="handleOptionImage($event, 'D')" accept="image/*" class="text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-gray-100 file:text-[#153B70]">
+                                    <template x-if="optDPreview">
+                                        <div class="w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white p-0.5 flex-shrink-0">
+                                            <img :src="optDPreview" alt="Option D preview" class="w-full h-full object-contain">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @error('correct_option')
@@ -314,18 +386,33 @@
                     @enderror
                 </div>
 
-                {{-- Step-by-Step Explanation --}}
-                <div class="pt-2">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                        Step-by-Step Explanation / Mathematical Solution
-                    </label>
-                    <textarea name="explanation"
-                              rows="4"
-                              placeholder="Provide step-by-step mathematical working or conceptual reason..."
-                              class="w-full p-3.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">{{ old('explanation') }}</textarea>
-                    @error('explanation')
-                        <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
-                    @enderror
+                {{-- Step-by-Step Explanation & Explanation Diagram --}}
+                <div class="space-y-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Step-by-Step Explanation / Mathematical Solution
+                        </label>
+                        <textarea name="explanation"
+                                  rows="4"
+                                  placeholder="Provide step-by-step mathematical working or conceptual reason..."
+                                  class="w-full p-3.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">{{ old('explanation') }}</textarea>
+                        @error('explanation')
+                            <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Optional Explanation Diagram / Solution Figure
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="file" name="explanation_image" @change="handleExpImage" accept="image/*" class="text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-[#153B70]">
+                            <template x-if="expPreview">
+                                <div class="w-16 h-16 rounded-lg border border-gray-200 overflow-hidden bg-white p-1 flex-shrink-0">
+                                    <img :src="expPreview" alt="Explanation preview" class="w-full h-full object-contain">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3">

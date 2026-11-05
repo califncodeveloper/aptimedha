@@ -164,6 +164,7 @@
                             </span>
                             <span class="ql-formats">
                                 <button class="ql-link"></button>
+                                <button class="ql-image" type="button" title="Upload & Insert Image"></button>
                                 <button class="ql-clean"></button>
                             </span>
                         </div>
@@ -225,6 +226,56 @@
                 },
                 theme: 'snow',
                 placeholder: 'Write the complete educational article here...'
+            });
+
+            // Custom image handler: uploads to Cloudinary via admin endpoint
+            const toolbar = quill.getModule('toolbar');
+            toolbar.addHandler('image', function () {
+                const fileInput = document.createElement('input');
+                fileInput.setAttribute('type', 'file');
+                fileInput.setAttribute('accept', 'image/jpeg,image/png,image/jpg,image/webp,image/gif');
+                fileInput.click();
+
+                fileInput.onchange = async function () {
+                    const file = fileInput.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    try {
+                        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        const response = await fetch('{{ route("admin.blogs.upload-image") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+                        if (data.success && data.url) {
+                            const range = quill.getSelection(true);
+                            quill.insertEmbed(range.index, 'image', data.url);
+                            quill.setSelection(range.index + 1);
+                        } else {
+                            alert(data.message || data.error || 'Failed to upload image. Please try again.');
+                        }
+                    } catch (err) {
+                        alert('Network or server error while uploading image: ' + err.message);
+                    }
+                };
+            });
+
+            // Prevent pasting of base64 images into the editor
+            quill.clipboard.addMatcher('IMG', function (node, delta) {
+                const src = node.getAttribute('src');
+                if (src && src.startsWith('data:')) {
+                    alert('Direct pasting of Base64 images is disabled. Please use the toolbar image button to upload.');
+                    return new (Quill.import('delta'))();
+                }
+                return delta;
             });
 
             // Sync editor content to hidden input on submit

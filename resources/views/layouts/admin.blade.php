@@ -78,6 +78,7 @@
                     ['label' => 'Contact Messages', 'icon' => 'mail', 'route' => 'admin.contacts.index', 'pattern' => 'admin.contacts*'],
                     ['label' => 'Pages', 'icon' => 'file', 'route' => 'admin.pages.index', 'pattern' => 'admin.pages*'],
                     ['label' => 'Settings', 'icon' => 'settings', 'route' => 'admin.settings.index', 'pattern' => 'admin.settings*'],
+                    ['label' => 'Cloudinary Test', 'icon' => 'cloud', 'route' => 'admin.cloudinary-test.index', 'pattern' => 'admin.cloudinary-test*'],
                 ];
             @endphp
 
