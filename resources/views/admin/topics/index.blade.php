@@ -114,7 +114,7 @@
                                         <a href="{{ route('mcq.index', ['category' => $item->category->slug ?? '', 'topic' => $item->slug]) }}" target="_blank" class="p-1.5 text-gray-500 hover:text-[#153B70] rounded-lg hover:bg-blue-50 transition-colors" title="Practice Topic MCQs">
                                             <i data-lucide="external-link" class="w-4 h-4"></i>
                                         </a>
-                                        <form action="{{ route('admin.topics.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete topic &quot;{{ $item->name }}&quot;? Deletion will be rejected if associated MCQs exist.');" class="inline">
+                                        <form action="{{ route('admin.topics.destroy', $item->id) }}" method="POST" onsubmit="return confirm(@js('Are you sure you want to delete topic \"' . $item->name . '\"? Deletion will be rejected if associated MCQs exist.'));" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Delete Topic">

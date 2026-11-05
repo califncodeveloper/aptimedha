@@ -43,13 +43,13 @@ class CloudinaryTestController extends Controller
     public function upload(Request $request): RedirectResponse
     {
         $request->validate([
-            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'], // 2MB limit
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // 2MB limit
             'folder' => ['nullable', 'string'],
         ], [
             'image.required' => 'Please select an image file to upload.',
             'image.image' => 'The uploaded file must be a valid image.',
             'image.max' => 'The image size must not exceed 2MB (oversized file rejected).',
-            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, webp, svg.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, webp.',
         ]);
 
         $folder = $request->input('folder', CloudinaryService::FOLDER_BASE);

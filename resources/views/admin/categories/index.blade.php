@@ -89,7 +89,7 @@
                                         <a href="{{ route('categories.show', $cat->slug) }}" target="_blank" class="p-1.5 text-gray-500 hover:text-[#153B70] rounded-lg hover:bg-blue-50 transition-colors" title="View Public Page">
                                             <i data-lucide="external-link" class="w-4 h-4"></i>
                                         </a>
-                                        <form action="{{ route('admin.categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete category &quot;{{ $cat->name }}&quot;? Deletion will be rejected if child subjects or topics exist.');" class="inline">
+                                        <form action="{{ route('admin.categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm(@js('Are you sure you want to delete category \"' . $cat->name . '\"? Deletion will be rejected if child subjects or topics exist.'));" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Delete Category">

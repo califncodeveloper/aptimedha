@@ -252,7 +252,7 @@
                                         <form method="POST"
                                               action="{{ route('admin.current-affairs.destroy', $affair) }}"
                                               class="inline-block"
-                                              onsubmit="return confirm('Are you sure you want to delete the Current Affairs issue for {{ $affair->period_label }}? This will safely remove the associated PDF and preview image.');">
+                                              onsubmit="return confirm(@js('Are you sure you want to delete the Current Affairs issue for ' . $affair->period_label . '? This will safely remove the associated PDF and preview image.'));">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

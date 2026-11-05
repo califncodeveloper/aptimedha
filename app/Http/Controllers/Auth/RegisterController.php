@@ -48,8 +48,9 @@ class RegisterController
             'username' => $validated['username'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => UserRole::User,
         ]);
+        $user->role = UserRole::User;
+        $user->save();
 
         event(new Registered($user));
 

@@ -73,8 +73,8 @@ class ArchitectureVerificationTest extends TestCase
         $user = new User([
             'name' => 'Regular User',
             'email' => 'user@example.com',
-            'role' => UserRole::User,
         ]);
+        $user->role = UserRole::User;
 
         $this->actingAs($user)->get('/dashboard')->assertStatus(200);
         $this->actingAs($user)->get('/dashboard/profile')->assertStatus(200);
@@ -100,8 +100,8 @@ class ArchitectureVerificationTest extends TestCase
         $admin = new User([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
-            'role' => UserRole::Admin,
         ]);
+        $admin->role = UserRole::Admin;
 
         $this->actingAs($admin)->get('/admin')->assertStatus(200);
         $this->actingAs($admin)->get('/admin/mcqs')->assertStatus(200);

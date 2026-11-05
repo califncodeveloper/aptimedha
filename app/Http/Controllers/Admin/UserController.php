@@ -97,7 +97,13 @@ class UserController
             'role' => ['required', Rule::enum(UserRole::class)],
         ]);
 
-        $user->update($validated);
+        $user->fill([
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+        ]);
+        $user->role = $validated['role'] instanceof UserRole ? $validated['role'] : UserRole::from($validated['role']);
+        $user->save();
 
         return redirect()->route('admin.users.index')
             ->with('success', "User '{$user->name}' was successfully updated.");

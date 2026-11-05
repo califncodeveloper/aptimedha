@@ -18,16 +18,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Ensure primary administrator account exists
-        User::updateOrCreate(
-            ['email' => 'admin@aptimedha.com'],
-            [
-                'name' => 'AptiMedha Administrator',
-                'username' => 'admin',
-                'password' => Hash::make('Admin@12345'),
-                'role' => UserRole::Admin,
-                'email_verified_at' => now(),
-            ]
-        );
+        $admin = User::firstOrNew(['email' => 'admin@aptimedha.com']);
+        $admin->fill([
+            'name' => 'AptiMedha Administrator',
+            'username' => 'admin',
+            'password' => Hash::make('Admin@12345'),
+            'email_verified_at' => now(),
+        ]);
+        $admin->role = UserRole::Admin;
+        $admin->save();
 
         $this->call([
             TaxonomySeeder::class,

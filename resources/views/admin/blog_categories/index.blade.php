@@ -123,7 +123,7 @@
                                             <a href="{{ route('admin.blog-categories.edit', $category) }}" class="p-1.5 text-gray-500 hover:text-[#087F82] rounded-lg hover:bg-teal-50" title="Edit Category">
                                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                             </a>
-                                            <form action="{{ route('admin.blog-categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm('Delete category \'{{ addslashes($category->name) }}\'?');">
+                                            <form action="{{ route('admin.blog-categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm(@js('Delete category \'' . $category->name . '\'?'));">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50" title="Delete Category">

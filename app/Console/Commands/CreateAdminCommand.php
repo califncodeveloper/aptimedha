@@ -75,8 +75,9 @@ class CreateAdminCommand extends Command
             'username' => $username,
             'email' => $email,
             'password' => Hash::make($password),
-            'role' => UserRole::Admin,
         ]);
+        $admin->role = UserRole::Admin;
+        $admin->save();
 
         $this->info("Administrator '{$admin->name}' ({$admin->email}) created successfully with role '{$admin->role->value}'.");
 

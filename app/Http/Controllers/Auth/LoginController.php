@@ -390,9 +390,9 @@ class LoginController
                             'username' => $candidate,
                             'email' => $email,
                             'password' => Hash::make(Str::random(32)),
-                            'role' => UserRole::User, // Standard User role; never elevated from OAuth data
                         ]);
 
+                        $user->role = UserRole::User; // Standard User role; never elevated from OAuth data
                         $user->email_verified_at = now();
                         $user->save();
 

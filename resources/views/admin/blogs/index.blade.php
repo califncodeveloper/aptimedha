@@ -211,7 +211,7 @@
                                         </a>
 
                                         {{-- Delete with confirmation --}}
-                                        <form action="{{ route('admin.blogs.destroy', $post) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this article: \'{{ addslashes($post->title) }}\'? This cannot be undone.');">
+                                        <form action="{{ route('admin.blogs.destroy', $post) }}" method="POST" class="inline" onsubmit="return confirm(@js('Are you sure you want to delete this article: \'' . $post->title . '\'? This cannot be undone.'));">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Delete Article">

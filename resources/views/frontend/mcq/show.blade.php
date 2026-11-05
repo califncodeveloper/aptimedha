@@ -341,7 +341,7 @@
 
                             @if (Auth::id() === $disc->user_id)
                                 <div class="flex items-center gap-2">
-                                    <button type="button" @click="editingDiscussionId = {{ $disc->id }}; editingDiscussionText = '{{ addslashes($disc->comment) }}';"
+                                    <button type="button" @click="editingDiscussionId = {{ $disc->id }}; editingDiscussionText = @js($disc->comment);"
                                         class="text-xs text-gray-500 hover:text-[#087F82]">
                                         Edit
                                     </button>

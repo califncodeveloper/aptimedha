@@ -19,6 +19,23 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
+     * Create a new instance of the model.
+     * Handles non-fillable role explicitly for test factory compatibility.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function newModel(array $attributes = [])
+    {
+        $role = $attributes['role'] ?? UserRole::User;
+        unset($attributes['role']);
+
+        $user = parent::newModel($attributes);
+        $user->role = $role instanceof UserRole ? $role : UserRole::from($role);
+
+        return $user;
+    }
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>

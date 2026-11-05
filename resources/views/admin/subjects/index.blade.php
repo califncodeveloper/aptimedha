@@ -99,7 +99,7 @@
                                         <a href="{{ route('admin.subjects.edit', $subj->id) }}" class="p-1.5 text-gray-500 hover:text-[#087F82] rounded-lg hover:bg-teal-50 transition-colors" title="Edit Subject">
                                             <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
-                                        <form action="{{ route('admin.subjects.destroy', $subj->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete subject &quot;{{ $subj->name }}&quot;? Deletion will be rejected if child topics exist.');" class="inline">
+                                        <form action="{{ route('admin.subjects.destroy', $subj->id) }}" method="POST" onsubmit="return confirm(@js('Are you sure you want to delete subject \"' . $subj->name . '\"? Deletion will be rejected if child topics exist.'));" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Delete Subject">

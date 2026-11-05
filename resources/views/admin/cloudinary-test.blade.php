@@ -169,9 +169,9 @@
 
                 <div>
                     <label for="image" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                        Image File (Max 2MB, jpeg/png/webp/svg)
+                        Image File (Max 2MB, jpeg/png/webp)
                     </label>
-                    <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/webp,image/svg+xml" required
+                    <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/webp" required
                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#153B70] file:text-white hover:file:bg-[#102d55] file:cursor-pointer border border-gray-200 rounded-xl p-2 bg-[#F7F9FC]">
                     @error('image')
                         <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
