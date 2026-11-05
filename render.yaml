@@ -18,8 +18,6 @@ services:
         value: cookie
       - key: CACHE_STORE
         value: file
-      - key: DB_CONNECTION
-        value: sqlite
       - key: QUEUE_CONNECTION
         value: sync
 

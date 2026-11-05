@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 /**
@@ -71,11 +72,13 @@ class McqController
         // Resolve Sidebar Topics for this Category
         $sidebarTopics = collect();
         if ($category) {
-            $sidebarTopics = Topic::where('category_id', $category->id)
-                ->active()
-                ->ordered()
-                ->withCount(['questions' => fn ($q) => $q->active()])
-                ->get();
+            $sidebarTopics = Cache::remember("cat_{$category->id}_sidebar_topics", 300, function () use ($category) {
+                return Topic::where('category_id', $category->id)
+                    ->active()
+                    ->ordered()
+                    ->withCount(['questions' => fn ($q) => $q->active()])
+                    ->get();
+            });
         }
 
         // Fallback topic if not resolved yet
@@ -98,7 +101,7 @@ class McqController
             }
 
             $mcqs = $questionsQuery->paginate(10)->withQueryString();
-            $totalQuestions = Question::where('topic_id', $topic->id)->active()->count();
+            $totalQuestions = $mcqs->total();
         } else {
             $mcqs = Question::whereRaw('0 = 1')->paginate(10);
             $totalQuestions = 0;
