@@ -33,6 +33,8 @@ class DatabaseSeeder extends Seeder
             TaxonomySeeder::class,
             StaticPageSeeder::class,
             BlogSeeder::class,
+            PlacementGuideSeeder::class,
+            CurrentAffairSeeder::class,
         ]);
     }
 }

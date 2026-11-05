@@ -97,6 +97,14 @@
                        ])>
                         Placement Prep
                     </a>
+                    <a href="{{ route('current-affairs.index') }}"
+                       @class([
+                           'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
+                           'text-[#087F82] font-bold bg-teal-50' => request()->routeIs('current-affairs*'),
+                           'text-[#243247] hover:text-[#087F82] hover:bg-gray-50' => !request()->routeIs('current-affairs*'),
+                       ])>
+                        Current Affairs
+                    </a>
                     <a href="{{ route('blog.index') }}"
                        @class([
                            'px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap text-sm',
@@ -242,6 +250,9 @@
             </a>
             <a @click="mobileMenu = false" href="{{ route('placement.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('placement*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
                 <i data-lucide="graduation-cap" class="w-4 h-4 mr-2.5 text-gray-400"></i> Placement Preparation
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('current-affairs.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('current-affairs*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="newspaper" class="w-4 h-4 mr-2.5 text-gray-400"></i> Current Affairs
             </a>
             <a @click="mobileMenu = false" href="{{ route('blog.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('blog.*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
                 <i data-lucide="file-text" class="w-4 h-4 mr-2.5 text-gray-400"></i> Blog & Guides
@@ -409,6 +420,7 @@
                         <li><a href="{{ route('placement.index') }}#group-discussions" class="text-white/70 hover:text-white transition-colors">Group Discussions</a></li>
                         <li><a href="{{ route('placement.index') }}#resume-guide" class="text-white/70 hover:text-white transition-colors">Resume Guide</a></li>
                         <li><a href="{{ route('blog.index') }}" class="text-white/70 hover:text-white transition-colors">Articles & Tips</a></li>
+                        <li><a href="{{ route('current-affairs.index') }}" class="text-white/70 hover:text-white transition-colors">Monthly Current Affairs</a></li>
                         <li><a href="{{ route('categories.index') }}" class="text-white/70 hover:text-white transition-colors">Explore All Categories</a></li>
                     </ul>
                 </div>

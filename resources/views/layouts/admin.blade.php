@@ -72,6 +72,8 @@
                     ['label' => 'Topics', 'icon' => 'tag', 'route' => 'admin.topics.index', 'pattern' => 'admin.topics*'],
                     ['label' => 'Import MCQs', 'icon' => 'upload', 'route' => 'admin.mcqs.import.form', 'pattern' => 'admin.mcqs.import*'],
                     ['label' => 'Blog Management', 'icon' => 'file-text', 'route' => 'admin.blogs.index', 'pattern' => 'admin.blog*'],
+                    ['label' => 'Placement Guides', 'icon' => 'briefcase', 'route' => 'admin.placement.index', 'pattern' => 'admin.placement*'],
+                    ['label' => 'Current Affairs', 'icon' => 'calendar', 'route' => 'admin.current-affairs.index', 'pattern' => 'admin.current-affairs*'],
                     ['label' => 'User Management', 'icon' => 'users', 'route' => 'admin.users.index', 'pattern' => 'admin.users*'],
                     ['label' => 'Discussions', 'icon' => 'message-square', 'route' => 'admin.discussions.index', 'pattern' => 'admin.discussions*'],
                     ['label' => 'Reports', 'icon' => 'flag', 'route' => 'admin.reports.index', 'pattern' => 'admin.reports*'],

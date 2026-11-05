@@ -22,7 +22,12 @@ class CloudinaryService
     public const FOLDER_BLOGS_FEATURED = 'aptimedha/blogs/featured';
     public const FOLDER_BLOGS_CONTENT = 'aptimedha/blogs/content';
     public const FOLDER_PLACEMENT = 'aptimedha/placement';
+    public const FOLDER_PLACEMENT_FEATURED = 'aptimedha/placement/featured';
+    public const FOLDER_PLACEMENT_CONTENT = 'aptimedha/placement/content';
+    public const FOLDER_PLACEMENT_DOWNLOADS = 'aptimedha/placement/downloads';
     public const FOLDER_CURRENT_AFFAIRS = 'aptimedha/current-affairs';
+    public const FOLDER_CURRENT_AFFAIRS_PDFS = 'aptimedha/current-affairs/pdfs';
+    public const FOLDER_CURRENT_AFFAIRS_PREVIEWS = 'aptimedha/current-affairs/previews';
 
     /**
      * Allowed Standard Media Folders
@@ -35,7 +40,12 @@ class CloudinaryService
         self::FOLDER_BLOGS_FEATURED,
         self::FOLDER_BLOGS_CONTENT,
         self::FOLDER_PLACEMENT,
+        self::FOLDER_PLACEMENT_FEATURED,
+        self::FOLDER_PLACEMENT_CONTENT,
+        self::FOLDER_PLACEMENT_DOWNLOADS,
         self::FOLDER_CURRENT_AFFAIRS,
+        self::FOLDER_CURRENT_AFFAIRS_PDFS,
+        self::FOLDER_CURRENT_AFFAIRS_PREVIEWS,
     ];
 
     /**
@@ -227,7 +237,14 @@ class CloudinaryService
             $prefix = Str::slug($originalFilename);
             $prefix = substr($prefix, 0, 30);
             $randomString = Str::random(12);
-            $uploadParams['public_id'] = $prefix ? "{$prefix}_{$randomString}" : $randomString;
+            $generatedId = $prefix ? "{$prefix}_{$randomString}" : $randomString;
+            if ($resourceType === 'raw') {
+                $ext = $file instanceof UploadedFile ? $file->getClientOriginalExtension() : pathinfo($sourcePath, PATHINFO_EXTENSION);
+                if ($ext) {
+                    $generatedId .= '.' . strtolower($ext);
+                }
+            }
+            $uploadParams['public_id'] = $generatedId;
         }
 
         try {

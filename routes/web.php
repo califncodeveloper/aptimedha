@@ -11,6 +11,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController;
 use App\Http\Controllers\Frontend\McqController as FrontendMcqController;
 use App\Http\Controllers\Frontend\PlacementController;
+use App\Http\Controllers\Frontend\CurrentAffairController as FrontendCurrentAffairController;
 use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
 use App\Http\Controllers\Frontend\PageController as FrontendPageController;
 
@@ -36,6 +37,8 @@ use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\McqImportController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\BlogCategoryController;
+use App\Http\Controllers\Admin\PlacementGuideController;
+use App\Http\Controllers\Admin\CurrentAffairController as AdminCurrentAffairController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DiscussionController as AdminDiscussionController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
@@ -86,8 +89,15 @@ Route::get('/categories/{category}', [FrontendCategoryController::class, 'show']
 Route::get('/mcq', [FrontendMcqController::class, 'index'])->name('mcq.index');
 Route::get('/mcq/{mcq}', [FrontendMcqController::class, 'show'])->name('mcq.show');
 
-Route::get('/placement-preparation', PlacementController::class)->name('placement.index');
+Route::get('/placement-preparation', [PlacementController::class, 'index'])->name('placement.index');
+Route::get('/placement-preparation/{slug}', [PlacementController::class, 'show'])->name('placement.show');
+Route::get('/placement-preparation/{slug}/download', [PlacementController::class, 'download'])->name('placement.download');
 Route::get('/placement', fn () => redirect()->route('placement.index'))->name('placement');
+
+Route::get('/current-affairs', [FrontendCurrentAffairController::class, 'index'])->name('current-affairs.index');
+Route::get('/current-affairs/{year}/{month}', [FrontendCurrentAffairController::class, 'show'])->where(['year' => '[0-9]{4}'])->name('current-affairs.show');
+Route::get('/current-affairs/{currentAffair}/preview', [FrontendCurrentAffairController::class, 'preview'])->name('current-affairs.preview');
+Route::get('/current-affairs/{currentAffair}/download', [FrontendCurrentAffairController::class, 'download'])->name('current-affairs.download');
 
 Route::get('/blog', [FrontendBlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post}', [FrontendBlogController::class, 'show'])->name('blog.show');
@@ -179,6 +189,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('blogs/upload-image', [AdminBlogController::class, 'uploadEmbeddedImage'])->name('blogs.upload-image');
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
+
+    Route::patch('placement/{placement}/toggle-status', [PlacementGuideController::class, 'toggleStatus'])->name('placement.toggle-status');
+    Route::get('placement/{placement}/preview', [PlacementGuideController::class, 'preview'])->name('placement.preview');
+    Route::post('placement/upload-image', [PlacementGuideController::class, 'uploadEmbeddedImage'])->name('placement.upload-image');
+    Route::post('placement/reorder', [PlacementGuideController::class, 'reorder'])->name('placement.reorder');
+    Route::resource('placement', PlacementGuideController::class);
+
+    Route::patch('current-affairs/{currentAffair}/toggle-status', [AdminCurrentAffairController::class, 'toggleStatus'])->name('current-affairs.toggle-status');
+    Route::get('current-affairs/{currentAffair}/preview', [AdminCurrentAffairController::class, 'preview'])->name('current-affairs.preview');
+    Route::resource('current-affairs', AdminCurrentAffairController::class);
 
     Route::resource('users', UserController::class)->except(['create', 'store']);
 
