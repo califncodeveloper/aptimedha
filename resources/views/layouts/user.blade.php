@@ -90,8 +90,8 @@
         </div>
     </header>
 
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 lg:pb-8">
+        <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
             {{-- Desktop Sidebar --}}
             <aside class="hidden lg:block w-56 flex-shrink-0">
@@ -140,8 +140,8 @@
     </div>
 
     {{-- Mobile Bottom Navigation --}}
-    <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 shadow-lg">
-        <div class="flex items-center justify-around py-2">
+    <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg">
+        <div class="flex items-center justify-around py-1">
             @php
                 $mobileNav = [
                     ['label' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'user.dashboard', 'pattern' => 'user.dashboard*'],
@@ -155,9 +155,9 @@
             @foreach($mobileNav as $item)
                 <a href="{{ route($item['route']) }}"
                    @class([
-                       'flex flex-col items-center px-2 py-1 text-xs font-medium transition-colors',
+                       'flex flex-col items-center justify-center min-w-[52px] min-h-[48px] px-1 py-1 text-[10px] sm:text-xs font-semibold transition-colors',
                        'text-[#153B70]' => request()->routeIs($item['pattern']),
-                       'text-gray-400' => !request()->routeIs($item['pattern']),
+                       'text-gray-400 hover:text-gray-600' => !request()->routeIs($item['pattern']),
                    ])>
                     <i data-lucide="{{ $item['icon'] }}" class="w-5 h-5 mb-0.5"></i>
                     <span>{{ $item['label'] }}</span>

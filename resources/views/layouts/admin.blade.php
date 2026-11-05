@@ -26,6 +26,7 @@
     </style>
 </head>
 <body class="min-h-screen bg-[#F7F9FC] text-[#243247] font-sans antialiased"
+      :class="{ 'overflow-hidden': mobileSidebar }"
       x-data="{ sidebarOpen: true, mobileSidebar: false }">
 
     {{-- Mobile Sidebar Backdrop --}}
@@ -55,13 +56,13 @@
                 <span class="text-lg font-bold text-white">A</span>
             </a>
             {{-- Close button on mobile --}}
-            <button @click="mobileSidebar = false" class="lg:hidden text-white/70 hover:text-white">
+            <button @click="mobileSidebar = false" class="lg:hidden text-white/70 hover:text-white p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-white/10" aria-label="Close sidebar">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
 
         {{-- Navigation --}}
-        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin">
             @php
                 $navItems = [
                     ['label' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'admin.dashboard', 'pattern' => 'admin.dashboard*'],
@@ -81,9 +82,10 @@
             @endphp
 
             @foreach($navItems as $item)
-                <a href="{{ route($item['route']) }}"
+                <a @click="mobileSidebar = false"
+                   href="{{ route($item['route']) }}"
                    @class([
-                       'flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 group',
+                       'flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 group min-h-[42px]',
                        'bg-[#087F82] text-white' => request()->routeIs($item['pattern']),
                        'text-white/70 hover:bg-white/10 hover:text-white' => !request()->routeIs($item['pattern']),
                    ])>
@@ -107,19 +109,19 @@
     <div :class="sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'" class="transition-all duration-300 ease-in-out">
 
         {{-- Top Bar --}}
-        <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 shadow-sm">
-            <div class="flex items-center space-x-4">
+        <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-3 sm:px-6 shadow-sm">
+            <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
                 {{-- Mobile Hamburger --}}
-                <button @click="mobileSidebar = true" class="lg:hidden text-[#243247] p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <button @click="mobileSidebar = true" class="lg:hidden text-[#243247] p-2 rounded-lg hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Open sidebar">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
 
                 {{-- Page Title --}}
-                <h1 class="text-lg font-semibold text-[#243247]">{{ $header ?? '' }}</h1>
+                <h1 class="text-sm sm:text-lg font-semibold text-[#243247] truncate max-w-[170px] xs:max-w-xs sm:max-w-none">{{ $header ?? '' }}</h1>
             </div>
 
             {{-- Right Section --}}
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                 {{-- Visit Site --}}
                 <a href="{{ url('/') }}" target="_blank"
                    class="hidden sm:inline-flex items-center space-x-1 text-sm text-gray-500 hover:text-[#153B70] transition-colors">
@@ -129,7 +131,7 @@
 
                 {{-- Admin User Dropdown --}}
                 <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open" class="flex items-center space-x-2 text-sm text-[#243247] hover:text-[#153B70] transition-colors">
+                    <button @click="open = !open" class="flex items-center space-x-2 text-sm text-[#243247] hover:text-[#153B70] transition-colors p-1 rounded-lg">
                         <div class="w-8 h-8 rounded-full bg-[#153B70] flex items-center justify-center text-white text-xs font-bold">
                             {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                         </div>
@@ -139,7 +141,7 @@
                     <div x-show="open"
                          @click.away="open = false"
                          x-transition
-                         class="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg ring-1 ring-black/5 py-1"
+                         class="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg ring-1 ring-black/5 py-1 z-50"
                          x-cloak>
                         <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-[#243247] hover:bg-gray-50">Admin Dashboard</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -154,7 +156,7 @@
         </header>
 
         {{-- Flash Messages --}}
-        <div class="px-4 sm:px-6 pt-4">
+        <div class="px-3 sm:px-6 pt-4">
             @if(session('success'))
                 <x-alert type="success">{{ session('success') }}</x-alert>
             @endif
@@ -164,7 +166,7 @@
         </div>
 
         {{-- Main Content --}}
-        <main class="p-6">
+        <main class="p-3.5 sm:p-6">
             {{ $slot }}
         </main>
     </div>

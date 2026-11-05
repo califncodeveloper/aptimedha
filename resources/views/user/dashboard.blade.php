@@ -16,7 +16,7 @@
                     Track your saved bookmarks, community discussions, and question correction reports all in one place.
                 </p>
             </div>
-            <a href="{{ route('mcq.index') }}" class="relative z-10 px-6 py-3 rounded-xl bg-white text-[#153B70] font-bold text-xs hover:bg-gray-100 transition-all shadow-xs hover:-translate-y-0.5 whitespace-nowrap">
+            <a href="{{ route('mcq.index') }}" class="relative z-10 w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-white text-[#153B70] font-bold text-xs hover:bg-gray-100 transition-all shadow-xs hover:-translate-y-0.5 whitespace-nowrap">
                 Continue Practice &rarr;
             </a>
         </div>
@@ -176,8 +176,8 @@
             </div>
 
             @if ($recentReports->isNotEmpty())
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm">
+                <div class="overflow-x-auto scrollbar-thin">
+                    <table class="w-full text-left text-xs sm:text-sm min-w-[620px]">
                         <thead class="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100">
                             <tr>
                                 <th class="px-6 py-3">Question</th>

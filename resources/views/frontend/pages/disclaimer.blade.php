@@ -6,7 +6,7 @@
 
     <div class="bg-white border-b border-gray-200/80 py-10 sm:py-14">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <nav class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 <a href="{{ url('/') }}" class="hover:text-[#153B70] transition-colors">Home</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 <span class="text-[#087F82]">Disclaimer</span>

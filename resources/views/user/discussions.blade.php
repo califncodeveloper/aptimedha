@@ -90,13 +90,13 @@
 
                             <div class="flex items-center gap-2">
                                 <button type="button" @click="openEdit({{ $disc->id }}, '{{ addslashes($disc->comment) }}')"
-                                    class="px-2.5 py-1 text-xs font-semibold text-gray-600 hover:text-[#087F82] hover:bg-teal-50 rounded-lg transition-colors">
+                                    class="px-2.5 py-1 text-xs font-semibold text-gray-600 hover:text-[#087F82] hover:bg-teal-50 rounded-lg transition-colors min-h-[36px] flex items-center">
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5 inline mr-1"></i> Edit
                                 </button>
                                 <form method="POST" action="{{ route('user.discussions.destroy', $disc->id) }}" onsubmit="return confirm('Delete this comment?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                                    <button type="submit" class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors min-h-[36px] flex items-center">
                                         <i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i> Delete
                                     </button>
                                 </form>

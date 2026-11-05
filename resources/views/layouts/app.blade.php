@@ -32,15 +32,16 @@
     </style>
 </head>
 <body class="min-h-screen bg-[#F7F9FC] text-[#243247] font-sans antialiased flex flex-col justify-between"
+      :class="{ 'overflow-hidden': mobileMenu || searchOpen }"
       x-data="{ mobileMenu: false, searchOpen: false }">
 
     {{-- Main Navbar (Clean, Premium, Properly Spaced matching Client Mockup) --}}
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-16 sm:h-18 items-center justify-between gap-4 lg:gap-8">
+        <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+            <div class="flex h-16 sm:h-18 items-center justify-between gap-2 sm:gap-4 lg:gap-8">
                 
                 {{-- Brand Logo --}}
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 min-w-0">
                     <a href="{{ url('/') }}" class="group transition-transform active:scale-95 block">
                         <x-application-logo />
                     </a>
@@ -107,11 +108,12 @@
                 </nav>
 
                 {{-- Right Actions (Search & Auth) --}}
-                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                     {{-- Clean Search Icon Button matching mockup --}}
                     <button @click="searchOpen = true" 
                             type="button" 
-                            class="p-2 text-[#243247]/80 hover:text-[#087F82] hover:bg-teal-50/70 rounded-full transition-colors cursor-pointer"
+                            class="min-w-[40px] min-h-[40px] p-2 text-[#243247]/80 hover:text-[#087F82] hover:bg-teal-50/70 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+                            aria-label="Search Topics"
                             title="Search Topics (Ctrl+K)">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
@@ -119,11 +121,11 @@
                     @guest
                         <div class="hidden sm:flex items-center gap-2">
                             <a href="{{ route('login') }}"
-                               class="px-3.5 py-2 text-sm font-semibold text-[#153B70] hover:text-[#087F82] hover:bg-gray-50 rounded-xl transition-colors whitespace-nowrap">
+                               class="px-3.5 py-2 text-sm font-semibold text-[#153B70] hover:text-[#087F82] hover:bg-gray-50 rounded-xl transition-colors whitespace-nowrap min-h-[40px] inline-flex items-center">
                                 Log in
                             </a>
                             <a href="{{ route('register') }}"
-                               class="inline-flex items-center px-4.5 py-2 text-sm font-bold text-white bg-[#087F82] hover:bg-[#066668] rounded-xl shadow-xs transition-all whitespace-nowrap hover:shadow-sm active:scale-95">
+                               class="inline-flex items-center px-4.5 py-2 text-sm font-bold text-white bg-[#087F82] hover:bg-[#066668] rounded-xl shadow-xs transition-all whitespace-nowrap hover:shadow-sm active:scale-95 min-h-[40px]">
                                 Sign up
                             </a>
                         </div>
@@ -131,7 +133,8 @@
                         <div x-data="{ userMenu: false }" class="relative">
                             <button @click="userMenu = !userMenu"
                                     type="button"
-                                    class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                                    class="flex items-center space-x-1.5 sm:space-x-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors min-h-[40px]"
+                                    aria-label="User Menu">
                                 <div class="w-8 h-8 rounded-full bg-[#153B70] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
                                     {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                                 </div>
@@ -182,7 +185,8 @@
                     {{-- Mobile Hamburger --}}
                     <button @click="mobileMenu = !mobileMenu"
                             type="button"
-                            class="lg:hidden p-2 text-[#243247] hover:bg-gray-100 rounded-lg transition-colors">
+                            class="lg:hidden p-2 text-[#243247] hover:bg-gray-100 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                            aria-label="Toggle navigation menu">
                         <i x-show="!mobileMenu" data-lucide="menu" class="w-6 h-6"></i>
                         <i x-show="mobileMenu" data-lucide="x" class="w-6 h-6" x-cloak></i>
                     </button>
@@ -190,33 +194,80 @@
             </div>
         </div>
 
+        {{-- Mobile Backdrop --}}
+        <div x-show="mobileMenu"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="mobileMenu = false"
+             class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+             x-cloak></div>
+
         {{-- Mobile Slide-down Navigation Menu --}}
         <div x-show="mobileMenu"
-             x-transition
-             class="lg:hidden border-t border-gray-200 bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             class="lg:hidden relative z-50 border-t border-gray-200 bg-white px-4 pt-3 pb-6 space-y-1.5 shadow-xl max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-thin"
              x-cloak>
-            <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Home</a>
-            <a href="{{ route('categories.show', 'arithmetic-aptitude') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Aptitude</a>
-            <a href="{{ route('categories.show', 'logical-reasoning') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Reasoning</a>
-            <a href="{{ route('categories.show', 'programming') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Programming</a>
-            <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">All Categories</a>
-            <a href="{{ route('mcq.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">MCQ Practice</a>
-            <a href="{{ route('placement.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Placement Preparation</a>
-            <a href="{{ route('blog.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Blog & Guides</a>
-            <a href="{{ route('about') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">About Us</a>
-            <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">Contact</a>
+            <div class="flex items-center justify-between pb-2 border-b border-gray-100 lg:hidden">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Navigation Menu</span>
+                <button @click="mobileMenu = false" class="p-1.5 text-gray-500 hover:text-[#153B70] rounded-lg" aria-label="Close menu">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <a @click="mobileMenu = false" href="{{ url('/') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->is('/') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="home" class="w-4 h-4 mr-2.5 text-gray-400"></i> Home
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('categories.show', 'arithmetic-aptitude') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->is('categories/arithmetic-aptitude*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="calculator" class="w-4 h-4 mr-2.5 text-gray-400"></i> Arithmetic Aptitude
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('categories.show', 'logical-reasoning') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->is('categories/logical-reasoning*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="brain" class="w-4 h-4 mr-2.5 text-gray-400"></i> Logical Reasoning
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('categories.show', 'programming') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->is('categories/programming*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="code-2" class="w-4 h-4 mr-2.5 text-gray-400"></i> Programming
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('categories.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('categories.index') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="layers" class="w-4 h-4 mr-2.5 text-gray-400"></i> All Categories
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('mcq.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('mcq.*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="help-circle" class="w-4 h-4 mr-2.5 text-gray-400"></i> MCQ Practice
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('placement.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('placement*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="graduation-cap" class="w-4 h-4 mr-2.5 text-gray-400"></i> Placement Preparation
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('blog.index') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs('blog.*') ? 'text-[#087F82] bg-teal-50' : 'text-[#243247] hover:bg-[#F7F9FC]' }}">
+                <i data-lucide="file-text" class="w-4 h-4 mr-2.5 text-gray-400"></i> Blog & Guides
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('about') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">
+                <i data-lucide="info" class="w-4 h-4 mr-2.5 text-gray-400"></i> About Us
+            </a>
+            <a @click="mobileMenu = false" href="{{ route('contact') }}" class="flex items-center px-3 py-2.5 rounded-xl text-sm font-medium text-[#243247] hover:bg-[#F7F9FC]">
+                <i data-lucide="mail" class="w-4 h-4 mr-2.5 text-gray-400"></i> Contact
+            </a>
 
-            <div class="border-t border-gray-100 pt-4 mt-3">
+            <div class="border-t border-gray-100 pt-3 mt-2">
                 @guest
                     <div class="grid grid-cols-2 gap-3">
-                        <a href="{{ route('login') }}" class="text-center px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-semibold text-[#153B70] hover:bg-gray-50">Log in</a>
-                        <a href="{{ route('register') }}" class="text-center px-4 py-2.5 rounded-lg bg-[#087F82] text-sm font-semibold text-white hover:bg-[#066668]">Sign up</a>
+                        <a @click="mobileMenu = false" href="{{ route('login') }}" class="text-center px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-[#153B70] hover:bg-gray-50 flex items-center justify-center min-h-[44px]">Log in</a>
+                        <a @click="mobileMenu = false" href="{{ route('register') }}" class="text-center px-4 py-2.5 rounded-xl bg-[#087F82] text-sm font-semibold text-white hover:bg-[#066668] flex items-center justify-center min-h-[44px]">Sign up</a>
                     </div>
                 @else
-                    <a href="{{ route('user.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-[#087F82] bg-teal-50">Go to Dashboard</a>
+                    <a @click="mobileMenu = false" href="{{ route('user.dashboard') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-[#087F82] bg-teal-50 min-h-[44px] flex items-center">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i> Go to Dashboard
+                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="mt-2">
                         @csrf
-                        <button type="submit" class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">Log out</button>
+                        <button type="submit" class="flex items-center w-full text-left px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl min-h-[44px]">
+                            <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Log out
+                        </button>
                     </form>
                 @endguest
             </div>
@@ -226,7 +277,7 @@
     {{-- Interactive Search Modal (Alpine.js) --}}
     <div x-show="searchOpen"
          @keydown.escape.window="searchOpen = false"
-         class="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 md:p-20"
+         class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 md:p-20 flex items-start sm:items-center justify-center pt-16 sm:pt-6"
          x-cloak>
         <div x-show="searchOpen"
              x-transition:enter="ease-out duration-200"
@@ -245,41 +296,41 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
-             class="relative mx-auto max-w-xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden"
+             class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col max-h-[85vh]"
              x-data="{ query: '' }">
-            <div class="flex items-center px-4 border-b border-gray-200">
+            <div class="flex items-center px-4 border-b border-gray-200 flex-shrink-0">
                 <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
                 <input type="text"
                        x-model="query"
-                       placeholder="Search subjects, topics (e.g. Percentages, Python, Profit & Loss)..."
-                       class="w-full border-0 py-4 pl-3 pr-4 text-[#243247] placeholder-gray-400 focus:outline-none focus:ring-0 text-sm">
+                       placeholder="Search subjects, topics (e.g. Percentages, Python)..."
+                       class="w-full border-0 py-3.5 sm:py-4 pl-3 pr-4 text-[#243247] placeholder-gray-400 focus:outline-none focus:ring-0 text-base sm:text-sm">
                 <button @click="searchOpen = false" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded">ESC</button>
             </div>
 
-            <div class="p-4 max-h-80 overflow-y-auto">
+            <div class="p-4 overflow-y-auto scrollbar-thin">
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Popular Practice Topics</p>
                 <div class="space-y-1">
-                    <a href="{{ route('mcq.index', ['topic' => 'percentages']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('mcq.index', ['topic' => 'percentages']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Percentages</span>
                         <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
                     </a>
-                    <a href="{{ route('mcq.index', ['topic' => 'profit-and-loss']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('mcq.index', ['topic' => 'profit-and-loss']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Profit and Loss</span>
                         <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
                     </a>
-                    <a href="{{ route('mcq.index', ['topic' => 'number-series']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('mcq.index', ['topic' => 'number-series']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Number Series & Puzzles</span>
                         <span class="text-xs text-gray-400">Logical Reasoning</span>
                     </a>
-                    <a href="{{ route('mcq.index', ['topic' => 'python']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('mcq.index', ['topic' => 'python']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Python Programming</span>
                         <span class="text-xs text-gray-400">Programming</span>
                     </a>
-                    <a href="{{ route('mcq.index', ['topic' => 'time-and-work']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('mcq.index', ['topic' => 'time-and-work']) }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">Time and Work</span>
                         <span class="text-xs text-gray-400">Arithmetic Aptitude</span>
                     </a>
-                    <a href="{{ route('placement.index') }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
+                    <a @click="searchOpen = false" href="{{ route('placement.index') }}" class="flex items-center justify-between p-2.5 rounded-lg hover:bg-teal-50 group">
                         <span class="text-sm font-medium text-[#243247] group-hover:text-[#087F82]">HR & Technical Interview Questions</span>
                         <span class="text-xs text-[#087F82] font-semibold">Placement Prep</span>
                     </a>
@@ -377,9 +428,9 @@
             </div>
 
             {{-- Bottom copyright line matching mockup --}}
-            <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-white/50 gap-4">
+            <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-white/50 gap-4 text-center sm:text-left">
                 <p>&copy; {{ date('Y') }} AptiMedha.com. All rights reserved.</p>
-                <div class="flex items-center space-x-6">
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                     <a href="{{ route('disclaimer') }}" class="hover:text-white transition-colors">Disclaimer</a>
                     <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms</a>
                     <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy</a>
@@ -392,7 +443,7 @@
     {{-- Back to Top Floating Button (Spring Interactive & Accessible) --}}
     <div x-data="{ showTop: false }"
          @scroll.window="showTop = (window.pageYOffset > 400)"
-         class="fixed bottom-6 right-6 z-40">
+         class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
         <button x-show="showTop"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 translate-y-3 scale-90"

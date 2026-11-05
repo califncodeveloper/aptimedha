@@ -72,16 +72,16 @@
                 </div>
 
                 {{-- Action Bar --}}
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                    <a href="{{ route('admin.mcqs.import.template') }}" class="inline-flex items-center text-xs font-bold text-[#087F82] hover:text-[#066668] transition-colors">
-                        <i data-lucide="download" class="w-4 h-4 mr-1.5"></i> Download Canonical Import Template (.csv)
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+                    <a href="{{ route('admin.mcqs.import.template') }}" class="inline-flex items-center text-xs font-bold text-[#087F82] hover:text-[#066668] transition-colors py-2">
+                        <i data-lucide="download" class="w-4 h-4 mr-1.5 shrink-0"></i> Download Canonical Import Template (.csv)
                     </a>
 
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('admin.mcqs.index') }}" class="px-5 py-2.5 rounded-xl border border-gray-300 text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</a>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <a href="{{ route('admin.mcqs.index') }}" class="px-5 py-2.5 rounded-xl border border-gray-300 text-xs font-semibold text-gray-600 hover:bg-gray-50 text-center">Cancel</a>
                         <button type="submit" 
                                 :disabled="isUploading"
-                                class="px-6 py-2.5 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-2">
+                                class="px-6 py-2.5 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2">
                             <span x-show="!isUploading">Upload and Validate Workbook</span>
                             <span x-show="isUploading" style="display:none;" class="flex items-center gap-2">
                                 <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Validating Workbook...
@@ -99,8 +99,8 @@
                 <p class="text-xs text-gray-500 mt-0.5">Every row in the spreadsheet must match the canonical schema sequence:</p>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border border-gray-200 rounded-xl overflow-hidden">
+            <div class="overflow-x-auto scrollbar-thin">
+                <table class="w-full text-left text-xs border border-gray-200 rounded-xl overflow-hidden min-w-[550px]">
                     <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
                         <tr>
                             <th class="px-3 py-2.5">Col</th>

@@ -4,7 +4,7 @@
     {{-- Category Hero with Subtle Background Pattern --}}
     <div class="bg-gradient-to-b from-white to-[#F7F9FC] border-b border-gray-200/80 py-12 sm:py-16 bg-grid-pattern relative overflow-hidden">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <nav class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 <a href="{{ url('/') }}" class="hover:text-[#153B70] transition-colors">Home</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-300"></i>
                 <span class="text-[#087F82]">Categories</span>

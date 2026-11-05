@@ -11,13 +11,13 @@
     {{-- Blog Header with Subtle Grid Pattern --}}
     <div class="bg-gradient-to-b from-white to-[#F7F9FC] border-b border-gray-200/80 py-12 sm:py-16 bg-grid-pattern relative overflow-hidden">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <nav class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 <a href="{{ url('/') }}" class="hover:text-[#153B70] transition-colors">Home</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-300"></i>
                 <span class="text-[#087F82]">Blog & Placement Guides</span>
             </nav>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/70 text-xs font-bold text-[#087F82] mb-3">
-                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <i data-lucide="book-open" class="w-3.5 h-3.5 shrink-0"></i>
                 <span>Aptitude & Placement Insights</span>
             </div>
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#153B70] tracking-tight">Placement Insights & Aptitude Guides</h1>
@@ -27,23 +27,25 @@
 
             {{-- Search & Filter Bar --}}
             <div class="mt-8 max-w-xl">
-                <form action="{{ route('blog.index') }}" method="GET" class="flex items-center gap-2">
+                <form action="{{ route('blog.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     @if(request('category'))
                         <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
                     <div class="relative flex-1">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-gray-400"></i>
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400"></i>
                         <input type="text" name="q" value="{{ request('q') }}" placeholder="Search articles, roadmaps, frameworks..."
-                               class="w-full pl-10 pr-4 py-2.5 bg-white text-xs sm:text-sm rounded-xl border border-gray-300 shadow-2xs focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full pl-10 pr-4 py-2.5 bg-white text-xs sm:text-sm rounded-xl border border-gray-300 shadow-2xs focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
-                    <button type="submit" class="px-5 py-2.5 bg-[#153B70] hover:bg-[#0e2a52] text-white text-xs sm:text-sm font-bold rounded-xl transition-colors shadow-2xs">
-                        Search
-                    </button>
-                    @if(request()->hasAny(['q', 'category']))
-                        <a href="{{ route('blog.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-colors" title="Reset Filters">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                        </a>
-                    @endif
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="flex-1 sm:flex-none px-5 py-2.5 bg-[#153B70] hover:bg-[#0e2a52] text-white text-xs sm:text-sm font-bold rounded-xl transition-colors shadow-2xs min-h-[44px]">
+                            Search
+                        </button>
+                        @if(request()->hasAny(['q', 'category']))
+                            <a href="{{ route('blog.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" title="Reset Filters">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            </a>
+                        @endif
+                    </div>
                 </form>
             </div>
 

@@ -140,8 +140,8 @@
 
         {{-- MCQs Table --}}
         <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs sm:text-sm">
+            <div class="overflow-x-auto scrollbar-thin">
+                <table class="w-full min-w-[720px] text-left text-xs sm:text-sm">
                     <thead class="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100">
                         <tr>
                             <th class="px-5 py-3.5">ID</th>

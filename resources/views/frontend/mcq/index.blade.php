@@ -217,11 +217,11 @@
                                  }">
                                 
                                 {{-- Question Body --}}
-                                <div class="p-6 sm:p-7">
+                                <div class="p-4 sm:p-7">
                                     
                                     {{-- Question Header with Number and Actions --}}
-                                    <div class="flex items-start justify-between gap-4 mb-5">
-                                        <h3 class="text-base sm:text-lg font-bold text-[#243247] leading-relaxed">
+                                    <div class="flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                                        <h3 class="text-base sm:text-lg font-bold text-[#243247] leading-relaxed break-words">
                                             <span class="text-[#153B70] mr-1">{{ $mcq->question_number }}.</span> {{ $mcq->question_text }}
                                         </h3>
 
@@ -229,8 +229,9 @@
                                         <div class="flex items-center space-x-1 flex-shrink-0">
                                             <button @click="toggleBookmark({{ $mcq->id }})" 
                                                     type="button"
-                                                    class="p-2 rounded-lg text-gray-400 hover:text-[#087F82] hover:bg-gray-50 transition-colors"
+                                                    class="p-2 rounded-lg text-gray-400 hover:text-[#087F82] hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
                                                     :class="{ 'text-amber-500': isBookmarked({{ $mcq->id }}) }"
+                                                    aria-label="Bookmark Question"
                                                     title="Bookmark Question">
                                                 <i data-lucide="bookmark" class="w-5 h-5" :class="{ 'fill-amber-400 text-amber-500': isBookmarked({{ $mcq->id }}) }"></i>
                                             </button>
@@ -239,8 +240,8 @@
 
                                     {{-- Optional Question Image --}}
                                     @if($mcq->has_image && $mcq->image_url)
-                                        <div class="mb-5 rounded-xl border border-gray-200 overflow-hidden max-w-md bg-gray-50 p-2">
-                                            <img src="{{ $mcq->image_url }}" alt="Question {{ $mcq->question_number }} Diagram" class="w-full h-auto rounded-lg">
+                                        <div class="mb-5 rounded-xl border border-gray-200 overflow-hidden max-w-full sm:max-w-md bg-gray-50 p-2">
+                                            <img src="{{ $mcq->image_url }}" alt="Question {{ $mcq->question_number }} Diagram" class="w-full h-auto rounded-lg object-contain">
                                         </div>
                                     @endif
 
@@ -250,14 +251,14 @@
                                             <button type="button"
                                                     @click="selectOption('{{ $optKey }}')"
                                                     :disabled="revealed"
-                                                    class="interactive-mcq-option w-full flex items-center justify-between px-4 sm:px-5 py-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer disabled:cursor-default"
+                                                    class="interactive-mcq-option w-full min-h-[48px] flex items-center justify-between px-3.5 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer disabled:cursor-default"
                                                     :class="{
                                                         'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20': revealed && isCorrect('{{ $optKey }}'),
                                                         'border-rose-400 bg-rose-50/70 ring-2 ring-rose-400/20': revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}'),
                                                         'border-gray-200 hover:border-gray-300 hover:bg-gray-50/80': !revealed
                                                     }">
                                                 
-                                                <div class="flex items-center gap-3.5 min-w-0">
+                                                <div class="flex items-center gap-3 sm:gap-3.5 min-w-0">
                                                     {{-- Radio circle indicator matching mockup --}}
                                                     <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors"
                                                          :class="{
@@ -270,7 +271,7 @@
                                                         <i x-show="revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}')" data-lucide="x" class="w-3.5 h-3.5 stroke-[3]"></i>
                                                     </div>
 
-                                                    <span class="text-sm sm:text-base font-medium text-[#243247]">
+                                                    <span class="text-sm sm:text-base font-medium text-[#243247] break-words">
                                                         <span class="font-bold text-gray-400 mr-1.5">{{ $optKey }}.</span> {{ $optVal }}
                                                     </span>
                                                 </div>
@@ -284,23 +285,23 @@
                                     </div>
 
                                     {{-- Correct Answer Banner matching mockup --}}
-                                    <div x-show="revealed" x-transition class="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800" x-cloak>
+                                    <div x-show="revealed" x-transition class="mt-4 p-3.5 sm:p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 sm:gap-3 text-emerald-800" x-cloak>
                                         <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
                                             <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
                                         </div>
-                                        <p class="text-sm font-bold">
+                                        <p class="text-xs sm:text-sm font-bold break-words">
                                             Correct answer: {{ $mcq->correct_option }}. {{ $mcq->options[$mcq->correct_option] ?? '' }}
                                         </p>
                                     </div>
 
                                     {{-- Step-by-Step Explanation matching mockup --}}
                                     @if($mcq->explanation)
-                                        <div x-show="revealed" x-transition class="mt-3 p-4 sm:p-5 rounded-xl bg-[#F7F9FC] border border-gray-200/90 text-sm text-[#243247] leading-relaxed" x-cloak>
+                                        <div x-show="revealed" x-transition class="mt-3 p-3.5 sm:p-5 rounded-xl bg-[#F7F9FC] border border-gray-200/90 text-xs sm:text-sm text-[#243247] leading-relaxed break-words" x-cloak>
                                             <div class="flex items-center gap-2 font-bold text-[#153B70] mb-1.5">
                                                 <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
                                                 <span>Explanation:</span>
                                             </div>
-                                            <p class="text-gray-700 font-medium pl-6 whitespace-pre-line">
+                                            <p class="text-gray-700 font-medium pl-2 sm:pl-6 whitespace-pre-line break-words">
                                                 {{ $mcq->explanation }}
                                             </p>
                                         </div>
@@ -309,30 +310,30 @@
                                 </div>
 
                                 {{-- Question Footer Bar (Actions: Show Answer, Bookmark, Discuss, Report) --}}
-                                <div class="px-6 sm:px-7 py-3.5 bg-gray-50/70 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                                <div class="px-4 sm:px-7 py-3 bg-gray-50/70 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2.5 text-xs">
                                     
                                     {{-- Show Answer toggle button --}}
                                     <button type="button"
                                             @click="toggleShowAnswer()"
-                                            class="inline-flex items-center font-bold px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-white text-[#153B70] transition-colors cursor-pointer">
-                                        <i data-lucide="eye" class="w-3.5 h-3.5 mr-1.5 text-[#087F82]"></i>
+                                            class="inline-flex items-center font-bold px-3 py-2 rounded-lg border border-gray-300 hover:bg-white text-[#153B70] transition-colors cursor-pointer min-h-[38px]">
+                                        <i data-lucide="eye" class="w-4 h-4 mr-1.5 text-[#087F82]"></i>
                                         <span x-text="revealed ? 'Hide Answer' : 'Show Answer'"></span>
                                     </button>
 
                                     {{-- Secondary Action Buttons: Discuss Here & Report --}}
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex items-center gap-1.5 sm:gap-2">
                                         <a href="{{ route('mcq.show', $mcq->id) }}"
-                                           class="inline-flex items-center px-3 py-1.5 rounded-lg text-gray-600 hover:text-[#087F82] hover:bg-white transition-colors font-medium">
-                                            <i data-lucide="message-square" class="w-3.5 h-3.5 mr-1.5"></i>
-                                            Discuss Here ({{ $mcq->discussions_count }})
+                                           class="inline-flex items-center px-2.5 sm:px-3 py-2 rounded-lg text-gray-600 hover:text-[#087F82] hover:bg-white transition-colors font-medium min-h-[38px]">
+                                            <i data-lucide="message-square" class="w-4 h-4 mr-1.5"></i>
+                                            <span>Discuss <span class="hidden xs:inline">Here</span> ({{ $mcq->discussions_count }})</span>
                                         </a>
 
                                         <button type="button"
                                                 @click="openReportModal({{ $mcq->id }})"
-                                                class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors font-medium"
+                                                class="inline-flex items-center px-2.5 py-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors font-medium min-h-[38px]"
                                                 title="Report Error in Question">
-                                            <i data-lucide="flag" class="w-3.5 h-3.5 mr-1"></i>
-                                            Report
+                                            <i data-lucide="flag" class="w-4 h-4 mr-1"></i>
+                                            <span>Report</span>
                                         </button>
                                     </div>
                                 </div>
@@ -343,39 +344,47 @@
                     {{-- Pagination matching client mockup --}}
                     @if($mcqs->hasPages())
                         <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <p class="text-xs text-gray-500 font-medium">
+                            <p class="text-xs text-gray-500 font-medium text-center sm:text-left">
                                 Showing questions <span class="font-bold text-[#153B70]">{{ $mcqs->firstItem() }} – {{ $mcqs->lastItem() }}</span> of <span class="font-bold text-[#153B70]">{{ $mcqs->total() }}</span>
                             </p>
 
-                            <nav class="inline-flex items-center gap-1.5" aria-label="Pagination">
+                            <nav class="inline-flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center" aria-label="Pagination">
                                 @if ($mcqs->onFirstPage())
-                                    <span class="inline-flex items-center px-3 h-9 rounded-lg bg-gray-100 text-gray-400 font-bold text-xs cursor-not-allowed">
+                                    <span class="inline-flex items-center px-2.5 sm:px-3 h-9 rounded-lg bg-gray-100 text-gray-400 font-bold text-xs cursor-not-allowed">
                                         &larr; Prev
                                     </span>
                                 @else
-                                    <a href="{{ $mcqs->previousPageUrl() }}" class="inline-flex items-center px-3 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-bold text-xs transition-colors">
+                                    <a href="{{ $mcqs->previousPageUrl() }}" class="inline-flex items-center px-2.5 sm:px-3 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-bold text-xs transition-colors">
                                         &larr; Prev
                                     </a>
                                 @endif
 
-                                @foreach ($mcqs->getUrlRange(max(1, $mcqs->currentPage() - 2), min($mcqs->lastPage(), $mcqs->currentPage() + 2)) as $page => $url)
-                                    @if ($page == $mcqs->currentPage())
-                                        <span class="w-9 h-9 rounded-lg bg-[#087F82] text-white font-bold text-sm flex items-center justify-center shadow-xs">
-                                            {{ $page }}
-                                        </span>
-                                    @else
-                                        <a href="{{ $url }}" class="w-9 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-semibold text-sm flex items-center justify-center transition-colors">
-                                            {{ $page }}
-                                        </a>
-                                    @endif
-                                @endforeach
+                                {{-- Compact mobile indicator when on small screens --}}
+                                <span class="sm:hidden px-3 py-1.5 text-xs font-bold text-[#153B70] bg-gray-100 rounded-lg">
+                                    {{ $mcqs->currentPage() }} / {{ $mcqs->lastPage() }}
+                                </span>
+
+                                {{-- Desktop page buttons --}}
+                                <div class="hidden sm:inline-flex items-center gap-1.5">
+                                    @foreach ($mcqs->getUrlRange(max(1, $mcqs->currentPage() - 2), min($mcqs->lastPage(), $mcqs->currentPage() + 2)) as $page => $url)
+                                        @if ($page == $mcqs->currentPage())
+                                            <span class="w-9 h-9 rounded-lg bg-[#087F82] text-white font-bold text-sm flex items-center justify-center shadow-xs">
+                                                {{ $page }}
+                                            </span>
+                                        @else
+                                            <a href="{{ $url }}" class="w-9 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-semibold text-sm flex items-center justify-center transition-colors">
+                                                {{ $page }}
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                </div>
 
                                 @if ($mcqs->hasMorePages())
-                                    <a href="{{ $mcqs->nextPageUrl() }}" class="inline-flex items-center px-3 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-bold text-xs transition-colors">
+                                    <a href="{{ $mcqs->nextPageUrl() }}" class="inline-flex items-center px-2.5 sm:px-3 h-9 rounded-lg bg-white border border-gray-200 text-[#243247] hover:border-[#087F82] font-bold text-xs transition-colors">
                                         Next &rarr;
                                     </a>
                                 @else
-                                    <span class="inline-flex items-center px-3 h-9 rounded-lg bg-gray-100 text-gray-400 font-bold text-xs cursor-not-allowed">
+                                    <span class="inline-flex items-center px-2.5 sm:px-3 h-9 rounded-lg bg-gray-100 text-gray-400 font-bold text-xs cursor-not-allowed">
                                         Next &rarr;
                                     </span>
                                 @endif

@@ -32,7 +32,7 @@
     {{-- Header Section --}}
     <div class="bg-white border-b border-gray-200/80 py-10 sm:py-14">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <nav class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 <a href="{{ url('/') }}" class="hover:text-[#153B70] transition-colors">Home</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 <a href="{{ route('blog.index') }}" class="hover:text-[#153B70] transition-colors">Blog</a>
@@ -50,7 +50,7 @@
                 </a>
             @endif
 
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#153B70] tracking-tight leading-tight">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#153B70] tracking-tight leading-tight break-words">
                 {{ $post->title }}
             </h1>
 
@@ -60,7 +60,7 @@
                 </p>
             @endif
 
-            <div class="mt-6 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-gray-500 font-medium pt-4 border-t border-gray-100">
+            <div class="mt-6 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 font-medium pt-4 border-t border-gray-100">
                 <div class="flex items-center space-x-2">
                     <div class="w-7 h-7 rounded-full bg-[#153B70] text-white flex items-center justify-center font-bold text-xs">
                         {{ substr($post->author_display_name, 0, 1) }}
@@ -95,7 +95,7 @@
         @endif
 
         {{-- Rich-Text Content --}}
-        <article class="bg-white rounded-2xl border border-gray-200/90 shadow-2xs p-6 sm:p-10 text-[#243247] leading-relaxed space-y-5 text-sm sm:text-base">
+        <article class="bg-white rounded-2xl border border-gray-200/90 shadow-2xs p-4 sm:p-10 text-[#243247] leading-relaxed space-y-5 text-sm sm:text-base overflow-hidden break-words">
             <div class="prose max-w-none text-[#243247] prose-headings:text-[#153B70] prose-headings:font-black prose-h2:text-2xl prose-h3:text-xl prose-a:text-[#087F82] prose-a:font-semibold prose-strong:text-[#153B70] prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[#153B70] prose-blockquote:border-l-4 prose-blockquote:border-[#087F82] prose-blockquote:bg-gray-50 prose-blockquote:p-4 prose-blockquote:rounded-r-lg">
                 {!! $post->body !!}
             </div>

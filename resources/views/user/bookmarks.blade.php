@@ -45,14 +45,14 @@
                                 @endif
                             </div>
 
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <a href="{{ route('mcq.show', $q->id) }}" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-[#087F82] hover:text-white text-[#153B70] text-xs font-bold transition-colors">
+                            <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
+                                <a href="{{ route('mcq.show', $q->id) }}" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-[#087F82] hover:text-white text-[#153B70] text-xs font-bold transition-colors min-h-[38px] flex items-center">
                                     Solve Again
                                 </a>
                                 <form method="POST" action="{{ route('user.bookmarks.destroy', $bookmark->id) }}" onsubmit="return confirm('Remove this question from your saved bookmarks?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Remove Bookmark">
+                                    <button type="submit" class="p-2 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center" title="Remove Bookmark">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>

@@ -31,7 +31,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {{-- Edit Personal Details Form --}}
-            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-7">
+            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-5 sm:p-7">
                 <h3 class="text-base font-bold text-[#153B70] mb-4">Personal Details</h3>
 
                 <form action="{{ route('user.profile.update') }}" method="POST" class="space-y-4">
@@ -45,7 +45,7 @@
                                id="name"
                                value="{{ old('name', Auth::user()->name) }}"
                                required
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div>
@@ -54,7 +54,7 @@
                                name="username"
                                id="username"
                                value="{{ old('username', Auth::user()->username) }}"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div>
@@ -64,11 +64,11 @@
                                id="email"
                                value="{{ old('email', Auth::user()->email) }}"
                                required
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div class="pt-2">
-                        <button type="submit" class="px-5 py-2.5 bg-[#087F82] hover:bg-[#066668] text-white text-xs font-bold rounded-xl shadow-xs transition-colors">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-[#087F82] hover:bg-[#066668] text-white text-xs font-bold rounded-xl shadow-xs transition-colors min-h-[42px] flex items-center justify-center">
                             Save Changes
                         </button>
                     </div>
@@ -76,7 +76,7 @@
             </div>
 
             {{-- Change Password Form --}}
-            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-7">
+            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-5 sm:p-7">
                 <h3 class="text-base font-bold text-[#153B70] mb-4">Change Password</h3>
 
                 <form action="{{ route('user.profile.update') }}" method="POST" class="space-y-4">
@@ -89,7 +89,7 @@
                                name="current_password"
                                id="current_password"
                                placeholder="Enter existing password"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div>
@@ -98,7 +98,7 @@
                                name="new_password"
                                id="new_password"
                                placeholder="Min 8 characters"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div>
@@ -107,11 +107,11 @@
                                name="new_password_confirmation"
                                id="new_password_confirmation"
                                placeholder="Confirm new password"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none min-h-[44px]">
                     </div>
 
                     <div class="pt-2">
-                        <button type="submit" class="px-5 py-2.5 bg-[#153B70] hover:bg-[#0e2a52] text-white text-xs font-bold rounded-xl shadow-xs transition-colors">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-[#153B70] hover:bg-[#0e2a52] text-white text-xs font-bold rounded-xl shadow-xs transition-colors min-h-[42px] flex items-center justify-center">
                             Update Password
                         </button>
                     </div>

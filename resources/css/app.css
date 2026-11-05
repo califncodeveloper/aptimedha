@@ -37,13 +37,39 @@
 
 /* Base styles */
 @layer base {
+    html {
+        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
     body {
         @apply bg-[#F7F9FC] text-[#243247] antialiased selection:bg-[#087F82]/20 selection:text-[#153B70];
         font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        overflow-x: hidden;
+        min-width: 320px;
     }
 
     h1, h2, h3, h4, h5, h6 {
         @apply font-bold text-inherit tracking-tight text-[#153B70];
+        overflow-wrap: break-word;
+    }
+
+    p, span, a, label, li {
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent mobile browser zoom on form input focus while keeping desktop crisp */
+    @media (max-width: 640px) {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="search"],
+        select,
+        textarea {
+            font-size: 16px !important;
+        }
     }
 }
 

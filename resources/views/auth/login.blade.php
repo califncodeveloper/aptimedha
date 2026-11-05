@@ -1,16 +1,16 @@
 <x-layouts.app>
     <x-slot:title>Login - AptiMedha</x-slot:title>
 
-    <div class="py-14 sm:py-20 bg-grid-pattern relative flex items-center justify-center">
-        <div class="mx-auto w-full max-w-md px-4 sm:px-6">
-            <div class="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-6 sm:p-8">
+    <div class="py-8 sm:py-16 bg-grid-pattern relative flex items-center justify-center min-h-[calc(100vh-14rem)]">
+        <div class="mx-auto w-full max-w-md px-3 sm:px-6">
+            <div class="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-5 sm:p-8">
                 
                 {{-- Card Header with Logo --}}
                 <div class="text-center mb-6">
                     <a href="{{ url('/') }}" class="inline-block mb-3">
                         <x-application-logo size="lg" />
                     </a>
-                    <h2 class="text-2xl font-extrabold text-[#153B70]">Welcome Back</h2>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#153B70]">Welcome Back</h2>
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">Sign in to track your MCQ practice, bookmarks, and discussions.</p>
                 </div>
 
@@ -73,7 +73,7 @@
                                value="{{ old('email') }}"
                                required
                                placeholder="you@example.com or username"
-                               class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/20 focus:outline-none transition-colors">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/20 focus:outline-none transition-colors min-h-[44px]">
                     </div>
 
                     <div>
@@ -81,7 +81,7 @@
                             <label for="password" class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 Password
                             </label>
-                            <a href="{{ route('password.request') }}" class="text-xs font-semibold text-[#087F82] hover:underline">
+                            <a href="{{ route('password.request') }}" class="text-xs font-semibold text-[#087F82] hover:underline p-1">
                                 Forgot password?
                             </a>
                         </div>
@@ -91,11 +91,12 @@
                                    id="password"
                                    required
                                    placeholder="Enter your password"
-                                   class="w-full pl-4 pr-11 py-2.5 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/20 focus:outline-none transition-colors">
+                                   class="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-300 text-sm focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/20 focus:outline-none transition-colors min-h-[44px]">
                             <button type="button"
                                     @click="showPass = !showPass"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#087F82] transition-colors p-1"
-                                    :title="showPass ? 'Hide password' : 'Show password'">
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#087F82] transition-colors p-2 min-w-[40px] min-h-[40px] flex items-center justify-center cursor-pointer"
+                                    :title="showPass ? 'Hide password' : 'Show password'"
+                                    aria-label="Toggle password visibility">
                                 <i x-show="!showPass" data-lucide="eye" class="w-4 h-4"></i>
                                 <i x-show="showPass" data-lucide="eye-off" class="w-4 h-4" x-cloak></i>
                             </button>
@@ -103,7 +104,7 @@
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="flex items-center gap-2 cursor-pointer py-1">
                             <input id="remember" name="remember" type="checkbox"
                                    class="h-4 w-4 rounded border-gray-300 text-[#087F82] focus:ring-[#087F82]">
                             <span class="text-xs text-gray-600 font-medium">Keep me signed in</span>
@@ -111,7 +112,7 @@
                     </div>
 
                     <button type="submit"
-                            class="w-full py-3 px-4 rounded-xl bg-[#153B70] hover:bg-[#0e2a52] text-white font-bold text-sm shadow-md transition-colors cursor-pointer mt-2">
+                            class="w-full py-3 px-4 rounded-xl bg-[#153B70] hover:bg-[#0e2a52] text-white font-bold text-sm shadow-md transition-colors cursor-pointer mt-2 min-h-[46px] flex items-center justify-center">
                         Sign In to AptiMedha
                     </button>
 

@@ -25,7 +25,7 @@
                     </div>
 
                     {{-- 2. Powerful Headline with Gradient Highlight --}}
-                    <h1 class="text-3.5xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.85rem] font-black text-[#153B70] tracking-tight leading-[1.12]">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] xl:text-[3.85rem] font-black text-[#153B70] tracking-tight leading-[1.15] sm:leading-[1.12]">
                         <span data-motion="fade-up" class="block">Practise Smart.</span>
                         <span data-motion="fade-up" data-motion-delay="0.12" class="block text-transparent bg-clip-text bg-gradient-to-r from-[#153B70] via-[#087F82] to-[#087F82]">
                             Get Placement Ready.
@@ -33,65 +33,65 @@
                     </h1>
 
                     {{-- Supporting Description --}}
-                    <p data-motion="fade-up" data-motion-delay="0.2" class="text-base sm:text-lg text-[#243247]/80 leading-relaxed max-w-xl">
+                    <p data-motion="fade-up" data-motion-delay="0.2" class="text-sm sm:text-base md:text-lg text-[#243247]/80 leading-relaxed max-w-xl">
                         Master quantitative aptitude, logical reasoning, verbal ability, and programming with verified step-by-step solutions designed for campus placements and competitive exams.
                     </p>
 
                     {{-- 3. Smart Search Bar & Trending Topics --}}
                     <div data-motion="fade-up" data-motion-delay="0.26" class="pt-1 max-w-xl" x-data="{ heroSearch: '' }">
                         <form action="{{ route('mcq.index') }}" method="GET" class="relative flex items-center group">
-                            <div class="absolute left-4 pointer-events-none text-gray-400 group-focus-within:text-[#087F82] transition-colors">
-                                <i data-lucide="search" class="w-5 h-5"></i>
+                            <div class="absolute left-3.5 sm:left-4 pointer-events-none text-gray-400 group-focus-within:text-[#087F82] transition-colors">
+                                <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                             </div>
                             <input type="text"
                                    name="topic"
                                    x-model="heroSearch"
                                    placeholder="Search Percentages, Python, Number Series..."
-                                   class="w-full pl-12 pr-28 sm:pr-32 py-3.5 sm:py-4 bg-white rounded-2xl border border-gray-200/90 shadow-xs text-sm sm:text-base text-[#243247] placeholder-gray-400 focus:outline-none focus:border-[#087F82] focus:ring-4 focus:ring-[#087F82]/15 transition-all">
+                                   class="w-full pl-10 sm:pl-12 pr-24 sm:pr-32 py-3 sm:py-4 bg-white rounded-2xl border border-gray-200/90 shadow-xs text-xs sm:text-base text-[#243247] placeholder-gray-400 focus:outline-none focus:border-[#087F82] focus:ring-4 focus:ring-[#087F82]/15 transition-all">
                             <button type="submit"
                                     data-motion-spring
-                                    class="absolute right-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#087F82] hover:bg-[#066668] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+                                    class="absolute right-1.5 sm:right-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-[#087F82] hover:bg-[#066668] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
                                 <span>Practice</span>
                                 <i data-lucide="arrow-right" class="w-3.5 h-3.5 hidden sm:inline"></i>
                             </button>
                         </form>
 
                         {{-- 4. Trending Topics --}}
-                        <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                            <span class="text-gray-400 font-medium flex items-center gap-1 mr-0.5">
+                        <div class="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
+                            <span class="text-gray-400 font-medium flex items-center gap-1 mr-0.5 text-[11px] sm:text-xs">
                                 <i data-lucide="trending-up" class="w-3.5 h-3.5 text-[#087F82]"></i>
                                 <span>Trending:</span>
                             </span>
                             <a href="{{ route('mcq.index', ['topic' => 'percentages']) }}"
-                               class="px-3 py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium">
+                               class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium text-[11px] sm:text-xs">
                                 Percentages
                             </a>
                             <a href="{{ route('mcq.index', ['topic' => 'profit-and-loss']) }}"
-                               class="px-3 py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium">
+                               class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium text-[11px] sm:text-xs">
                                 Profit &amp; Loss
                             </a>
                             <a href="{{ route('mcq.index', ['topic' => 'number-series']) }}"
-                               class="px-3 py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium">
+                               class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium text-[11px] sm:text-xs">
                                 Number Series
                             </a>
                             <a href="{{ route('mcq.index', ['topic' => 'python']) }}"
-                               class="px-3 py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium">
+                               class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white border border-gray-200/80 text-gray-600 hover:text-[#087F82] hover:border-[#087F82] hover:bg-teal-50/50 hover:shadow-2xs transition-all font-medium text-[11px] sm:text-xs">
                                 Python
                             </a>
                         </div>
                     </div>
 
                     {{-- 5. Call-to-Action Buttons --}}
-                    <div data-motion="fade-up" data-motion-delay="0.32" class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                    <div data-motion="fade-up" data-motion-delay="0.32" class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <a href="{{ route('mcq.index') }}"
                            data-motion-spring
-                           class="inline-flex items-center justify-center px-7 py-3.5 text-base font-bold text-white bg-[#087F82] hover:bg-[#066668] rounded-xl shadow-md shadow-[#087F82]/20 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer group">
+                           class="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 text-sm sm:text-base font-bold text-white bg-[#087F82] hover:bg-[#066668] rounded-xl shadow-md shadow-[#087F82]/20 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer group w-full sm:w-auto">
                             <i data-lucide="play-circle" class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform"></i>
                             Start Practicing
                         </a>
                         <a href="{{ route('categories.index') }}"
                            data-motion-spring
-                           class="inline-flex items-center justify-center px-7 py-3.5 text-base font-semibold text-[#153B70] bg-white border-2 border-gray-200 hover:border-[#153B70] hover:bg-gray-50 rounded-xl transition-all cursor-pointer group">
+                           class="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 text-sm sm:text-base font-semibold text-[#153B70] bg-white border-2 border-gray-200 hover:border-[#153B70] hover:bg-gray-50 rounded-xl transition-all cursor-pointer group w-full sm:w-auto">
                             <i data-lucide="compass" class="w-5 h-5 mr-2 text-[#153B70] group-hover:rotate-45 transition-transform"></i>
                             Explore Topics
                         </a>
@@ -125,26 +125,26 @@
                         {{-- 7. Floating Information Element 1: Top-Right (Campus Assessment Ready) --}}
                         <div data-motion="fade-left"
                              data-motion-delay="0.3"
-                             class="absolute -top-5 -right-2 sm:-right-4 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-xl border border-gray-100 flex items-center gap-3 z-20 animate-float">
-                            <div class="w-9 h-9 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
-                                <i data-lucide="briefcase" class="w-4.5 h-4.5"></i>
+                             class="absolute -top-4 -right-1 xs:-top-5 xs:-right-2 sm:-right-4 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2.5 shadow-xl border border-gray-100 flex items-center gap-2 sm:gap-3 z-20 animate-float scale-90 sm:scale-100 origin-top-right">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
+                                <i data-lucide="briefcase" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-[#153B70]">Campus Assessment Ready</p>
-                                <p class="text-[11px] text-gray-500">TCS, Infosys &amp; Wipro Patterns</p>
+                                <p class="text-[11px] sm:text-xs font-bold text-[#153B70]">Campus Assessment Ready</p>
+                                <p class="text-[10px] sm:text-[11px] text-gray-500">TCS, Infosys &amp; Wipro Patterns</p>
                             </div>
                         </div>
 
                         {{-- 7. Floating Information Element 2: Bottom-Left (Instant Verification) --}}
                         <div data-motion="fade-right"
                              data-motion-delay="0.4"
-                             class="absolute -bottom-5 -left-2 sm:-left-4 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-xl border border-gray-100 flex items-center gap-3 z-20 animate-float-delayed">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
-                                <i data-lucide="trending-up" class="w-4.5 h-4.5"></i>
+                             class="absolute -bottom-4 -left-1 xs:-bottom-5 xs:-left-2 sm:-left-4 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2.5 shadow-xl border border-gray-100 flex items-center gap-2 sm:gap-3 z-20 animate-float-delayed scale-90 sm:scale-100 origin-bottom-left">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
+                                <i data-lucide="trending-up" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-[#153B70]">Instant Verification</p>
-                                <p class="text-[11px] text-gray-500">Formulas &amp; Speed Math</p>
+                                <p class="text-[11px] sm:text-xs font-bold text-[#153B70]">Instant Verification</p>
+                                <p class="text-[10px] sm:text-[11px] text-gray-500">Formulas &amp; Speed Math</p>
                             </div>
                         </div>
 
@@ -264,58 +264,58 @@
     </section>
 
     {{-- Platform Statistics Section (100% Genuine Database-Driven Stats) --}}
-    <section class="py-10 bg-white border-b border-gray-200/70">
+    <section class="py-8 sm:py-10 bg-white border-b border-gray-200/70">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div data-motion-stagger data-motion-stagger-delay="0.08" class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div data-motion-stagger data-motion-stagger-delay="0.08" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
                 {{-- Stat 1: MCQs --}}
-                <div data-motion-item class="bg-[#F7F9FC] p-5 sm:p-6 rounded-2xl border border-gray-200/80 flex items-center gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
-                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
-                        <i data-lucide="help-circle" class="w-6 h-6"></i>
+                <div data-motion-item class="bg-[#F7F9FC] p-4 sm:p-6 rounded-2xl border border-gray-200/80 flex flex-col xs:flex-row items-start xs:items-center gap-2.5 sm:gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
+                        <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
-                    <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">
+                    <div class="min-w-0">
+                        <div class="text-xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight truncate">
                             {{ number_format($totalActiveQuestions ?? 0) }}+
                         </div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Verified MCQs</p>
+                        <p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5 truncate">Verified MCQs</p>
                     </div>
                 </div>
 
                 {{-- Stat 2: Categories --}}
-                <div data-motion-item class="bg-[#F7F9FC] p-5 sm:p-6 rounded-2xl border border-gray-200/80 flex items-center gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#153B70] flex items-center justify-center flex-shrink-0 group-hover:bg-[#087F82] group-hover:text-white transition-colors">
-                        <i data-lucide="layers" class="w-6 h-6"></i>
+                <div data-motion-item class="bg-[#F7F9FC] p-4 sm:p-6 rounded-2xl border border-gray-200/80 flex flex-col xs:flex-row items-start xs:items-center gap-2.5 sm:gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-[#153B70] flex items-center justify-center flex-shrink-0 group-hover:bg-[#087F82] group-hover:text-white transition-colors">
+                        <i data-lucide="layers" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
-                    <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">
+                    <div class="min-w-0">
+                        <div class="text-xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight truncate">
                             {{ number_format($totalCategories ?? 0) }}
                         </div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Learning Domains</p>
+                        <p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5 truncate">Learning Domains</p>
                     </div>
                 </div>
 
                 {{-- Stat 3: Subjects --}}
-                <div data-motion-item class="bg-[#F7F9FC] p-5 sm:p-6 rounded-2xl border border-gray-200/80 flex items-center gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
-                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                <div data-motion-item class="bg-[#F7F9FC] p-4 sm:p-6 rounded-2xl border border-gray-200/80 flex flex-col xs:flex-row items-start xs:items-center gap-2.5 sm:gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
+                        <i data-lucide="book-open" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
-                    <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">
+                    <div class="min-w-0">
+                        <div class="text-xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight truncate">
                             {{ number_format($totalSubjects ?? 0) }}
                         </div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Core Subjects</p>
+                        <p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5 truncate">Core Subjects</p>
                     </div>
                 </div>
 
                 {{-- Stat 4: Topics --}}
-                <div data-motion-item class="bg-[#F7F9FC] p-5 sm:p-6 rounded-2xl border border-gray-200/80 flex items-center gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
-                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
-                        <i data-lucide="tag" class="w-6 h-6"></i>
+                <div data-motion-item class="bg-[#F7F9FC] p-4 sm:p-6 rounded-2xl border border-gray-200/80 flex flex-col xs:flex-row items-start xs:items-center gap-2.5 sm:gap-4 transition-all hover:border-[#087F82] hover:bg-white hover:shadow-xs group">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 group-hover:bg-[#153B70] group-hover:text-white transition-colors">
+                        <i data-lucide="tag" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
-                    <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">
+                    <div class="min-w-0">
+                        <div class="text-xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight truncate">
                             {{ number_format($totalTopics ?? 0) }}+
                         </div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Practice Chapters</p>
+                        <p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5 truncate">Practice Chapters</p>
                     </div>
                 </div>
             </div>
@@ -519,7 +519,7 @@
         <div data-motion-marquee data-motion-direction="reverse" data-motion-duration="44" class="motion-marquee-container py-2">
             <div class="motion-marquee-track flex items-center gap-6 pr-6">
                 {{-- Testimonial 1 --}}
-                <div class="w-80 sm:w-96 p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
+                <div class="w-[280px] xs:w-80 sm:w-96 p-4 sm:p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
                     <div class="flex items-center gap-1 text-amber-400 mb-2.5">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
@@ -537,7 +537,7 @@
                 </div>
 
                 {{-- Testimonial 2 --}}
-                <div class="w-80 sm:w-96 p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
+                <div class="w-[280px] xs:w-80 sm:w-96 p-4 sm:p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
                     <div class="flex items-center gap-1 text-amber-400 mb-2.5">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
@@ -555,7 +555,7 @@
                 </div>
 
                 {{-- Testimonial 3 --}}
-                <div class="w-80 sm:w-96 p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
+                <div class="w-[280px] xs:w-80 sm:w-96 p-4 sm:p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
                     <div class="flex items-center gap-1 text-amber-400 mb-2.5">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
@@ -573,7 +573,7 @@
                 </div>
 
                 {{-- Testimonial 4 --}}
-                <div class="w-80 sm:w-96 p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
+                <div class="w-[280px] xs:w-80 sm:w-96 p-4 sm:p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
                     <div class="flex items-center gap-1 text-amber-400 mb-2.5">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
@@ -591,7 +591,7 @@
                 </div>
 
                 {{-- Testimonial 5 --}}
-                <div class="w-80 sm:w-96 p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
+                <div class="w-[280px] xs:w-80 sm:w-96 p-4 sm:p-5 rounded-2xl bg-[#F7F9FC] border border-gray-200 shadow-xs flex flex-col justify-between whitespace-normal flex-shrink-0">
                     <div class="flex items-center gap-1 text-amber-400 mb-2.5">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>

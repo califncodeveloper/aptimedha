@@ -15,14 +15,14 @@
                 <p data-motion="fade-up" data-motion-delay="0.2" class="mt-4 text-base sm:text-lg text-white/85 leading-relaxed">
                     From resume building and aptitude rounds to technical interviews, group discussions, and HR questions — everything you need to crack your dream placement.
                 </p>
-                <div data-motion="fade-up" data-motion-delay="0.3" class="mt-8 flex flex-wrap gap-3.5">
-                    <a href="#placement-roadmap" data-motion-spring class="px-6 py-3 rounded-xl bg-white text-[#153B70] font-bold text-sm shadow-md hover:bg-gray-100 transition-all hover:-translate-y-0.5">
+                <div data-motion="fade-up" data-motion-delay="0.3" class="mt-8 flex flex-col sm:flex-row flex-wrap gap-3.5">
+                    <a href="#placement-roadmap" data-motion-spring class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-white text-[#153B70] font-bold text-sm shadow-md hover:bg-gray-100 transition-all hover:-translate-y-0.5">
                         View 4-Stage Roadmap &rarr;
                     </a>
-                    <a href="#hr-interviews" data-motion-spring class="px-6 py-3 rounded-xl bg-[#087F82] text-white font-bold text-sm border border-white/20 hover:bg-[#066668] transition-all hover:-translate-y-0.5">
+                    <a href="#hr-interviews" data-motion-spring class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-[#087F82] text-white font-bold text-sm border border-white/20 hover:bg-[#066668] transition-all hover:-translate-y-0.5">
                         HR Interview Questions
                     </a>
-                    <a href="#resume-guide" data-motion-spring class="px-6 py-3 rounded-xl bg-white/15 text-white font-bold text-sm hover:bg-white/25 transition-all">
+                    <a href="#resume-guide" data-motion-spring class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-white/15 text-white font-bold text-sm hover:bg-white/25 transition-all">
                         Resume Guide
                     </a>
                 </div>
@@ -183,11 +183,11 @@
                     <p class="text-sm text-[#243247]/80 leading-relaxed">
                         A modern recruiter spends fewer than 10 seconds on a preliminary resume screen. Learn how to format education, project bullet points using the STAR method (Situation, Task, Action, Result), technical skill clusters, and internship achievements.
                     </p>
-                    <div class="pt-2 flex flex-wrap gap-3">
-                        <a href="{{ route('contact') }}?subject=Resume+Template+Request" data-motion-spring class="inline-flex items-center px-5 py-2.5 bg-[#087F82] text-white font-bold text-xs rounded-xl hover:bg-[#066668] transition-colors shadow-xs">
-                            <i data-lucide="download" class="w-4 h-4 mr-1.5"></i> Download Clean Resume DOCX Template
+                    <div class="pt-2 flex flex-col sm:flex-row flex-wrap gap-3">
+                        <a href="{{ route('contact') }}?subject=Resume+Template+Request" data-motion-spring class="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 bg-[#087F82] text-white font-bold text-xs rounded-xl hover:bg-[#066668] transition-colors shadow-xs">
+                            <i data-lucide="download" class="w-4 h-4 mr-1.5 shrink-0"></i> Download Clean Resume DOCX Template
                         </a>
-                        <a href="{{ route('blog.show', 'how-to-prepare-for-aptitude-tests-in-placements') }}" data-motion-spring class="inline-flex items-center px-5 py-2.5 bg-white text-[#153B70] border border-gray-300 font-bold text-xs rounded-xl hover:bg-gray-50 transition-colors">
+                        <a href="{{ route('blog.show', 'how-to-prepare-for-aptitude-tests-in-placements') }}" data-motion-spring class="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 bg-white text-[#153B70] border border-gray-300 font-bold text-xs rounded-xl hover:bg-gray-50 transition-colors">
                             Read Guide Article
                         </a>
                     </div>

@@ -4,7 +4,7 @@
     {{-- Breadcrumb & Category Hero with Modern Background Pattern --}}
     <div class="bg-gradient-to-b from-white to-[#F7F9FC] border-b border-gray-200/80 py-10 sm:py-14 bg-grid-pattern relative overflow-hidden">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <nav class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 <a href="{{ url('/') }}" class="hover:text-[#153B70] transition-colors">Home</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-300"></i>
                 <a href="{{ route('categories.index') }}" class="hover:text-[#153B70] transition-colors">Categories</a>
@@ -13,18 +13,18 @@
             </nav>
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div class="flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 shadow-xs border border-teal-100">
-                        <i data-lucide="{{ $category->icon ?: 'folder' }}" class="w-7 h-7"></i>
+                <div class="flex items-start gap-3 sm:gap-4">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-teal-50 text-[#087F82] flex items-center justify-center flex-shrink-0 shadow-xs border border-teal-100">
+                        <i data-lucide="{{ $category->icon ?: 'folder' }}" class="w-6 h-6 sm:w-7 sm:h-7"></i>
                     </div>
                     <div>
-                        <div class="flex items-center gap-3">
-                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">{{ $category->name }}</h1>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <h1 class="text-xl sm:text-3xl font-extrabold text-[#153B70] tracking-tight">{{ $category->name }}</h1>
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#087F82]/10 text-[#087F82] border border-[#087F82]/20">
                                 {{ $category->subjects->count() > 0 ? $category->subjects->count() . ' Subjects' : 'Direct Track' }}
                             </span>
                         </div>
-                        <p class="mt-1 text-sm text-[#243247]/70 max-w-2xl leading-relaxed">
+                        <p class="mt-1 text-xs sm:text-sm text-[#243247]/70 max-w-2xl leading-relaxed">
                             {{ $category->description ?? 'Browse topics and start practicing multiple choice questions.' }}
                         </p>
                     </div>
@@ -32,7 +32,7 @@
 
                 <div class="flex items-center gap-3">
                     <a href="{{ route('mcq.index', ['category' => $category->slug]) }}"
-                       class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#087F82] text-white font-bold text-sm hover:bg-[#066668] transition-all shadow-md shadow-[#087F82]/20 hover:-translate-y-0.5">
+                       class="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 rounded-xl bg-[#087F82] text-white font-bold text-sm hover:bg-[#066668] transition-all shadow-md shadow-[#087F82]/20 hover:-translate-y-0.5">
                         <i data-lucide="play" class="w-4 h-4 mr-2"></i>
                         Start Full Track Practice
                     </a>

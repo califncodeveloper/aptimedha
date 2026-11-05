@@ -224,8 +224,8 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm">
+                <div class="overflow-x-auto scrollbar-thin">
+                    <table class="w-full min-w-[580px] text-left text-xs sm:text-sm">
                         <thead class="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100">
                             <tr>
                                 <th class="px-6 py-3">#</th>

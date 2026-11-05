@@ -125,8 +125,8 @@
         <div class="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
             
             {{-- Header Badge & Metadata --}}
-            <div class="px-6 sm:px-8 py-5 border-b border-gray-200/80 bg-gray-50/70 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
+            <div class="px-4 sm:px-8 py-4 sm:py-5 border-b border-gray-200/80 bg-gray-50/70 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2">
                     <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#153B70] text-white">
                         Question #{{ $mcq->question_number }}
                     </span>
@@ -141,18 +141,18 @@
                 </div>
 
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center text-xs text-gray-500 font-medium px-2.5 py-1 bg-white rounded-lg border border-gray-200/80 shadow-2xs" title="Total Views">
+                    <span class="inline-flex items-center text-xs text-gray-500 font-medium px-2.5 py-1.5 bg-white rounded-lg border border-gray-200/80 shadow-2xs" title="Total Views">
                         <i data-lucide="eye" class="w-3.5 h-3.5 mr-1 text-[#087F82]"></i>
                         {{ number_format($mcq->views_count) }}
                     </span>
                     <button @click="toggleBookmark()" 
-                            class="p-2 rounded-lg text-gray-400 hover:text-[#087F82] hover:bg-white transition-colors"
+                            class="p-2 rounded-lg text-gray-400 hover:text-[#087F82] hover:bg-white transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
                             :class="{ 'text-amber-500': bookmarked }"
                             title="Bookmark Question">
                         <i data-lucide="bookmark" class="w-5 h-5" :class="{ 'fill-amber-400 text-amber-500': bookmarked }"></i>
                     </button>
                     <button @click="openReportModal()" 
-                            class="p-2 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-white transition-colors"
+                            class="p-2 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-white transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
                             title="Report Question">
                         <i data-lucide="flag" class="w-5 h-5"></i>
                     </button>
@@ -160,15 +160,15 @@
             </div>
 
             {{-- Question Text --}}
-            <div class="p-6 sm:p-8">
-                <h1 class="text-lg sm:text-xl font-bold text-[#243247] leading-relaxed mb-6">
+            <div class="p-4 sm:p-8">
+                <h1 class="text-base sm:text-xl font-bold text-[#243247] leading-relaxed mb-6 break-words">
                     {{ $mcq->question_text }}
                 </h1>
 
                 {{-- Optional Diagram / Image --}}
                 @if($mcq->has_image && $mcq->image_url)
-                    <div class="mb-6 rounded-xl border border-gray-200 overflow-hidden max-w-lg bg-gray-50 p-2">
-                        <img src="{{ $mcq->image_url }}" alt="Question {{ $mcq->question_number }} Diagram" class="w-full h-auto rounded-lg">
+                    <div class="mb-6 rounded-xl border border-gray-200 overflow-hidden max-w-full sm:max-w-lg bg-gray-50 p-2">
+                        <img src="{{ $mcq->image_url }}" alt="Question {{ $mcq->question_number }} Diagram" class="w-full h-auto rounded-lg object-contain">
                     </div>
                 @endif
 
@@ -178,14 +178,14 @@
                         <button type="button"
                                 @click="selectOption('{{ $optKey }}')"
                                 :disabled="revealed"
-                                class="w-full flex items-center justify-between px-5 py-4 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer disabled:cursor-default"
+                                class="w-full min-h-[48px] flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer disabled:cursor-default"
                                 :class="{
                                     'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20': revealed && isCorrect('{{ $optKey }}'),
                                     'border-rose-400 bg-rose-50/70 ring-2 ring-rose-400/20': revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}'),
                                     'border-gray-200 hover:border-gray-300 hover:bg-gray-50/80': !revealed
                                 }">
                             
-                            <div class="flex items-center gap-4 min-w-0">
+                            <div class="flex items-center gap-3.5 min-w-0">
                                 <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors"
                                      :class="{
                                          'border-emerald-500 bg-emerald-500 text-white': revealed && isCorrect('{{ $optKey }}'),
@@ -196,7 +196,7 @@
                                     <i x-show="revealed && isCorrect('{{ $optKey }}')" data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
                                     <i x-show="revealed && selected === '{{ $optKey }}' && !isCorrect('{{ $optKey }}')" data-lucide="x" class="w-4 h-4 stroke-[3]"></i>
                                 </div>
-                                <span class="text-base font-medium text-[#243247]">
+                                <span class="text-sm sm:text-base font-medium text-[#243247] break-words">
                                     <span class="font-bold text-gray-400 mr-2">{{ $optKey }}.</span> {{ $optVal }}
                                 </span>
                             </div>
@@ -213,41 +213,41 @@
                     <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
                         <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
                     </div>
-                    <p class="text-sm font-bold">
+                    <p class="text-xs sm:text-sm font-bold break-words">
                         Correct answer: {{ $mcq->correct_option }}. {{ $mcq->options[$mcq->correct_option] ?? '' }}
                     </p>
                 </div>
 
                 {{-- Step-by-Step Explanation --}}
                 @if($mcq->explanation)
-                    <div x-show="revealed" x-transition class="mt-4 p-5 rounded-xl bg-[#F7F9FC] border border-gray-200 text-sm text-[#243247] leading-relaxed" x-cloak>
+                    <div x-show="revealed" x-transition class="mt-4 p-4 sm:p-5 rounded-xl bg-[#F7F9FC] border border-gray-200 text-xs sm:text-sm text-[#243247] leading-relaxed break-words" x-cloak>
                         <div class="flex items-center gap-2 font-bold text-[#153B70] mb-2">
                             <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i>
                             <span>Detailed Explanation:</span>
                         </div>
-                        <p class="text-gray-700 font-medium pl-7 whitespace-pre-line">
+                        <p class="text-gray-700 font-medium pl-2 sm:pl-7 whitespace-pre-line break-words">
                             {{ $mcq->explanation }}
                         </p>
                     </div>
                 @endif
 
                 {{-- Bottom Action Row --}}
-                <div class="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
+                <div class="mt-6 pt-5 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                     <button type="button"
                             @click="revealed = !revealed"
-                            class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-xs font-bold text-[#153B70] flex items-center gap-2 transition-colors cursor-pointer">
+                            class="px-4 py-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 text-xs font-bold text-[#153B70] flex items-center justify-center gap-2 transition-colors cursor-pointer min-h-[42px]">
                         <i data-lucide="eye" class="w-4 h-4 text-[#087F82]"></i>
                         <span x-text="revealed ? 'Hide Answer' : 'Show Answer'"></span>
                     </button>
 
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         @if(isset($previousMcq))
-                            <a href="{{ route('mcq.show', $previousMcq->id) }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 text-xs font-bold text-[#153B70] hover:bg-gray-200 transition-colors">
+                            <a href="{{ route('mcq.show', $previousMcq->id) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-gray-100 text-xs font-bold text-[#153B70] hover:bg-gray-200 transition-colors min-h-[42px]">
                                 &larr; Previous
                             </a>
                         @endif
                         @if(isset($nextMcq))
-                            <a href="{{ route('mcq.show', $nextMcq->id) }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-[#087F82] text-xs font-bold text-white hover:bg-[#066668] transition-colors">
+                            <a href="{{ route('mcq.show', $nextMcq->id) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#087F82] text-xs font-bold text-white hover:bg-[#066668] transition-colors min-h-[42px]">
                                 Next Question &rarr;
                             </a>
                         @endif
@@ -258,7 +258,7 @@
         </div>
 
         {{-- Community Discussion Thread --}}
-        <div id="discussions" class="mt-10 bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8">
+        <div id="discussions" class="mt-10 bg-white rounded-2xl border border-gray-200/90 shadow-sm p-4 sm:p-8">
             <h3 class="text-lg font-bold text-[#153B70] flex items-center gap-2 mb-6">
                 <i data-lucide="message-square" class="w-5 h-5 text-[#087F82]"></i>
                 Discussion & Queries ({{ $discussions->count() }})
@@ -266,7 +266,7 @@
 
             {{-- Post Comment Form --}}
             @auth
-                <div class="mb-8 p-5 bg-gray-50 rounded-xl border border-gray-200/80">
+                <div class="mb-8 p-4 sm:p-5 bg-gray-50 rounded-xl border border-gray-200/80">
                     <form method="POST" action="{{ route('user.discussions.store') }}">
                         @csrf
                         <input type="hidden" name="question_id" value="{{ $mcq->id }}">
@@ -276,10 +276,10 @@
                         <textarea id="comment" name="comment" rows="3" required minlength="3" maxlength="2000"
                             placeholder="Write your explanation or question..."
                             class="w-full text-sm border border-gray-200 rounded-lg p-3 bg-white focus:border-[#087F82] focus:ring-1 focus:ring-[#087F82] focus:outline-none"></textarea>
-                        <div class="mt-2.5 flex items-center justify-between">
+                        <div class="mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                             <span class="text-[11px] text-gray-400">Be respectful and focus on constructive learning discussions.</span>
                             <button type="submit" 
-                                    class="px-5 py-2 bg-[#087F82] text-white text-xs font-bold rounded-lg hover:bg-[#066668] transition-colors shadow-xs">
+                                    class="w-full sm:w-auto px-5 py-2.5 bg-[#087F82] text-white text-xs font-bold rounded-lg hover:bg-[#066668] transition-colors shadow-xs min-h-[40px]">
                                 Post Comment
                             </button>
                         </div>
