@@ -17,16 +17,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure primary administrator account exists
-        $admin = User::firstOrNew(['email' => 'admin@aptimedha.com']);
-        $admin->fill([
-            'name' => 'AptiMedha Administrator',
-            'username' => 'admin',
-            'password' => Hash::make('Admin@12345'),
-            'email_verified_at' => now(),
-        ]);
-        $admin->role = UserRole::Admin;
-        $admin->save();
+        // SEC-01: Ensure primary administrator account is only provisioned on a fresh system.
+        // Never overwrite an existing administrator's password, role, or account details.
+        $adminExists = User::where('role', UserRole::Admin)->exists();
+
+        if (! $adminExists) {
+            $existingUser = User::where('email', 'admin@aptimedha.com')->first();
+            if ($existingUser) {
+                $existingUser->role = UserRole::Admin;
+                $existingUser->save();
+            } else {
+                $admin = new User([
+                    'name' => 'AptiMedha Administrator',
+                    'username' => 'admin',
+                    'email' => 'admin@aptimedha.com',
+                    'password' => Hash::make(env('INITIAL_ADMIN_PASSWORD', 'Admin@12345')),
+                    'email_verified_at' => now(),
+                ]);
+                $admin->role = UserRole::Admin;
+                $admin->save();
+            }
+        }
 
         $this->call([
             TaxonomySeeder::class,

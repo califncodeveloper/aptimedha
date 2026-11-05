@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\Blog;
 use App\Models\BlogCategory;
 use App\Models\User;
@@ -15,17 +16,25 @@ class BlogSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure admin user exists for author attribution
-        $admin = User::where('role', 'admin')->first();
-        if (!$admin) {
-            $admin = User::firstOrNew(['email' => 'admin@aptimedha.com']);
-            $admin->fill([
-                'name' => 'AptiMedha Editorial Team',
-                'username' => 'editorial',
-                'password' => Hash::make('Admin@12345'),
-            ]);
-            $admin->role = UserRole::Admin;
-            $admin->save();
+        // Ensure admin user exists for author attribution without modifying existing passwords
+        $admin = User::where('role', UserRole::Admin)->first();
+        if (! $admin) {
+            $existingByEmail = User::where('email', 'admin@aptimedha.com')->first();
+            if ($existingByEmail) {
+                $admin = $existingByEmail;
+                $admin->role = UserRole::Admin;
+                $admin->save();
+            } else {
+                $admin = new User([
+                    'name' => 'AptiMedha Editorial Team',
+                    'username' => 'editorial',
+                    'email' => 'admin@aptimedha.com',
+                    'password' => Hash::make(env('INITIAL_ADMIN_PASSWORD', 'Admin@12345')),
+                    'email_verified_at' => now(),
+                ]);
+                $admin->role = UserRole::Admin;
+                $admin->save();
+            }
         }
 
         $categories = [

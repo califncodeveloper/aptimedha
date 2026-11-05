@@ -15,7 +15,7 @@ services:
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER
-        value: cookie
+        value: database
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
