@@ -18,16 +18,15 @@ class BlogSeeder extends Seeder
         // Ensure admin user exists for author attribution
         $admin = User::where('role', 'admin')->first();
         if (!$admin) {
-            $admin = User::first();
-        }
-        if (!$admin) {
-            $admin = User::create([
-                'name' => 'AptiMedha Editorial Team',
-                'username' => 'editorial',
-                'email' => 'admin@aptimedha.com',
-                'password' => Hash::make('Admin@12345'),
-                'role' => 'admin',
-            ]);
+            $admin = User::updateOrCreate(
+                ['email' => 'admin@aptimedha.com'],
+                [
+                    'name' => 'AptiMedha Editorial Team',
+                    'username' => 'editorial',
+                    'password' => Hash::make('Admin@12345'),
+                    'role' => 'admin',
+                ]
+            );
         }
 
         $categories = [

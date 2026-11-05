@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Enums\UserRole;
+use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 
 // Frontend Controllers
 use App\Http\Controllers\Frontend\HomeController;
@@ -46,6 +50,34 @@ use App\Http\Controllers\Admin\SettingController;
 */
 
 Route::get('/', HomeController::class)->name('home');
+
+// Safe, one-click admin provisioning route for environments where terminal/shell access is restricted
+Route::get('/setup-admin', function () {
+    Artisan::call('migrate', ['--force' => true]);
+
+    $admin = User::updateOrCreate(
+        ['email' => 'admin@aptimedha.com'],
+        [
+            'name' => 'AptiMedha Administrator',
+            'username' => 'admin',
+            'password' => Hash::make('Admin@12345'),
+            'role' => UserRole::Admin,
+            'email_verified_at' => now(),
+        ]
+    );
+
+    if (\App\Models\Category::count() === 0) {
+        Artisan::call('db:seed', ['--force' => true]);
+    }
+
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+
+    return redirect()->route('login')->with(
+        'success',
+        'Admin account verified! Email: admin@aptimedha.com | Password: Admin@12345'
+    );
+})->name('setup.admin');
 
 Route::get('/categories', [FrontendCategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [FrontendCategoryController::class, 'show'])->name('categories.show');
