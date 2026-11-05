@@ -62,6 +62,30 @@ class SpreadsheetReader
         'explanation' => 'explanation',
         'solution' => 'explanation',
         'answer explanation' => 'explanation',
+
+        'question_image' => 'question_image',
+        'question image' => 'question_image',
+
+        'option_a_image' => 'option_a_image',
+        'option a image' => 'option_a_image',
+        'option_1_image' => 'option_a_image',
+
+        'option_b_image' => 'option_b_image',
+        'option b image' => 'option_b_image',
+        'option_2_image' => 'option_b_image',
+
+        'option_c_image' => 'option_c_image',
+        'option c image' => 'option_c_image',
+        'option_3_image' => 'option_c_image',
+
+        'option_d_image' => 'option_d_image',
+        'option d image' => 'option_d_image',
+        'option_4_image' => 'option_d_image',
+
+        'explanation_image' => 'explanation_image',
+        'explanation image' => 'explanation_image',
+        'solution_image' => 'explanation_image',
+        'solution image' => 'explanation_image',
     ];
 
     /**

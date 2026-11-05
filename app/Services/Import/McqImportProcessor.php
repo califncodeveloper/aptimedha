@@ -6,12 +6,21 @@ use App\Models\ImportBatch;
 use App\Models\Question;
 use App\Models\Topic;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class McqImportProcessor
 {
+    protected CloudinaryService $cloudinary;
+
+    public function __construct(?CloudinaryService $cloudinary = null)
+    {
+        $this->cloudinary = $cloudinary ?? app(CloudinaryService::class);
+    }
+
     /**
      * Process and commit validated import rows into the database.
      *
@@ -30,6 +39,8 @@ class McqImportProcessor
      *     duplicate_count: int,
      *     invalid_count: int,
      *     missing_image_count: int,
+     *     uploaded_images_count: int,
+     *     failed_images_count: int,
      *     details: list<array<string, mixed>>
      * }
      */
@@ -46,9 +57,15 @@ class McqImportProcessor
         $duplicateCount = 0;
         $invalidCount = 0;
         $missingImageCount = 0;
+        $uploadedImagesCount = 0;
+        $failedImagesCount = 0;
 
         $auditLog = [];
         $topicIncrementCounts = [];
+
+        // Track Cloudinary assets uploaded during this batch for safe rollback cleanup
+        $uploadedPublicIdsThisBatch = [];
+        $uploadedUrlCache = [];
 
         // Create initial pending batch
         $batch = ImportBatch::create([
@@ -70,8 +87,12 @@ class McqImportProcessor
                 &$duplicateCount,
                 &$invalidCount,
                 &$missingImageCount,
+                &$uploadedImagesCount,
+                &$failedImagesCount,
                 &$auditLog,
-                &$topicIncrementCounts
+                &$topicIncrementCounts,
+                &$uploadedPublicIdsThisBatch,
+                &$uploadedUrlCache
             ) {
                 // Track dynamic max question number per topic within transaction
                 $topicCurrentNumbers = [];
@@ -119,7 +140,89 @@ class McqImportProcessor
                         continue;
                     }
 
-                    // Handle Valid rows
+                    // Handle Valid rows: upload any referenced local images to Cloudinary
+                    $rowPublicIds = [];
+                    $rowImageUrls = [
+                        'question_image' => $row['question_image'] ?? null,
+                        'option_a_image' => $row['option_a_image'] ?? null,
+                        'option_b_image' => $row['option_b_image'] ?? null,
+                        'option_c_image' => $row['option_c_image'] ?? null,
+                        'option_d_image' => $row['option_d_image'] ?? null,
+                        'explanation_image' => $row['explanation_image'] ?? null,
+                    ];
+
+                    $fieldFolderMap = [
+                        'question_image' => 'aptimedha/mcqs/questions',
+                        'option_a_image' => 'aptimedha/mcqs/options',
+                        'option_b_image' => 'aptimedha/mcqs/options',
+                        'option_c_image' => 'aptimedha/mcqs/options',
+                        'option_d_image' => 'aptimedha/mcqs/options',
+                        'explanation_image' => 'aptimedha/mcqs/explanations',
+                    ];
+
+                    $imageUploadFailed = false;
+                    $imageUploadError = null;
+                    $failedField = null;
+
+                    if (!empty($row['image_files']) && is_array($row['image_files'])) {
+                        foreach ($fieldFolderMap as $imgField => $folder) {
+                            if (!empty($row['image_files'][$imgField])) {
+                                $localFilePath = $row['image_files'][$imgField];
+
+                                if (file_exists($localFilePath)) {
+                                    // Check local cache if file was already uploaded during this run
+                                    if (isset($uploadedUrlCache[$localFilePath])) {
+                                        $rowImageUrls[$imgField] = $uploadedUrlCache[$localFilePath];
+                                    } else {
+                                        $uploadRes = $this->cloudinary->uploadImage($localFilePath, $folder);
+
+                                        if (!empty($uploadRes['success'])) {
+                                            $secureUrl = $uploadRes['secure_url'];
+                                            $uploadedUrlCache[$localFilePath] = $secureUrl;
+                                            $rowImageUrls[$imgField] = $secureUrl;
+                                            $uploadedImagesCount++;
+
+                                            if (!empty($uploadRes['public_id'])) {
+                                                $rowPublicIds[] = $uploadRes['public_id'];
+                                                $uploadedPublicIdsThisBatch[] = $uploadRes['public_id'];
+                                            }
+                                        } else {
+                                            $imageUploadFailed = true;
+                                            $failedImagesCount++;
+                                            $failedField = $imgField;
+                                            $imageUploadError = $uploadRes['error'] ?? 'Unknown Cloudinary upload failure';
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ($imageUploadFailed) {
+                        // Clean up any images that were uploaded for this failed row
+                        foreach ($rowPublicIds as $pid) {
+                            $this->cloudinary->deleteAsset($pid);
+                        }
+
+                        $auditReason = "Cloudinary upload failed for {$failedField} (" . ($row[$failedField] ?? '') . "): {$imageUploadError}";
+                        $auditLog[] = [
+                            'row' => $rowNum,
+                            'sheet' => $sheet,
+                            'status' => 'failed',
+                            'reason' => $auditReason,
+                            'question' => mb_substr($row['question_text'] ?? '', 0, 80),
+                        ];
+
+                        $invalidCount++;
+                        $skippedCount++;
+
+                        if (!$skipInvalids) {
+                            throw new Exception("Row {$rowNum} in {$sheet} image upload failed: {$imageUploadError}");
+                        }
+                        continue;
+                    }
+
                     $topicId = (int) $row['topic_id'];
                     $qNum = $row['question_number'] !== null ? (int) $row['question_number'] : null;
 
@@ -154,11 +257,12 @@ class McqImportProcessor
                         'explanation' => $row['explanation'],
                         'difficulty' => 'medium',
                         'figure_id' => $row['figure_id'],
-                        'question_image' => $row['question_image'],
-                        'option_a_image' => $row['option_a_image'],
-                        'option_b_image' => $row['option_b_image'],
-                        'option_c_image' => $row['option_c_image'],
-                        'option_d_image' => $row['option_d_image'],
+                        'question_image' => $rowImageUrls['question_image'],
+                        'option_a_image' => $rowImageUrls['option_a_image'],
+                        'option_b_image' => $rowImageUrls['option_b_image'],
+                        'option_c_image' => $rowImageUrls['option_c_image'],
+                        'option_d_image' => $rowImageUrls['option_d_image'],
+                        'explanation_image' => $rowImageUrls['explanation_image'],
                         'is_active' => true,
                     ]);
 
@@ -188,6 +292,15 @@ class McqImportProcessor
                 'status' => 'completed',
             ]);
         } catch (Throwable $e) {
+            // Rollback cleanup: delete any newly created Cloudinary assets from this batch to avoid orphans
+            foreach ($uploadedPublicIdsThisBatch as $pid) {
+                try {
+                    $this->cloudinary->deleteAsset($pid);
+                } catch (Throwable $delEx) {
+                    Log::warning("Failed to clean up Cloudinary asset during rollback: {$pid}");
+                }
+            }
+
             $batch->update([
                 'status' => 'failed',
                 'errors' => [
@@ -210,6 +323,8 @@ class McqImportProcessor
             'duplicate_count' => $duplicateCount,
             'invalid_count' => $invalidCount,
             'missing_image_count' => $missingImageCount,
+            'uploaded_images_count' => $uploadedImagesCount,
+            'failed_images_count' => $failedImagesCount,
             'details' => $auditLog,
         ];
     }
@@ -256,4 +371,3 @@ class McqImportProcessor
         return $value;
     }
 }
-

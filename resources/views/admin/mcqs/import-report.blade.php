@@ -17,31 +17,36 @@
                 </div>
             </div>
 
-            {{-- Summary Metric Cards --}}
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6 pt-6 border-t border-gray-100">
+            {{-- Summary Metric Cards (Matching Requirement 5) --}}
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-6 pt-6 border-t border-gray-100">
                 <div class="bg-[#F7F9FC] p-4 rounded-xl border border-gray-200/70">
-                    <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Rows</div>
-                    <div class="text-2xl font-bold text-[#153B70] mt-1">{{ number_format($report['total_rows']) }}</div>
+                    <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Total Rows</div>
+                    <div class="text-xl font-bold text-[#153B70] mt-1">{{ number_format($report['total_rows']) }}</div>
                 </div>
 
                 <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
-                    <div class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Successfully Added</div>
-                    <div class="text-2xl font-bold text-emerald-700 mt-1">{{ number_format($report['imported_count']) }}</div>
+                    <div class="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">Imported MCQs</div>
+                    <div class="text-xl font-bold text-emerald-700 mt-1">{{ number_format($report['imported_count']) }}</div>
                 </div>
 
                 <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
-                    <div class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">Skipped Duplicates</div>
-                    <div class="text-2xl font-bold text-amber-700 mt-1">{{ number_format($report['duplicate_count']) }}</div>
+                    <div class="text-[10px] font-semibold text-amber-700 uppercase tracking-wider">Skipped Duplicates</div>
+                    <div class="text-xl font-bold text-amber-700 mt-1">{{ number_format($report['duplicate_count']) }}</div>
                 </div>
 
                 <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
-                    <div class="text-[11px] font-semibold text-red-700 uppercase tracking-wider">Invalid Rows</div>
-                    <div class="text-2xl font-bold text-red-700 mt-1">{{ number_format($report['invalid_count']) }}</div>
+                    <div class="text-[10px] font-semibold text-red-700 uppercase tracking-wider">Failed / Invalid</div>
+                    <div class="text-xl font-bold text-red-700 mt-1">{{ number_format($report['invalid_count']) }}</div>
                 </div>
 
-                <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-100 col-span-2 sm:col-span-1">
-                    <div class="text-[11px] font-semibold text-purple-700 uppercase tracking-wider">Missing Images</div>
-                    <div class="text-2xl font-bold text-purple-700 mt-1">{{ number_format($report['missing_image_count']) }}</div>
+                <div class="bg-teal-50/60 p-4 rounded-xl border border-teal-200">
+                    <div class="text-[10px] font-semibold text-[#087F82] uppercase tracking-wider">Uploaded Images</div>
+                    <div class="text-xl font-bold text-[#087F82] mt-1">{{ number_format($report['uploaded_images_count'] ?? 0) }}</div>
+                </div>
+
+                <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-100">
+                    <div class="text-[10px] font-semibold text-purple-700 uppercase tracking-wider">Failed Images</div>
+                    <div class="text-xl font-bold text-purple-700 mt-1">{{ number_format($report['failed_images_count'] ?? 0) }}</div>
                 </div>
             </div>
 
@@ -96,14 +101,14 @@
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">
-                                            Invalid Skipped
+                                            Failed / Skipped
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 max-w-xs truncate text-gray-600">
                                     {{ $item['question'] }}
                                 </td>
-                                <td class="px-4 py-3 {{ $item['status'] === 'imported' ? 'text-gray-500' : 'text-amber-700 font-medium' }}">
+                                <td class="px-4 py-3 {{ $item['status'] === 'imported' ? 'text-gray-500' : 'text-red-700 font-medium' }}">
                                     {{ $item['reason'] }}
                                 </td>
                             </tr>
@@ -120,4 +125,3 @@
         </div>
     </div>
 </x-layouts.admin>
-

@@ -1,13 +1,21 @@
 <x-layouts.admin>
     <x-slot:title>Bulk Import MCQs - AptiMedha Admin</x-slot:title>
-    <x-slot:header>Bulk MCQ Import (.xlsx / .csv)</x-slot:header>
+    <x-slot:header>Bulk MCQ Import with Cloudinary Image Integration</x-slot:header>
 
     <div class="space-y-8 max-w-5xl" x-data="{ 
         fileName: '', 
+        zipName: '',
         isUploading: false,
         fileSelected(e) {
             if(e.target.files.length) {
                 this.fileName = e.target.files[0].name;
+            }
+        },
+        zipSelected(e) {
+            if(e.target.files.length) {
+                this.zipName = e.target.files[0].name;
+            } else {
+                this.zipName = '';
             }
         }
     }">
@@ -15,7 +23,7 @@
             <a href="{{ route('admin.mcqs.index') }}" class="text-xs font-bold text-[#153B70] hover:underline flex items-center">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to MCQ Bank
             </a>
-            <span class="text-xs text-gray-500 font-medium">Canonical Handover Schema Compliant</span>
+            <span class="text-xs text-gray-500 font-medium">Canonical Schema & Cloudinary Integrated</span>
         </div>
 
         @if(session('error'))
@@ -53,28 +61,47 @@
             <form action="{{ route('admin.mcqs.import') }}" method="POST" enctype="multipart/form-data" @submit="isUploading = true" class="space-y-6">
                 @csrf
 
-                {{-- Drag & Drop Area --}}
-                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-10 text-center hover:border-[#087F82] bg-[#F7F9FC]/60 transition-colors relative cursor-pointer group">
-                    <input type="file" 
-                           name="file" 
-                           accept=".xlsx,.csv" 
-                           required 
-                           @change="fileSelected"
-                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                    
-                    <div class="w-14 h-14 rounded-2xl bg-teal-50 text-[#087F82] flex items-center justify-center mx-auto mb-3 group-hover:bg-[#087F82] group-hover:text-white transition-colors">
-                        <i data-lucide="file-spreadsheet" class="w-7 h-7"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Spreadsheet File Drop Area --}}
+                    <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-[#087F82] bg-[#F7F9FC]/60 transition-colors relative cursor-pointer group flex flex-col items-center justify-center min-h-[200px]">
+                        <input type="file" 
+                               name="file" 
+                               accept=".xlsx,.csv" 
+                               required 
+                               @change="fileSelected"
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        
+                        <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#087F82] flex items-center justify-center mb-2.5 group-hover:bg-[#087F82] group-hover:text-white transition-colors">
+                            <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+                        </div>
+
+                        <p class="text-xs font-bold text-[#153B70]" x-text="fileName ? fileName : '1. Upload Excel / CSV (Required)'"></p>
+                        <p class="text-[11px] text-gray-500 mt-1">.xlsx or .csv up to 15MB</p>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 mt-2">Required</span>
                     </div>
 
-                    <p class="text-sm font-bold text-[#153B70]" x-text="fileName ? fileName : 'Choose Excel workbook (.xlsx) or CSV (.csv)'"></p>
-                    <p class="text-xs text-gray-500 mt-1">Drag and drop spreadsheet file here, or click to browse</p>
-                    <p class="text-[11px] text-[#087F82] font-semibold mt-2">Maximum file size: 15MB • Standard 10-Column Schema</p>
+                    {{-- Images ZIP Archive Drop Area --}}
+                    <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-[#087F82] bg-[#F7F9FC]/60 transition-colors relative cursor-pointer group flex flex-col items-center justify-center min-h-[200px]">
+                        <input type="file" 
+                               name="zip_file" 
+                               accept=".zip" 
+                               @change="zipSelected"
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-2.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                            <i data-lucide="archive" class="w-6 h-6"></i>
+                        </div>
+
+                        <p class="text-xs font-bold text-[#153B70]" x-text="zipName ? zipName : '2. Upload Images ZIP (Optional)'"></p>
+                        <p class="text-[11px] text-gray-500 mt-1">.zip with referenced images up to 50MB</p>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600 mt-2">Optional Cloudinary Sync</span>
+                    </div>
                 </div>
 
                 {{-- Action Bar --}}
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-gray-100">
                     <a href="{{ route('admin.mcqs.import.template') }}" class="inline-flex items-center text-xs font-bold text-[#087F82] hover:text-[#066668] transition-colors py-2">
-                        <i data-lucide="download" class="w-4 h-4 mr-1.5 shrink-0"></i> Download Canonical Import Template (.csv)
+                        <i data-lucide="download" class="w-4 h-4 mr-1.5 shrink-0"></i> Download Import Template with Image Columns (.csv)
                     </a>
 
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -92,19 +119,76 @@
             </form>
         </div>
 
-        {{-- 10-Column Canonical Schema Specification Card matching SRS Section 9 --}}
+        {{-- ZIP Folder Structure & Cloudinary Instructions --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#087F82] flex items-center justify-center">
+                        <i data-lucide="folder-tree" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#153B70]">ZIP Folder Structure Guide</h3>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    You can preserve a folder structure or keep unique filenames in the ZIP archive:
+                </p>
+                <div class="bg-[#F7F9FC] p-3 rounded-xl border border-gray-200 font-mono text-[11px] text-gray-700 leading-snug">
+                    bulk-import.zip<br>
+                    ├── images/<br>
+                    │&nbsp;&nbsp;&nbsp;├── q1.png<br>
+                    │&nbsp;&nbsp;&nbsp;├── q1_option_a.png<br>
+                    │&nbsp;&nbsp;&nbsp;├── q1_option_b.png<br>
+                    │&nbsp;&nbsp;&nbsp;└── q1_explanation.png<br>
+                    └── q2_chart.png
+                </div>
+                <p class="text-[11px] text-gray-500">
+                    Image columns in your Excel/CSV can reference either relative paths (e.g. <code class="text-[#087F82]">images/q1.png</code>) or unique basenames (<code class="text-[#087F82]">q1.png</code>).
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-blue-50 text-[#153B70] flex items-center justify-center">
+                        <i data-lucide="cloud" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#153B70]">Cloudinary Storage Folders</h3>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    Referenced images from valid MCQ rows are uploaded into dedicated Cloudinary directories:
+                </p>
+                <ul class="text-xs space-y-1.5 text-gray-600">
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#087F82]"></i>
+                        <span>Questions: <code class="font-mono text-[#153B70] bg-gray-100 px-1 py-0.5 rounded text-[11px]">aptimedha/mcqs/questions</code></span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#087F82]"></i>
+                        <span>Options A–D: <code class="font-mono text-[#153B70] bg-gray-100 px-1 py-0.5 rounded text-[11px]">aptimedha/mcqs/options</code></span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#087F82]"></i>
+                        <span>Explanations: <code class="font-mono text-[#153B70] bg-gray-100 px-1 py-0.5 rounded text-[11px]">aptimedha/mcqs/explanations</code></span>
+                    </li>
+                </ul>
+                <p class="text-[11px] text-gray-500">
+                    Only images referenced by successfully imported MCQs are uploaded. Unreferenced files are discarded safely.
+                </p>
+            </div>
+        </div>
+
+        {{-- Canonical Schema Specification Card matching SRS Section 9 --}}
         <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-8 space-y-4">
             <div>
                 <h3 class="text-base font-bold text-[#153B70]">Required 10-Column Spreadsheet Schema</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Every row in the spreadsheet must match the canonical schema sequence:</p>
+                <p class="text-xs text-gray-500 mt-0.5">Required core columns (1–10) and optional image reference columns (11–16):</p>
             </div>
 
             <div class="overflow-x-auto scrollbar-thin">
-                <table class="w-full text-left text-xs border border-gray-200 rounded-xl overflow-hidden min-w-[550px]">
+                <table class="w-full text-left text-xs border border-gray-200 rounded-xl overflow-hidden min-w-[650px]">
                     <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
                         <tr>
                             <th class="px-3 py-2.5">Col</th>
                             <th class="px-3 py-2.5">Header Name</th>
+                            <th class="px-3 py-2.5">Required</th>
                             <th class="px-3 py-2.5">Description</th>
                             <th class="px-3 py-2.5">Example Value</th>
                         </tr>
@@ -113,44 +197,72 @@
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">1</td>
                             <td class="px-3 py-2 font-sans font-semibold">Question Topic</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Canonical Category name</td>
                             <td class="px-3 py-2 text-gray-600">Arithmetic Aptitude</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">2</td>
                             <td class="px-3 py-2 font-sans font-semibold">Question Subtopic</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Topic name or Subject / Topic</td>
                             <td class="px-3 py-2 text-gray-600">Number System</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">3</td>
                             <td class="px-3 py-2 font-sans font-semibold">Question Number</td>
-                            <td class="px-3 py-2 font-sans text-gray-500">Unique integer within topic (optional auto-assign)</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Unique integer within topic</td>
                             <td class="px-3 py-2 text-gray-600">1</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">4</td>
                             <td class="px-3 py-2 font-sans font-semibold">Question Text</td>
-                            <td class="px-3 py-2 font-sans text-gray-500">Full question statement (required)</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Full question statement</td>
                             <td class="px-3 py-2 text-gray-600">How many positive factors does 36 have?</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">5-8</td>
                             <td class="px-3 py-2 font-sans font-semibold">Option A, B, C, D</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Four non-empty options</td>
                             <td class="px-3 py-2 text-gray-600">10 | 11 | 9 | 8</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">9</td>
                             <td class="px-3 py-2 font-sans font-semibold">Correct Option</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Single letter: A, B, C, or D</td>
                             <td class="px-3 py-2 text-emerald-600 font-bold">C</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">10</td>
                             <td class="px-3 py-2 font-sans font-semibold">Explanation</td>
+                            <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Detailed step-by-step solution</td>
                             <td class="px-3 py-2 text-gray-600">36 = 2^2 × 3^2. Factor count = (2+1)(2+1) = 9.</td>
+                        </tr>
+                        <tr class="bg-teal-50/40">
+                            <td class="px-3 py-2 font-bold text-[#087F82]">11</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Question Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
+                            <td class="px-3 py-2 font-sans text-gray-600">Filename in ZIP archive or URL</td>
+                            <td class="px-3 py-2 text-gray-600">images/q1.png</td>
+                        </tr>
+                        <tr class="bg-teal-50/40">
+                            <td class="px-3 py-2 font-bold text-[#087F82]">12-15</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Option A–D Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
+                            <td class="px-3 py-2 font-sans text-gray-600">Filenames for option graphics</td>
+                            <td class="px-3 py-2 text-gray-600">images/q1_opt_a.png</td>
+                        </tr>
+                        <tr class="bg-teal-50/40">
+                            <td class="px-3 py-2 font-bold text-[#087F82]">16</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Explanation Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
+                            <td class="px-3 py-2 font-sans text-gray-600">Filename for diagram in explanation</td>
+                            <td class="px-3 py-2 text-gray-600">images/q1_explanation.png</td>
                         </tr>
                     </tbody>
                 </table>

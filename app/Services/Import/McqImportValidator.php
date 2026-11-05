@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 class McqImportValidator
 {
     protected TaxonomyMatcher $taxonomyMatcher;
+    protected McqImageArchiveHandler $archiveHandler;
 
     /** @var array<int, array<int, bool>> */
     protected array $seenTopicNumbers = [];
@@ -21,9 +22,12 @@ class McqImportValidator
     /** @var array<string, bool> */
     protected array $existingDbTextCache = [];
 
-    public function __construct(?TaxonomyMatcher $taxonomyMatcher = null)
-    {
+    public function __construct(
+        ?TaxonomyMatcher $taxonomyMatcher = null,
+        ?McqImageArchiveHandler $archiveHandler = null
+    ) {
         $this->taxonomyMatcher = $taxonomyMatcher ?? new TaxonomyMatcher();
+        $this->archiveHandler = $archiveHandler ?? new McqImageArchiveHandler();
     }
 
     /**
@@ -34,6 +38,7 @@ class McqImportValidator
      *     image_references?: array<string, array<string, string>>,
      *     format: string
      * } $parsedData
+     * @param array<string, mixed>|null $archiveIndexData
      * @return array{
      *     total_rows: int,
      *     valid_count: int,
@@ -44,7 +49,7 @@ class McqImportValidator
      *     errors_summary: list<string>
      * }
      */
-    public function validateWorkbook(array $parsedData): array
+    public function validateWorkbook(array $parsedData, ?array $archiveIndexData = null): array
     {
         $this->seenTopicNumbers = [];
         $this->seenTopicTextHashes = [];
@@ -64,7 +69,7 @@ class McqImportValidator
         foreach ($parsedData['sheets'] as $sheetName => $sheet) {
             foreach ($sheet['rows'] as $rowItem) {
                 $totalRows++;
-                $rowResult = $this->validateRow($rowItem, $imageReferences);
+                $rowResult = $this->validateRow($rowItem, $imageReferences, $archiveIndexData);
 
                 if ($rowResult['status'] === 'valid') {
                     $validCount++;
@@ -102,9 +107,10 @@ class McqImportValidator
      *
      * @param array{row_number: int, sheet: string, data: array<string, mixed>} $rowItem
      * @param array<string, array<string, string>> $imageReferences
+     * @param array<string, mixed>|null $archiveIndexData
      * @return array<string, mixed>
      */
-    public function validateRow(array $rowItem, array $imageReferences = []): array
+    public function validateRow(array $rowItem, array $imageReferences = [], ?array $archiveIndexData = null): array
     {
         $data = $rowItem['data'];
         $rowNumber = $rowItem['row_number'];
@@ -227,40 +233,68 @@ class McqImportValidator
 
         // 6. Image & Figure References Check
         $figureId = null;
-        $questionImage = null;
-        $optionAImage = null;
-        $optionBImage = null;
-        $optionCImage = null;
-        $optionDImage = null;
-
-        // Check if figure ID can be matched (e.g. figure reference in text or Image References sheet)
         if (preg_match('/(?:figure|fig\.?)\s*([A-Za-z0-9\-_]+)/i', $questionText, $m)) {
             $figureId = trim($m[1]);
         }
 
-        if ($figureId && isset($imageReferences[$figureId])) {
-            $ref = $imageReferences[$figureId];
-            $questionImage = $ref['question image'] ?? $ref['question_image'] ?? null;
-            $optionAImage = $ref['option a image'] ?? $ref['option_a_image'] ?? null;
-            $optionBImage = $ref['option b image'] ?? $ref['option_b_image'] ?? null;
-            $optionCImage = $ref['option c image'] ?? $ref['option_c_image'] ?? null;
-            $optionDImage = $ref['option d image'] ?? $ref['option_d_image'] ?? null;
-        }
+        $figRef = ($figureId && isset($imageReferences[$figureId])) ? $imageReferences[$figureId] : [];
 
-        // Verify images exist on server if referenced
-        $allImgRefs = array_filter([
-            'Question Image' => $questionImage,
-            'Option A Image' => $optionAImage,
-            'Option B Image' => $optionBImage,
-            'Option C Image' => $optionCImage,
-            'Option D Image' => $optionDImage,
-        ]);
+        $questionImage = trim((string) ($data['question_image'] ?? '')) ?: ($figRef['question image'] ?? $figRef['question_image'] ?? null);
+        $optionAImage = trim((string) ($data['option_a_image'] ?? '')) ?: ($figRef['option a image'] ?? $figRef['option_a_image'] ?? null);
+        $optionBImage = trim((string) ($data['option_b_image'] ?? '')) ?: ($figRef['option b image'] ?? $figRef['option_b_image'] ?? null);
+        $optionCImage = trim((string) ($data['option_c_image'] ?? '')) ?: ($figRef['option c image'] ?? $figRef['option_c_image'] ?? null);
+        $optionDImage = trim((string) ($data['option_d_image'] ?? '')) ?: ($figRef['option d image'] ?? $figRef['option_d_image'] ?? null);
+        $explanationImage = trim((string) ($data['explanation_image'] ?? '')) ?: ($figRef['explanation image'] ?? $figRef['explanation_image'] ?? null);
 
-        foreach ($allImgRefs as $label => $imgRelPath) {
-            if (!$this->imageExistsOnServer($imgRelPath)) {
-                $missingImages[] = "{$label} ({$imgRelPath})";
-                $warnings[] = "Referenced file '{$imgRelPath}' not found on server.";
-                // Do not create broken image path in DB
+        $imageFields = [
+            'question_image' => ['label' => 'Question Image', 'ref' => $questionImage],
+            'option_a_image' => ['label' => 'Option A Image', 'ref' => $optionAImage],
+            'option_b_image' => ['label' => 'Option B Image', 'ref' => $optionBImage],
+            'option_c_image' => ['label' => 'Option C Image', 'ref' => $optionCImage],
+            'option_d_image' => ['label' => 'Option D Image', 'ref' => $optionDImage],
+            'explanation_image' => ['label' => 'Explanation Image', 'ref' => $explanationImage],
+        ];
+
+        $resolvedImageFiles = [];
+
+        foreach ($imageFields as $field => $info) {
+            $imgRef = $info['ref'];
+            $label = $info['label'];
+
+            if (!$imgRef) {
+                continue;
+            }
+
+            // Remote URL is already hosted
+            if (str_starts_with($imgRef, 'http://') || str_starts_with($imgRef, 'https://')) {
+                continue;
+            }
+
+            // If an archive was provided, resolve against the extracted ZIP files
+            if ($archiveIndexData !== null) {
+                $locateResult = $this->archiveHandler->locateImage($imgRef, $archiveIndexData);
+                if ($locateResult['found']) {
+                    $resolvedImageFiles[$field] = $locateResult['path'];
+                } else {
+                    $missingImages[] = "{$label} ({$imgRef})";
+                    if (!empty($locateResult['error'])) {
+                        $errors[] = "[{$label}] " . $locateResult['error'];
+                    } else {
+                        $errors[] = "Referenced image '{$imgRef}' for {$label} not found in the uploaded ZIP archive.";
+                    }
+                }
+            } else {
+                // No ZIP uploaded: check existing server file or public storage
+                if ($this->imageExistsOnServer($imgRef)) {
+                    $resolvedImageFiles[$field] = $imgRef;
+                } else {
+                    $missingImages[] = "{$label} ({$imgRef})";
+                    $warnings[] = "Referenced file '{$imgRef}' not found on server.";
+                    // If it was explicitly referenced in a dedicated column without ZIP, flag as error
+                    if (!empty($data[$field])) {
+                        $errors[] = "Referenced image '{$imgRef}' for {$label} not found on server (no ZIP archive was provided).";
+                    }
+                }
             }
         }
 
@@ -271,6 +305,7 @@ class McqImportValidator
             $optionBImage = null;
             $optionCImage = null;
             $optionDImage = null;
+            $explanationImage = null;
         }
 
         $status = 'valid';
@@ -307,6 +342,8 @@ class McqImportValidator
             'option_b_image' => $optionBImage,
             'option_c_image' => $optionCImage,
             'option_d_image' => $optionDImage,
+            'explanation_image' => $explanationImage,
+            'image_files' => $resolvedImageFiles,
         ];
     }
 

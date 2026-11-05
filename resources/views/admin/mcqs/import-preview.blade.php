@@ -16,8 +16,14 @@
                     </button>
                 </form>
             </div>
-            <div class="text-xs text-gray-500">
-                File: <span class="font-bold text-gray-700">{{ $filename }}</span>
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+                <div>File: <span class="font-bold text-gray-700">{{ $filename }}</span></div>
+                @if(!empty($zipFilename))
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-[#087F82] font-semibold">
+                        <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                        <span>{{ $zipFilename }} ({{ $summary['images_archive_count'] ?? 0 }} images)</span>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -61,6 +67,9 @@
                         <p class="text-xs text-gray-500 mt-0.5">
                             @if($summary['valid_count'] > 0)
                                 You can safely commit <strong class="text-emerald-700">{{ $summary['valid_count'] }}</strong> valid questions into the database using safe transaction wrapping.
+                                @if(!empty($hasImages))
+                                    Referenced images will be automatically synced to Cloudinary.
+                                @endif
                             @else
                                 No valid questions found in this batch. Please fix row errors and re-upload.
                             @endif
@@ -82,7 +91,7 @@
                                     class="px-6 py-2.5 rounded-xl bg-[#087F82] hover:bg-[#066668] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-2">
                                 <span x-show="!isConfirming">Confirm & Import {{ $summary['valid_count'] }} Valid MCQs</span>
                                 <span x-show="isConfirming" style="display:none;" class="flex items-center gap-2">
-                                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Writing to Database...
+                                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Writing & Syncing to Cloudinary...
                                 </span>
                             </button>
                         @endif
@@ -149,7 +158,7 @@
                             <th class="px-4 py-3">Category & Topic</th>
                             <th class="px-4 py-3">Q#</th>
                             <th class="px-4 py-3">Question Statement</th>
-                            <th class="px-4 py-3">Options</th>
+                            <th class="px-4 py-3">Images</th>
                             <th class="px-4 py-3">Ans</th>
                             <th class="px-4 py-3">Validation Details</th>
                         </tr>
@@ -185,8 +194,24 @@
                                 <td class="px-4 py-3 max-w-xs truncate" title="{{ $row['question_text'] }}">
                                     {{ $row['question_text'] }}
                                 </td>
-                                <td class="px-4 py-3 text-[10px] text-gray-500 max-w-[200px] truncate">
-                                    A: {{ $row['option_a'] }} | B: {{ $row['option_b'] }}
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    @php
+                                        $imgs = [];
+                                        if(!empty($row['question_image'])) $imgs[] = 'Q';
+                                        if(!empty($row['option_a_image'])) $imgs[] = 'Opt A';
+                                        if(!empty($row['option_b_image'])) $imgs[] = 'Opt B';
+                                        if(!empty($row['option_c_image'])) $imgs[] = 'Opt C';
+                                        if(!empty($row['option_d_image'])) $imgs[] = 'Opt D';
+                                        if(!empty($row['explanation_image'])) $imgs[] = 'Exp';
+                                    @endphp
+                                    @if(!empty($imgs))
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-50 text-[#087F82] border border-teal-200">
+                                            <i data-lucide="image" class="w-3 h-3"></i>
+                                            <span>{{ implode(', ', $imgs) }}</span>
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 text-[10px]">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 font-bold text-emerald-700 whitespace-nowrap">
                                     {{ $row['correct_option'] }}
@@ -214,4 +239,3 @@
         </div>
     </div>
 </x-layouts.admin>
-
