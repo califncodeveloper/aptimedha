@@ -52,12 +52,15 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 6. Run database migrations safely
 php artisan migrate --force || true
+php artisan db:seed --force || true
 
 # 7. Create storage link
 php artisan storage:link --force || true
 
-# 8. Clear and cache config/views
-php artisan config:clear
+# 8. Clear all stale caches and warm up production config/views
+php artisan cache:clear || true
+php artisan view:clear || true
+php artisan config:clear || true
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

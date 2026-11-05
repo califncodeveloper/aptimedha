@@ -345,6 +345,7 @@
             {{-- 3x3 Domain Cards Grid with Framer Motion Staggered Fade & Slide --}}
             <div data-motion-stagger data-motion-stagger-delay="0.06" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($categories as $cat)
+                    @if(is_object($cat) && !empty($cat->slug))
                     <a href="{{ route('categories.show', $cat->slug) }}"
                        data-motion-item
                        class="card-hover-effect flex flex-col justify-between p-6 bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:border-[#087F82] group">
@@ -363,12 +364,13 @@
                             </p>
                         </div>
                         <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
-                            <span class="text-[#087F82]">{{ number_format($cat->questions_count) }} {{ Str::plural('Question', $cat->questions_count) }}</span>
+                            <span class="text-[#087F82]">{{ number_format($cat->questions_count ?? 0) }} {{ Str::plural('Question', $cat->questions_count ?? 0) }}</span>
                             <span class="inline-flex items-center text-[#153B70] group-hover:text-[#087F82] group-hover:translate-x-1 transition-all">
                                 Start &rarr;
                             </span>
                         </div>
                     </a>
+                    @endif
                 @empty
                     <div class="col-span-3 py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-200">
                         <i data-lucide="folder-tree" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
@@ -629,6 +631,7 @@
             {{-- Article Cards with Staggered Entrance & Subtle Image Zoom --}}
             <div data-motion-stagger data-motion-stagger-delay="0.1" class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 @forelse($latestBlogs as $blog)
+                    @if(is_object($blog) && !empty($blog->slug))
                     <article data-motion-item
                              data-motion-zoom
                              class="image-zoom-card bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:border-[#087F82] card-hover-effect flex flex-col justify-between overflow-hidden group">
@@ -671,6 +674,7 @@
                             </a>
                         </div>
                     </article>
+                    @endif
                 @empty
                     <div class="col-span-3 py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-200">
                         <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>

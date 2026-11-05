@@ -72,13 +72,11 @@ class McqController
         // Resolve Sidebar Topics for this Category
         $sidebarTopics = collect();
         if ($category) {
-            $sidebarTopics = Cache::remember("cat_{$category->id}_sidebar_topics", 300, function () use ($category) {
-                return Topic::where('category_id', $category->id)
-                    ->active()
-                    ->ordered()
-                    ->withCount(['questions' => fn ($q) => $q->active()])
-                    ->get();
-            });
+            $sidebarTopics = Topic::where('category_id', $category->id)
+                ->active()
+                ->ordered()
+                ->withCount(['questions' => fn ($q) => $q->active()])
+                ->get();
         }
 
         // Fallback topic if not resolved yet
