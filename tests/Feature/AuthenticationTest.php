@@ -429,6 +429,7 @@ class AuthenticationTest extends TestCase
                 'sub' => 'google-user-id-9988',
                 'name' => 'Kavya Patel',
                 'email' => 'kavya.patel@gmail.com',
+                'email_verified' => true,
                 'picture' => 'https://lh3.googleusercontent.com/avatar/kavya.png',
             ], 200),
         ]);
@@ -472,6 +473,7 @@ class AuthenticationTest extends TestCase
                 'sub' => 'google-id-12345',
                 'name' => 'Existing Student',
                 'email' => 'existing@gmail.com',
+                'email_verified' => true,
                 'picture' => 'https://avatar.google.com/pic.jpg',
             ], 200),
         ]);

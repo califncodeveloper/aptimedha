@@ -8,6 +8,7 @@ use App\Models\UserProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -135,6 +136,10 @@ class LoginController
     public function handleGoogleCallback(Request $request): RedirectResponse
     {
         if ($request->has('error')) {
+            Log::info('Google OAuth sign-in cancelled or returned error', [
+                'error' => $request->input('error'),
+            ]);
+
             return redirect()->route('login')->with(
                 'error',
                 'Google Sign-In was cancelled or failed.'
@@ -220,6 +225,8 @@ class LoginController
         }
 
         if (! $userinfoResponse->successful()) {
+            Log::error('Google OAuth userinfo request failed', ['status' => $userinfoResponse->status()]);
+
             return redirect()->route('login')->with(
                 'error',
                 'Failed to fetch user profile from Google.'
@@ -231,30 +238,138 @@ class LoginController
         $email = $googleData['email'] ?? null;
         $name = $googleData['name'] ?? ($googleData['given_name'] ?? 'Google User');
         $avatar = $googleData['picture'] ?? null;
+        $emailVerified = $googleData['email_verified'] ?? null;
 
-        if (empty($googleId) || empty($email)) {
+        // 1. Validate required fields from Google profile
+        if (empty($googleId) || empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return redirect()->route('login')->with(
                 'error',
                 'Unable to retrieve email or identity from Google.'
             );
         }
 
-        // 1. Check if this Google account is already linked in user_providers
+        // 2. Explicitly verify Google email verification claim
+        $isEmailVerified = ($emailVerified === true || $emailVerified === 'true' || $emailVerified === 1 || $emailVerified === '1');
+        if (! $isEmailVerified) {
+            Log::warning('Google OAuth login rejected: unverified email', [
+                'email' => $email,
+                'google_id' => $googleId,
+            ]);
+
+            return redirect()->route('login')->with(
+                'error',
+                'Your Google account email is not verified. Please verify your email with Google or sign in using your password.'
+            );
+        }
+
+        // Normalize email to prevent case-sensitive mismatches
+        $email = strtolower(trim($email));
+
+        // 3. Check if this Google provider ID is already linked
         $userProvider = UserProvider::where('provider', 'google')
             ->where('provider_id', (string) $googleId)
             ->first();
 
         if ($userProvider) {
             $user = $userProvider->user;
-            if ($avatar && $userProvider->avatar !== $avatar) {
-                $userProvider->update(['avatar' => $avatar]);
-            }
-        } else {
-            // 2. Check if a user with this email already exists
-            $user = User::where('email', $email)->first();
 
             if (! $user) {
-                // Generate a unique username based on the email prefix
+                // Orphan provider record - clean up and continue
+                $userProvider->delete();
+                $userProvider = null;
+            } else {
+                // Security check: if another AptiMedha user has this exact email (cross-account conflict)
+                $userWithEmail = User::where('email', $email)->first();
+                if ($userWithEmail && $userWithEmail->id !== $user->id) {
+                    Log::warning('Google provider ID is linked to a different user than the email owner', [
+                        'provider_user_id' => $user->id,
+                        'email_user_id' => $userWithEmail->id,
+                        'google_id' => $googleId,
+                    ]);
+
+                    return redirect()->route('login')->with(
+                        'error',
+                        'This Google account is already linked to another AptiMedha account.'
+                    );
+                }
+
+                // Update avatar if changed
+                if ($avatar && $userProvider->avatar !== $avatar) {
+                    $userProvider->update(['avatar' => $avatar]);
+                }
+            }
+        }
+
+        if (! isset($user) || ! $user) {
+            // 4. No provider link for this Google ID. Check if a user with this email already exists
+            $user = User::where('email', $email)->first();
+
+            if ($user) {
+                // Ensure this user doesn't already have another Google account linked
+                $existingUserProvider = UserProvider::where('user_id', $user->id)
+                    ->where('provider', 'google')
+                    ->first();
+
+                if ($existingUserProvider && $existingUserProvider->provider_id !== (string) $googleId) {
+                    Log::warning('AptiMedha user already has a different Google account linked', [
+                        'user_id' => $user->id,
+                        'existing_provider_id' => $existingUserProvider->provider_id,
+                        'incoming_google_id' => $googleId,
+                    ]);
+
+                    return redirect()->route('login')->with(
+                        'error',
+                        'This AptiMedha account is already linked to a different Google account.'
+                    );
+                }
+
+                // Ensure incoming provider ID is not linked to any other user
+                $existingProviderWithId = UserProvider::where('provider', 'google')
+                    ->where('provider_id', (string) $googleId)
+                    ->first();
+
+                if ($existingProviderWithId && $existingProviderWithId->user_id !== $user->id) {
+                    Log::warning('Google provider ID is already linked to another AptiMedha account', [
+                        'incoming_user_id' => $user->id,
+                        'linked_user_id' => $existingProviderWithId->user_id,
+                        'google_id' => $googleId,
+                    ]);
+
+                    return redirect()->route('login')->with(
+                        'error',
+                        'This Google account is already linked to another AptiMedha account.'
+                    );
+                }
+
+                // Link the Google provider safely within a transaction
+                try {
+                    DB::transaction(function () use ($user, $googleId, $avatar) {
+                        UserProvider::firstOrCreate(
+                            [
+                                'provider' => 'google',
+                                'provider_id' => (string) $googleId,
+                            ],
+                            [
+                                'user_id' => $user->id,
+                                'avatar' => $avatar,
+                            ]
+                        );
+
+                        if ($user->email_verified_at === null) {
+                            $user->email_verified_at = now();
+                            $user->save();
+                        }
+                    });
+                } catch (\Illuminate\Database\QueryException $e) {
+                    Log::error('Database uniqueness conflict while linking Google provider', ['message' => $e->getMessage()]);
+
+                    return redirect()->route('login')->with(
+                        'error',
+                        'An error occurred while linking your Google account. Please try again or sign in with your password.'
+                    );
+                }
+            } else {
+                // 5. Account provisioning for new user
                 $emailPrefix = explode('@', $email)[0];
                 $baseUsername = Str::slug($emailPrefix, '_');
                 if (empty($baseUsername)) {
@@ -268,27 +383,44 @@ class LoginController
                     $candidate = substr($username, 0, 45).'_'.$counter++;
                 }
 
-                $user = User::create([
-                    'name' => $name,
-                    'username' => $candidate,
-                    'email' => $email,
-                    'password' => Hash::make(Str::random(32)),
-                    'role' => UserRole::User,
-                ]);
+                try {
+                    DB::transaction(function () use (&$user, $name, $candidate, $email, $googleId, $avatar) {
+                        $user = User::create([
+                            'name' => $name,
+                            'username' => $candidate,
+                            'email' => $email,
+                            'password' => Hash::make(Str::random(32)),
+                            'role' => UserRole::User, // Standard User role; never elevated from OAuth data
+                        ]);
 
-                $user->email_verified_at = now();
-                $user->save();
+                        $user->email_verified_at = now();
+                        $user->save();
+
+                        UserProvider::create([
+                            'user_id' => $user->id,
+                            'provider' => 'google',
+                            'provider_id' => (string) $googleId,
+                            'avatar' => $avatar,
+                        ]);
+                    });
+                } catch (\Illuminate\Database\QueryException $e) {
+                    Log::error('Database uniqueness conflict while creating user via Google OAuth', ['message' => $e->getMessage()]);
+
+                    // In case of concurrent request creation, check if the user and provider now exist
+                    $user = User::where('email', $email)->first();
+                    $userProvider = UserProvider::where('provider', 'google')->where('provider_id', (string) $googleId)->first();
+
+                    if (! ($user && $userProvider && $userProvider->user_id === $user->id)) {
+                        return redirect()->route('login')->with(
+                            'error',
+                            'An account with this email already exists or a conflict occurred. Please log in directly.'
+                        );
+                    }
+                }
             }
-
-            // Link the Google provider
-            UserProvider::create([
-                'user_id' => $user->id,
-                'provider' => 'google',
-                'provider_id' => (string) $googleId,
-                'avatar' => $avatar,
-            ]);
         }
 
+        // Authenticate the user
         Auth::login($user, remember: true);
         $request->session()->regenerate();
 
