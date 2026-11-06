@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // Register model event listeners for automatic XML sitemap cache invalidation
+        \App\Services\SitemapService::registerModelEvents();
+
         // Configure branded password reset URL and email representation
         ResetPassword::createUrlUsing(function (User $user, string $token) {
             return route('password.reset', [

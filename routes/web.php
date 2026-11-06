@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\PlacementController;
 use App\Http\Controllers\Frontend\CurrentAffairController as FrontendCurrentAffairController;
 use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
 use App\Http\Controllers\Frontend\PageController as FrontendPageController;
+use App\Http\Controllers\Frontend\SitemapController;
 
 // Auth Controllers
 use App\Http\Controllers\Auth\LoginController;
@@ -82,6 +83,16 @@ Route::get('/terms', fn () => redirect()->route('terms', [], 301));
 Route::get('/privacy-policy', [FrontendPageController::class, 'privacy'])->name('privacy');
 Route::get('/privacy', fn () => redirect()->route('privacy', [], 301));
 Route::get('/copyright', [FrontendPageController::class, 'copyright'])->name('copyright');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', function () {
+    $path = public_path('robots.txt');
+    $content = file_exists($path)
+        ? file_get_contents($path)
+        : "User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: https://aptimedha.onrender.com/sitemap.xml\n";
+
+    return response($content, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+});
 
 /*
 |--------------------------------------------------------------------------
