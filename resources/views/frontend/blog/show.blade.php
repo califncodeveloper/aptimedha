@@ -1,6 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>{{ $post->meta_title ?: $post->title . ' - AptiMedha' }}</x-slot:title>
-    <x-slot:metaDescription>{{ $post->meta_description ?: ($post->excerpt ?: Str::limit(strip_tags($post->body), 155)) }}</x-slot:metaDescription>
+    <x-slot:title>{{ \App\Services\SeoService::blogTitle($post) }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::blogDescription($post) }}</x-slot:metaDescription>
     <x-slot:meta>
         <meta property="og:title" content="{{ $post->meta_title ?: $post->title }}">
         <meta property="og:description" content="{{ $post->meta_description ?: $post->excerpt }}">

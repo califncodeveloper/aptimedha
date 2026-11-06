@@ -1,5 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>{{ $category->name }} - AptiMedha Topics & MCQs</x-slot:title>
+    <x-slot:title>{{ \App\Services\SeoService::categoryTitle($category) }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::categoryDescription($category) }}</x-slot:metaDescription>
 
     {{-- Breadcrumb & Category Hero with Modern Background Pattern --}}
     <div class="bg-gradient-to-b from-white to-[#F7F9FC] border-b border-gray-200/80 py-10 sm:py-14 bg-grid-pattern relative overflow-hidden">

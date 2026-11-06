@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot:title>Current Affairs & Monthly GK PDFs - AptiMedha</x-slot:title>
+    <x-slot:title>Current Affairs & Monthly GK PDFs | AptiMedha</x-slot:title>
     <x-slot:metaDescription>Download curated monthly Current Affairs PDF capsules and practice General Knowledge MCQs for campus placements, banking, SSC, and competitive examinations.</x-slot:metaDescription>
 
     <div class="min-h-screen bg-[#F7F9FC]">

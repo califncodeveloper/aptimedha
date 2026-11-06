@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class StaticPage extends Model
 {
@@ -50,6 +51,23 @@ class StaticPage extends Model
         return $this->where('slug', $value)
             ->orWhere('id', is_numeric($value) ? (int) $value : 0)
             ->firstOrFail();
+    }
+
+    /**
+     * Automatically ensure a safe unique slug if not explicitly supplied.
+     */
+    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
     }
 }
 

@@ -1,8 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>{{ $page->meta_title ?? ($page->title ?? 'About Us - AptiMedha: Practise Smart. Get Placement Ready.') }}</x-slot:title>
-    @if(!empty($page?->meta_description))
-        <x-slot:metaDescription>{{ $page->meta_description }}</x-slot:metaDescription>
-    @endif
+    <x-slot:title>{{ \App\Services\SeoService::staticPageTitle($page, 'About Us') }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::staticPageDescription($page, 'Learn about AptiMedha, our mission, vision, and comprehensive placement preparation resources.') }}</x-slot:metaDescription>
 
     {{-- Hero Section with Background Grid Overlay --}}
     <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-16 sm:py-20 relative overflow-hidden">

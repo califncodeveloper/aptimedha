@@ -1,5 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>Categories & Subject Tracks - AptiMedha</x-slot:title>
+    <x-slot:title>All Categories & Subject Tracks | AptiMedha</x-slot:title>
+    <x-slot:metaDescription>Explore structured question categories covering arithmetic aptitude, logical reasoning, verbal ability, programming, engineering, and general knowledge on AptiMedha.</x-slot:metaDescription>
 
     {{-- Category Hero with Subtle Background Pattern --}}
     <div class="bg-gradient-to-b from-white to-[#F7F9FC] border-b border-gray-200/80 py-12 sm:py-16 bg-grid-pattern relative overflow-hidden">

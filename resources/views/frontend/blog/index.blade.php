@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot:title>Blog & Career Preparation Articles - AptiMedha</x-slot:title>
+    <x-slot:title>Latest Articles & Learning Resources | AptiMedha</x-slot:title>
     <x-slot:metaDescription>Explore placement preparation roadmaps, speed math techniques, interview frameworks, and aptitude exam patterns on AptiMedha.</x-slot:metaDescription>
     <x-slot:meta>
         <meta property="og:title" content="AptiMedha Blog - Career Insights & Placement Guides">

@@ -63,8 +63,22 @@ class PlacementController
     /**
      * Display a specific published placement guide.
      */
-    public function show(string $slug): View
+    public function show(string $slug): View|RedirectResponse
     {
+        // Enforce lowercase slug
+        if ($slug !== strtolower($slug)) {
+            return redirect()->route('placement.show', strtolower($slug), 301);
+        }
+
+        // Backward compatibility: If numeric ID was requested, 301 redirect to canonical slug
+        if (is_numeric($slug)) {
+            $guide = PlacementGuide::published()->find((int) $slug);
+            if ($guide && $guide->slug) {
+                return redirect()->route('placement.show', $guide->slug, 301);
+            }
+            abort(404, 'Placement guide not found.');
+        }
+
         $guide = PlacementGuide::published()
             ->where('slug', $slug)
             ->firstOrFail();
@@ -105,6 +119,11 @@ class PlacementController
      */
     public function download(string $slug): Response|RedirectResponse
     {
+        // Enforce lowercase slug
+        if ($slug !== strtolower($slug)) {
+            return redirect()->route('placement.download', strtolower($slug), 301);
+        }
+
         $guide = PlacementGuide::published()
             ->where('slug', $slug)
             ->firstOrFail();

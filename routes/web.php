@@ -53,6 +53,7 @@ Route::get('/', HomeController::class)->name('home');
 
 Route::get('/categories', [FrontendCategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [FrontendCategoryController::class, 'show'])->name('categories.show');
+Route::get('/categories/{category}/{topic}', [FrontendMcqController::class, 'topicPractice'])->name('categories.topics.show');
 
 Route::get('/mcq', [FrontendMcqController::class, 'index'])->name('mcq.index');
 Route::get('/mcq/{mcq}', [FrontendMcqController::class, 'show'])->name('mcq.show');
@@ -60,7 +61,7 @@ Route::get('/mcq/{mcq}', [FrontendMcqController::class, 'show'])->name('mcq.show
 Route::get('/placement-preparation', [PlacementController::class, 'index'])->name('placement.index');
 Route::get('/placement-preparation/{slug}', [PlacementController::class, 'show'])->name('placement.show');
 Route::get('/placement-preparation/{slug}/download', [PlacementController::class, 'download'])->name('placement.download');
-Route::get('/placement', fn () => redirect()->route('placement.index'))->name('placement');
+Route::get('/placement', fn () => redirect()->route('placement.index', [], 301))->name('placement');
 
 Route::get('/current-affairs', [FrontendCurrentAffairController::class, 'index'])->name('current-affairs.index');
 Route::get('/current-affairs/{year}/{month}', [FrontendCurrentAffairController::class, 'show'])->where(['year' => '[0-9]{4}'])->name('current-affairs.show');
@@ -71,13 +72,15 @@ Route::get('/blog', [FrontendBlogController::class, 'index'])->name('blog.index'
 Route::get('/blog/{post}', [FrontendBlogController::class, 'show'])->name('blog.show');
 
 Route::get('/about', [FrontendPageController::class, 'about'])->name('about');
+Route::get('/about-us', fn () => redirect()->route('about', [], 301));
 Route::get('/contact', [FrontendPageController::class, 'contact'])->name('contact');
+Route::get('/contact-us', fn () => redirect()->route('contact', [], 301));
 Route::post('/contact', [FrontendPageController::class, 'submitContact'])->name('contact.submit')->middleware('throttle:contact');
 Route::get('/disclaimer', [FrontendPageController::class, 'disclaimer'])->name('disclaimer');
 Route::get('/terms-and-conditions', [FrontendPageController::class, 'terms'])->name('terms');
-Route::get('/terms', fn () => redirect()->route('terms'));
+Route::get('/terms', fn () => redirect()->route('terms', [], 301));
 Route::get('/privacy-policy', [FrontendPageController::class, 'privacy'])->name('privacy');
-Route::get('/privacy', fn () => redirect()->route('privacy'));
+Route::get('/privacy', fn () => redirect()->route('privacy', [], 301));
 Route::get('/copyright', [FrontendPageController::class, 'copyright'])->name('copyright');
 
 /*

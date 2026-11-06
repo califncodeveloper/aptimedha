@@ -4,14 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'AptiMedha - MCQ Practice & Placement Preparation' }}</title>
-    @if(!empty($metaDescription))
-        <meta name="description" content="{{ $metaDescription }}">
-    @else
-        <meta name="description" content="AptiMedha - Sharpen your aptitude, reasoning and subject skills to crack placement exams and interviews.">
-    @endif
-    <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/aptimedha-logo.png') }}">
+    <x-seo :title="$title ?? null" :description="$metaDescription ?? null" :canonical="$canonicalUrl ?? null" />
     {{ $meta ?? '' }}
 
     <!-- Fonts -->

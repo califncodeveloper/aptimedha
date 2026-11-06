@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -66,11 +67,24 @@ class BlogController
     /**
      * Display an individual article.
      */
-    public function show(string $slug): View
+    public function show(string $slug): View|RedirectResponse
     {
+        // Enforce lowercase slug
+        if ($slug !== strtolower($slug)) {
+            return redirect()->route('blog.show', strtolower($slug), 301);
+        }
+
+        // Backward compatibility: If numeric ID was requested, 301 redirect to canonical slug
+        if (is_numeric($slug)) {
+            $post = Blog::find((int) $slug);
+            if ($post && $post->slug) {
+                return redirect()->route('blog.show', $post->slug, 301);
+            }
+            abort(404);
+        }
+
         $post = Blog::with(['category', 'author'])
             ->where('slug', $slug)
-            ->orWhere('id', is_numeric($slug) ? (int) $slug : 0)
             ->first();
 
         if (!$post && $slug === 'sample-post') {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Category;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 /**
@@ -32,8 +33,22 @@ class CategoryController
     /**
      * Display the specified category with active subjects and topics.
      */
-    public function show(string $category): View
+    public function show(string $category): View|RedirectResponse
     {
+        // Enforce lowercase slug: 301 redirect if uppercase
+        if ($category !== strtolower($category)) {
+            return redirect()->route('categories.show', strtolower($category), 301);
+        }
+
+        // Backward compatibility: If numeric ID was requested, 301 redirect to canonical slug
+        if (is_numeric($category)) {
+            $cat = Category::active()->find((int) $category);
+            if ($cat) {
+                return redirect()->route('categories.show', $cat->slug, 301);
+            }
+            abort(404, 'Category not found.');
+        }
+
         $cat = Category::where('slug', $category)
             ->active()
             ->with([

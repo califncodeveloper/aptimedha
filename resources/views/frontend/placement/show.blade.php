@@ -1,6 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>{{ $guide->meta_title ?: $guide->title . ' - Placement Preparation | AptiMedha' }}</x-slot:title>
-    <x-slot:metaDescription>{{ $guide->meta_description ?: $guide->excerpt }}</x-slot:metaDescription>
+    <x-slot:title>{{ \App\Services\SeoService::placementTitle($guide) }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::placementDescription($guide) }}</x-slot:metaDescription>
 
     <div class="bg-[#F7F9FC] py-10 sm:py-14">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">

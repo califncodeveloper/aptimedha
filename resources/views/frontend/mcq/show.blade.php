@@ -1,5 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>Q{{ $mcq->question_number }}: {{ $mcq->topic?->name }} - AptiMedha Practice</x-slot:title>
+    <x-slot:title>{{ \App\Services\SeoService::mcqTitle($mcq) }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::mcqDescription($mcq) }}</x-slot:metaDescription>
 
     <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10"
          x-data="{ 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\Topic;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -123,6 +124,69 @@ class McqController
             'totalQuestions' => $totalQuestions,
             'bookmarkedIds' => $bookmarkedIds,
         ]);
+    }
+
+    /**
+     * Display MCQs for a specific category and topic with SEO-friendly clean URL.
+     */
+    public function topicPractice(string $category, string $topic, Request $request): View|RedirectResponse
+    {
+        // Enforce lowercase slugs
+        if ($category !== strtolower($category) || $topic !== strtolower($topic)) {
+            return redirect()->route('categories.topics.show', [
+                'category' => strtolower($category),
+                'topic' => strtolower($topic),
+            ], 301);
+        }
+
+        // Backward compatibility for numeric category ID
+        if (is_numeric($category)) {
+            $catModel = Category::active()->find((int) $category);
+            if ($catModel) {
+                return redirect()->route('categories.topics.show', [
+                    'category' => $catModel->slug,
+                    'topic' => $topic,
+                ], 301);
+            }
+            abort(404, 'Category not found.');
+        }
+
+        // Backward compatibility for numeric topic ID
+        if (is_numeric($topic)) {
+            $topicModel = Topic::active()->with('category')->find((int) $topic);
+            if ($topicModel && $topicModel->category) {
+                return redirect()->route('categories.topics.show', [
+                    'category' => $topicModel->category->slug,
+                    'topic' => $topicModel->slug,
+                ], 301);
+            }
+            abort(404, 'Topic not found.');
+        }
+
+        $cat = Category::where('slug', $category)->active()->first();
+        if (!$cat) {
+            abort(404, 'Category not found.');
+        }
+
+        $top = Topic::where('slug', $topic)->active()->with('category')->first();
+        if (!$top) {
+            abort(404, 'Topic not found.');
+        }
+
+        // If topic belongs to another category, 301 redirect to its canonical category URL
+        if ($top->category_id !== $cat->id && $top->category) {
+            return redirect()->route('categories.topics.show', [
+                'category' => $top->category->slug,
+                'topic' => $top->slug,
+            ], 301);
+        }
+
+        $request->merge([
+            'category' => $cat->slug,
+            'topic' => $top->slug,
+        ]);
+
+        return $this->index($request);
     }
 
     /**

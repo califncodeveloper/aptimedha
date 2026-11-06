@@ -1,8 +1,6 @@
 <x-layouts.app>
-    <x-slot:title>{{ $page->meta_title ?? ($page->title ?? 'Copyright Policy - AptiMedha') }}</x-slot:title>
-    @if(!empty($page?->meta_description))
-        <x-slot:metaDescription>{{ $page->meta_description }}</x-slot:metaDescription>
-    @endif
+    <x-slot:title>{{ \App\Services\SeoService::staticPageTitle($page, 'Copyright Policy') }}</x-slot:title>
+    <x-slot:metaDescription>{{ \App\Services\SeoService::staticPageDescription($page, 'Respecting original work, learning use guidelines, and copyright reporting procedures on AptiMedha.') }}</x-slot:metaDescription>
 
     <div class="bg-white border-b border-gray-200/80 py-10 sm:py-14">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
