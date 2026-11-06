@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>Placement Preparation Roadmap, Resume Guides & Interview Tips | AptiMedha</x-slot:title>
     <x-slot:metaDescription>Complete placement preparation guides for campus placements, fresh graduates, and professionals. Master aptitude tests, resumes, technical rounds, and HR interviews.</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forPlacementIndex()) !!}</x-slot:schema>
 
     {{-- Hero Section (Premium Gradient + White Grid Overlay) --}}
     <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-16 sm:py-20 relative overflow-hidden">

@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>AptiMedha – Practice MCQs, Aptitude & Placement Preparation</x-slot:title>
     <x-slot:metaDescription>Practice aptitude MCQs, reasoning puzzles, programming questions, and placement interview preparation guides on AptiMedha.</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forHome()) !!}</x-slot:schema>
 
     {{-- Hero Section (Premium, Modern EdTech Landing Design) --}}
     <section class="relative bg-gradient-to-b from-white via-[#F7F9FC] to-[#F7F9FC] overflow-hidden pt-12 pb-16 lg:pt-16 lg:pb-24 border-b border-gray-200/60 bg-grid-pattern">

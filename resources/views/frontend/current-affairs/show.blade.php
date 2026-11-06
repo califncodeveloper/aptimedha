@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::currentAffairsTitle($issue) }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::currentAffairsDescription($issue) }}</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forCurrentAffair($issue)) !!}</x-slot:schema>
 
     <div class="min-h-screen bg-[#F7F9FC] py-8 lg:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">

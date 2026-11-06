@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::blogTitle($post) }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::blogDescription($post) }}</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forBlog($post)) !!}</x-slot:schema>
     <x-slot:meta>
         <meta property="og:title" content="{{ $post->meta_title ?: $post->title }}">
         <meta property="og:description" content="{{ $post->meta_description ?: $post->excerpt }}">

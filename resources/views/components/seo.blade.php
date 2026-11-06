@@ -3,6 +3,7 @@
     'description' => null,
     'keywords' => null,
     'canonical' => null,
+    'schema' => null,
 ])
 
 @php
@@ -18,4 +19,9 @@
 @endif
 <link rel="canonical" href="{{ $resolvedCanonical }}">
 <link rel="icon" type="image/png" href="{{ asset('images/aptimedha-logo.png') }}">
+@if(!empty($schema))
+<script type="application/ld+json">
+{!! \App\Services\SchemaService::toJsonLd($schema) !!}
+</script>
+@endif
 

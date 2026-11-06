@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <x-seo :title="$title ?? null" :description="$metaDescription ?? null" :canonical="$canonicalUrl ?? null" />
+    <x-seo :title="$title ?? null" :description="$metaDescription ?? null" :canonical="$canonicalUrl ?? null" :schema="$schema ?? null" />
     {{ $meta ?? '' }}
 
     <!-- Fonts -->

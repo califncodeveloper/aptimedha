@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::staticPageTitle($page, 'Privacy Policy') }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::staticPageDescription($page, 'Information on personal data collection, cookies, technical logs, and student privacy rights on AptiMedha.') }}</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forStaticPage($page, 'Privacy Policy', route('privacy'))) !!}</x-slot:schema>
 
     <div class="bg-white border-b border-gray-200/80 py-10 sm:py-14">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">

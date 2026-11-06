@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>Latest Articles & Learning Resources | AptiMedha</x-slot:title>
     <x-slot:metaDescription>Explore placement preparation roadmaps, speed math techniques, interview frameworks, and aptitude exam patterns on AptiMedha.</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forBlogIndex()) !!}</x-slot:schema>
     <x-slot:meta>
         <meta property="og:title" content="AptiMedha Blog - Career Insights & Placement Guides">
         <meta property="og:description" content="Master campus placements with structured roadmaps, aptitude shortcuts, and interview strategies.">

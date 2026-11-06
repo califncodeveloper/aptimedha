@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::staticPageTitle($page, 'Contact Us') }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::staticPageDescription($page, 'Contact the AptiMedha team for questions, suggestions, corrections, or support with your placement preparation.') }}</x-slot:metaDescription>
+    <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forStaticPage($page, 'Contact Us', route('contact'))) !!}</x-slot:schema>
 
     {{-- Contact Hero with Background Grid Overlay --}}
     <div class="bg-gradient-to-br from-[#153B70] via-[#1a4a8a] to-[#087F82] text-white py-16 sm:py-20 relative overflow-hidden">

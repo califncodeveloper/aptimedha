@@ -1,6 +1,9 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::topicTitle($topic ?? $topicName, $category) }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::topicDescription($topic ?? $topicName, $category) }}</x-slot:metaDescription>
+    @if(!empty($topic))
+        <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forTopic($topic, $category)) !!}</x-slot:schema>
+    @endif
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8"
          x-data="{ 
