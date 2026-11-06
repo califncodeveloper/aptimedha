@@ -21,6 +21,68 @@ class SeoService
     public const DEFAULT_DESCRIPTION = 'AptiMedha - Sharpen your aptitude, reasoning, and subject skills to crack placement exams, screening tests, and technical interviews.';
 
     /**
+     * Get the base production canonical URL using APP_URL or canonical configuration.
+     */
+    public static function getBaseUrl(): string
+    {
+        $appUrl = config('app.canonical_url') ?: config('app.url');
+
+        if (empty($appUrl) || $appUrl === 'http://localhost' || $appUrl === 'http://localhost:8000') {
+            $appUrl = 'https://aptimedha.onrender.com';
+        }
+
+        // Always force https for canonical URLs
+        $appUrl = preg_replace('/^http:/i', 'https:', (string) $appUrl);
+
+        return rtrim($appUrl, '/');
+    }
+
+    /**
+     * Generate a canonical absolute URL adhering to the production APP_URL base.
+     */
+    public static function canonicalUrl(?string $url = null): string
+    {
+        $base = self::getBaseUrl();
+
+        if ($url === null || trim($url) === '') {
+            $path = '/' . ltrim(request()->path(), '/');
+        } else {
+            $trimmed = trim($url);
+            if (str_starts_with($trimmed, 'http://') || str_starts_with($trimmed, 'https://')) {
+                $parsedPath = parse_url($trimmed, PHP_URL_PATH);
+                $path = '/' . ltrim($parsedPath ?: '', '/');
+            } else {
+                $parsedPath = parse_url($trimmed, PHP_URL_PATH);
+                $path = '/' . ltrim($parsedPath ?: '', '/');
+            }
+        }
+
+        if ($path !== '/' && str_ends_with($path, '/')) {
+            $path = rtrim($path, '/');
+        }
+
+        return $path === '/' ? $base . '/' : $base . $path;
+    }
+
+    /**
+     * Resolve Open Graph and Twitter image absolute URL.
+     */
+    public static function resolveOgImage(?string $image = null): string
+    {
+        if (empty($image)) {
+            return self::canonicalUrl('/images/aptimedha-logo.png');
+        }
+
+        $trimmed = trim($image);
+
+        if (str_starts_with($trimmed, 'http://') || str_starts_with($trimmed, 'https://')) {
+            return $trimmed;
+        }
+
+        return self::canonicalUrl($trimmed);
+    }
+
+    /**
      * Clean, strip HTML, normalize whitespace, and truncate meta description to 150-160 characters.
      */
     public static function cleanDescription(?string $text, int $limit = 160, ?string $fallback = null): string

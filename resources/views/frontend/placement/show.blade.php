@@ -1,6 +1,10 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::placementTitle($guide) }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::placementDescription($guide) }}</x-slot:metaDescription>
+    <x-slot:ogType>article</x-slot:ogType>
+    @if($guide->featured_image_url)
+        <x-slot:ogImage>{{ $guide->featured_image_url }}</x-slot:ogImage>
+    @endif
     <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forPlacementGuide($guide)) !!}</x-slot:schema>
 
     <div class="bg-[#F7F9FC] py-10 sm:py-14">

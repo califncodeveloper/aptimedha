@@ -1,5 +1,6 @@
 <x-layouts.app>
     <x-slot:title>Forgot Password - AptiMedha</x-slot:title>
+    <x-slot:noindex>true</x-slot:noindex>
 
     <div class="py-8 sm:py-16 bg-grid-pattern relative flex items-center justify-center min-h-[calc(100vh-14rem)]">
         <div class="mx-auto w-full max-w-md px-3 sm:px-6">

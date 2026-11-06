@@ -135,7 +135,7 @@ class TaxonomyPublicBrowsingTest extends TestCase
         $response->assertOk();
         $response->assertSee('Direct Topics');
         $response->assertSee('Direct Math Basics');
-        $response->assertSee(route('mcq.index', ['category' => $category->slug, 'topic' => $directTopic->slug]));
+        $response->assertSee(route('categories.topics.show', ['category' => $category->slug, 'topic' => $directTopic->slug]));
     }
 
     public function test_category_show_links_to_topic_mcq_practice(): void
@@ -163,7 +163,7 @@ class TaxonomyPublicBrowsingTest extends TestCase
 
         $response = $this->get(route('categories.show', $category->slug));
         $response->assertOk();
-        $response->assertSee(route('mcq.index', ['category' => $category->slug, 'topic' => $topic->slug]));
+        $response->assertSee(route('categories.topics.show', ['category' => $category->slug, 'topic' => $topic->slug]));
     }
 
     public function test_mcq_practice_route_resolves_database_category_and_topic(): void

@@ -17,6 +17,8 @@ $heightClass = $sizeClasses[$size] ?? $sizeClasses['md'];
     <div {{ $attributes->merge(['class' => 'inline-flex items-center bg-white px-2.5 py-1 rounded-xl shadow-xs transition-opacity hover:opacity-95']) }}>
         <img src="{{ asset('images/aptimedha-logo.png') }}"
              alt="AptiMedha.com"
+             width="1024"
+             height="341"
              class="{{ $heightClass }} w-auto object-contain select-none"
              loading="eager" />
     </div>
@@ -24,6 +26,8 @@ $heightClass = $sizeClasses[$size] ?? $sizeClasses['md'];
     <div {{ $attributes->merge(['class' => 'inline-flex items-center']) }}>
         <img src="{{ asset('images/aptimedha-logo.png') }}"
              alt="AptiMedha.com"
+             width="1024"
+             height="341"
              class="{{ $heightClass }} w-auto object-contain select-none"
              loading="eager" />
     </div>

@@ -20,6 +20,11 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
+        // Prevent indexing of private, admin, dashboard, and authentication pages
+        if ($request->is('admin*', 'dashboard*', 'login', 'register', 'forgot-password', 'reset-password*', 'auth/*')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
         // Only add HSTS when request is served over HTTPS (respecting trusted proxies)
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

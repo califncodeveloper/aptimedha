@@ -24,16 +24,7 @@ class SitemapService
      */
     public static function getBaseUrl(): string
     {
-        $appUrl = config('app.canonical_url') ?: config('app.url');
-
-        if (empty($appUrl) || $appUrl === 'http://localhost' || $appUrl === 'http://localhost:8000') {
-            $appUrl = 'https://aptimedha.onrender.com';
-        }
-
-        // Always force https for canonical sitemap URLs per protocol requirements
-        $appUrl = preg_replace('/^http:/i', 'https:', (string) $appUrl);
-
-        return rtrim($appUrl, '/');
+        return SeoService::getBaseUrl();
     }
 
     /**
@@ -63,14 +54,7 @@ class SitemapService
      */
     public static function canonicalUrl(string $relativeUri): string
     {
-        $base = self::getBaseUrl();
-        $trimmed = trim($relativeUri);
-
-        if ($trimmed === '' || $trimmed === '/') {
-            return $base . '/';
-        }
-
-        return $base . '/' . ltrim($trimmed, '/');
+        return SeoService::canonicalUrl($relativeUri);
     }
 
     /**

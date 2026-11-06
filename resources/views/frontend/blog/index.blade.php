@@ -88,7 +88,7 @@
                             {{-- Featured Image with 16:10 Ratio and Clip-Reveal --}}
                             @if($post->featured_image_url)
                                 <a href="{{ route('blog.show', $post->slug) }}" data-motion="clip-reveal" class="block aspect-[16/10] overflow-hidden relative group-hover:opacity-95 transition-opacity">
-                                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="w-full h-full object-cover">
+                                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy" class="w-full h-full object-cover">
                                     @if($post->category)
                                         <span class="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#153B70]/90 text-white shadow-xs backdrop-blur-xs">
                                             {{ $post->category->name }}

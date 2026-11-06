@@ -1,5 +1,6 @@
 <x-layouts.app>
     <x-slot:title>Preview: {{ $guide->title }} - AptiMedha Admin</x-slot:title>
+    <x-slot:noindex>true</x-slot:noindex>
 
     {{-- Admin Preview Banner --}}
     <div class="bg-amber-500 text-amber-950 px-4 py-3 text-xs sm:text-sm font-bold shadow-md sticky top-0 z-50 flex flex-col sm:flex-row items-center justify-between gap-2">

@@ -78,7 +78,7 @@
                     <div class="p-6 sm:p-7">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                             @forelse($subject->topics as $topic)
-                                <a href="{{ route('mcq.index', ['category' => $category->slug, 'topic' => $topic->slug]) }}"
+                                <a href="{{ route('categories.topics.show', ['category' => $category->slug, 'topic' => $topic->slug]) }}"
                                    x-show="!searchQuery || (@js(strtolower($topic->name))).includes(searchQuery.toLowerCase())"
                                    class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200/70 hover:border-[#087F82] hover:bg-teal-50/30 group transition-all card-hover-effect">
                                     <span class="text-sm font-semibold text-[#243247] group-hover:text-[#087F82] transition-colors truncate">
@@ -112,7 +112,7 @@
                     <div class="p-6 sm:p-7">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                             @foreach($category->topics as $topic)
-                                <a href="{{ route('mcq.index', ['category' => $category->slug, 'topic' => $topic->slug]) }}"
+                                <a href="{{ route('categories.topics.show', ['category' => $category->slug, 'topic' => $topic->slug]) }}"
                                    x-show="!searchQuery || (@js(strtolower($topic->name))).includes(searchQuery.toLowerCase())"
                                    class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200/70 hover:border-[#087F82] hover:bg-teal-50/30 group transition-all card-hover-effect">
                                     <span class="text-sm font-semibold text-[#243247] group-hover:text-[#087F82] transition-colors truncate">

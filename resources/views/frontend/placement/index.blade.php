@@ -77,7 +77,7 @@
                             <div>
                                 @if($guide->featured_image)
                                     <div class="h-44 overflow-hidden bg-gray-100">
-                                        <img src="{{ $guide->featured_image_url }}" alt="{{ $guide->featured_image_alt ?: $guide->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        <img src="{{ $guide->featured_image_url }}" alt="{{ $guide->featured_image_alt ?: $guide->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                     </div>
                                 @endif
                                 <div class="p-6 space-y-3">

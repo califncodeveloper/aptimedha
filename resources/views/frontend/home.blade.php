@@ -641,7 +641,7 @@
                             {{-- Image Overlay Container with Clip-Reveal --}}
                             <div data-motion="clip-reveal" class="aspect-[16/10] bg-gradient-to-tr from-[#153B70] to-[#087F82] relative overflow-hidden flex items-end p-5">
                                 @if($blog->featured_image_url)
-                                    <img src="{{ $blog->featured_image_url }}" alt="{{ $blog->featured_image_alt ?? $blog->title }}" class="absolute inset-0 w-full h-full object-cover">
+                                    <img src="{{ $blog->featured_image_url }}" alt="{{ $blog->featured_image_alt ?? $blog->title }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
                                 @endif
                                 <div class="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors"></div>
                                 <div class="relative z-10 flex items-center justify-between w-full">

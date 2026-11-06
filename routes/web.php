@@ -86,10 +86,23 @@ Route::get('/copyright', [FrontendPageController::class, 'copyright'])->name('co
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/robots.txt', function () {
-    $path = public_path('robots.txt');
-    $content = file_exists($path)
-        ? file_get_contents($path)
-        : "User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: https://aptimedha.onrender.com/sitemap.xml\n";
+    $sitemapUrl = \App\Services\SitemapService::canonicalUrl('/sitemap.xml');
+    $content = implode("\n", [
+        'User-agent: *',
+        'Allow: /',
+        '',
+        'Disallow: /admin',
+        'Disallow: /dashboard',
+        'Disallow: /login',
+        'Disallow: /register',
+        'Disallow: /forgot-password',
+        'Disallow: /reset-password',
+        'Disallow: /auth/',
+        'Disallow: /user/',
+        '',
+        "Sitemap: {$sitemapUrl}",
+        '',
+    ]);
 
     return response($content, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
 });

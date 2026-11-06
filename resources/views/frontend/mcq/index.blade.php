@@ -1,6 +1,7 @@
 <x-layouts.app>
     <x-slot:title>{{ \App\Services\SeoService::topicTitle($topic ?? $topicName, $category) }}</x-slot:title>
     <x-slot:metaDescription>{{ \App\Services\SeoService::topicDescription($topic ?? $topicName, $category) }}</x-slot:metaDescription>
+    <x-slot:canonicalUrl>{{ $canonicalUrl ?? ($topic && $category ? route('categories.topics.show', ['category' => $category->slug, 'topic' => $topic->slug]) : ($category ? route('categories.show', $category->slug) : route('mcq.index'))) }}</x-slot:canonicalUrl>
     @if(!empty($topic))
         <x-slot:schema>{!! \App\Services\SchemaService::toJsonLd(\App\Services\SchemaService::forTopic($topic, $category)) !!}</x-slot:schema>
     @endif
@@ -125,7 +126,7 @@
 
                     <div class="p-2 space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto" :class="{ 'hidden lg:block': !mobileTopicMenu }">
                         @forelse($sidebarTopics as $sTopic)
-                            <a href="{{ route('mcq.index', ['category' => $categorySlug, 'topic' => $sTopic->slug]) }}"
+                            <a href="{{ $categorySlug ? route('categories.topics.show', ['category' => $categorySlug, 'topic' => $sTopic->slug]) : route('mcq.index', ['topic' => $sTopic->slug]) }}"
                                @class([
                                    'flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all',
                                    'bg-[#087F82] text-white shadow-xs' => $sTopic->slug === $topicSlug,

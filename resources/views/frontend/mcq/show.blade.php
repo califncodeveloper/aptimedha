@@ -116,7 +116,7 @@
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-400"></i>
             @endif
             @if($mcq->topic)
-                <a href="{{ route('mcq.index', ['category' => $mcq->category?->slug, 'topic' => $mcq->topic->slug]) }}" class="hover:text-[#153B70] transition-colors">{{ $mcq->topic->name }}</a>
+                <a href="{{ $mcq->category ? route('categories.topics.show', ['category' => $mcq->category->slug, 'topic' => $mcq->topic->slug]) : route('mcq.index', ['topic' => $mcq->topic->slug]) }}" class="hover:text-[#153B70] transition-colors">{{ $mcq->topic->name }}</a>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-400"></i>
             @endif
             <span class="text-[#243247] font-semibold">Question {{ $mcq->question_number }}</span>

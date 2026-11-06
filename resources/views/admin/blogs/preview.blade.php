@@ -1,5 +1,6 @@
 <x-layouts.app>
     <x-slot:title>[Admin Preview] {{ $blog->meta_title ?: $blog->title }} - AptiMedha</x-slot:title>
+    <x-slot:noindex>true</x-slot:noindex>
 
     {{-- Admin Preview Banner --}}
     <div class="bg-amber-500 text-amber-950 px-4 py-3 sticky top-0 z-50 shadow-md">
