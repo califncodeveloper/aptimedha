@@ -175,11 +175,16 @@
             </div>
         </div>
 
-        {{-- Canonical Schema Specification Card matching SRS Section 9 --}}
+        {{-- Canonical Schema Specification Card matching SRS Section 9 & Change 3 --}}
         <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 sm:p-8 space-y-4">
-            <div>
-                <h3 class="text-base font-bold text-[#153B70]">Required 10-Column Spreadsheet Schema</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Required core columns (1–10) and optional image reference columns (11–16):</p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h3 class="text-base font-bold text-[#153B70]">Required 10-Column Spreadsheet Schema & Hierarchy Mapping</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Supports both modern 3-level taxonomy and legacy 2-column formats, with auto-matching for newly created topics:</p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-teal-50 text-[#087F82] text-xs font-semibold">
+                    <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> Dynamically Validated
+                </span>
             </div>
 
             <div class="overflow-x-auto scrollbar-thin">
@@ -187,7 +192,8 @@
                     <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
                         <tr>
                             <th class="px-3 py-2.5">Col</th>
-                            <th class="px-3 py-2.5">Header Name</th>
+                            <th class="px-3 py-2.5">Modern Column</th>
+                            <th class="px-3 py-2.5">Legacy Header</th>
                             <th class="px-3 py-2.5">Required</th>
                             <th class="px-3 py-2.5">Description</th>
                             <th class="px-3 py-2.5">Example Value</th>
@@ -196,70 +202,96 @@
                     <tbody class="divide-y divide-gray-100 font-mono text-[11px]">
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">1</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Question Topic</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Category</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Question Topic</td>
                             <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
-                            <td class="px-3 py-2 font-sans text-gray-500">Canonical Category name</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Canonical Category name in database</td>
                             <td class="px-3 py-2 text-gray-600">Arithmetic Aptitude</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">2</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Question Subtopic</td>
-                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
-                            <td class="px-3 py-2 font-sans text-gray-500">Topic name or Subject / Topic</td>
-                            <td class="px-3 py-2 text-gray-600">Number System</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Subject</td>
+                            <td class="px-3 py-2 font-sans text-gray-500"><em>(Optional in legacy)</em></td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Optional</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Parent Subject belonging to Category</td>
+                            <td class="px-3 py-2 text-gray-600">Number & Algebra</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-bold text-[#087F82]">3</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Question Number</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Topic</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Question Subtopic</td>
+                            <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Topic name (supports newly created topics)</td>
+                            <td class="px-3 py-2 text-gray-600">Number System</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">4</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Question Number</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Question Number</td>
                             <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Unique integer within topic</td>
                             <td class="px-3 py-2 text-gray-600">1</td>
                         </tr>
                         <tr>
-                            <td class="px-3 py-2 font-bold text-[#087F82]">4</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Question Text</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">5</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Question Text</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Question Text</td>
                             <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Full question statement</td>
                             <td class="px-3 py-2 text-gray-600">How many positive factors does 36 have?</td>
                         </tr>
                         <tr>
-                            <td class="px-3 py-2 font-bold text-[#087F82]">5-8</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Option A, B, C, D</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">6-9</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Option A, B, C, D</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Option A, B, C, D</td>
                             <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Four non-empty options</td>
                             <td class="px-3 py-2 text-gray-600">10 | 11 | 9 | 8</td>
                         </tr>
                         <tr>
-                            <td class="px-3 py-2 font-bold text-[#087F82]">9</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Correct Option</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">10</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Correct Option</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Correct Option</td>
                             <td class="px-3 py-2 font-sans text-red-600 font-bold">Yes</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Single letter: A, B, C, or D</td>
                             <td class="px-3 py-2 text-emerald-600 font-bold">C</td>
                         </tr>
                         <tr>
-                            <td class="px-3 py-2 font-bold text-[#087F82]">10</td>
-                            <td class="px-3 py-2 font-sans font-semibold">Explanation</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">11</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Explanation</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Explanation</td>
                             <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
                             <td class="px-3 py-2 font-sans text-gray-500">Detailed step-by-step solution</td>
                             <td class="px-3 py-2 text-gray-600">36 = 2^2 × 3^2. Factor count = (2+1)(2+1) = 9.</td>
                         </tr>
-                        <tr class="bg-teal-50/40">
-                            <td class="px-3 py-2 font-bold text-[#087F82]">11</td>
-                            <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Question Image</td>
+                        <tr>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">12</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-gray-900">Difficulty</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Difficulty</td>
                             <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
-                            <td class="px-3 py-2 font-sans text-gray-600">Filename in ZIP archive or URL</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">easy, medium, or hard (default: medium)</td>
+                            <td class="px-3 py-2 text-gray-600">medium</td>
+                        </tr>
+                        <tr class="bg-teal-50/40">
+                            <td class="px-3 py-2 font-bold text-[#087F82]">13</td>
+                            <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Question Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Question Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
+                            <td class="px-3 py-2 font-sans text-gray-600">Filename in ZIP archive or hosted URL</td>
                             <td class="px-3 py-2 text-gray-600">images/q1.png</td>
                         </tr>
                         <tr class="bg-teal-50/40">
-                            <td class="px-3 py-2 font-bold text-[#087F82]">12-15</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">14-17</td>
                             <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Option A–D Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Option A–D Image</td>
                             <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
                             <td class="px-3 py-2 font-sans text-gray-600">Filenames for option graphics</td>
                             <td class="px-3 py-2 text-gray-600">images/q1_opt_a.png</td>
                         </tr>
                         <tr class="bg-teal-50/40">
-                            <td class="px-3 py-2 font-bold text-[#087F82]">16</td>
+                            <td class="px-3 py-2 font-bold text-[#087F82]">18</td>
                             <td class="px-3 py-2 font-sans font-semibold text-[#087F82]">Explanation Image</td>
+                            <td class="px-3 py-2 font-sans text-gray-500">Explanation Image</td>
                             <td class="px-3 py-2 font-sans text-gray-400">Optional</td>
                             <td class="px-3 py-2 font-sans text-gray-600">Filename for diagram in explanation</td>
                             <td class="px-3 py-2 text-gray-600">images/q1_explanation.png</td>
@@ -268,6 +300,58 @@
                 </table>
             </div>
         </div>
+
+        {{-- Dynamic Available Taxonomy Reference Card --}}
+        @if(isset($taxonomyCategories) && $taxonomyCategories->isNotEmpty())
+            <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs p-6 space-y-4" x-data="{ open: false }">
+                <div class="flex items-center justify-between cursor-pointer select-none" @click="open = !open">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#087F82] flex items-center justify-center">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-[#153B70]">Live Taxonomy Reference (Active Categories, Subjects & Topics)</h3>
+                            <p class="text-[11px] text-gray-500">Quickly copy the exact names of newly created topics, subjects, and categories from your database.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-xs font-bold text-[#087F82] hover:underline flex items-center gap-1">
+                        <span x-text="open ? 'Hide Reference' : 'View Taxonomy Reference'">View Taxonomy Reference</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                </div>
+
+                <div x-show="open" style="display:none;" class="pt-4 border-t border-gray-100 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach($taxonomyCategories as $cat)
+                            <div class="p-3.5 rounded-xl border border-gray-200 bg-[#F7F9FC]/60 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-xs text-[#153B70]">{{ $cat->name }}</span>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">{{ $cat->topics->count() }} topics</span>
+                                </div>
+                                @if($cat->subjects->isNotEmpty())
+                                    <div class="space-y-1.5 pl-2 border-l-2 border-[#087F82]/30 text-[11px]">
+                                        @foreach($cat->subjects as $sub)
+                                            <div>
+                                                <span class="font-semibold text-gray-800">{{ $sub->name }}</span>
+                                                @if($sub->topics->isNotEmpty())
+                                                    <div class="text-[10px] text-gray-500 pl-2">
+                                                        {{ $sub->topics->pluck('name')->join(', ') }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif($cat->topics->isNotEmpty())
+                                    <div class="text-[10px] text-gray-500 pl-2">
+                                        {{ $cat->topics->pluck('name')->join(', ') }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
 
         {{-- Recent Bulk Import History Audit Trail --}}
         @if(isset($recentBatches) && $recentBatches->isNotEmpty())

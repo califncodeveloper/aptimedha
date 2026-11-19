@@ -24,47 +24,91 @@ class McqController
         $selectedCategorySlug = $request->query('category');
         $selectedTopicSlug = $request->query('topic') ?? $request->query('q') ?? $request->query('search');
 
+        // Load all active main categories with active subcategories (topics) and counts
+        $navCategories = Category::active()
+            ->ordered()
+            ->with([
+                'topics' => function ($query) {
+                    $query->active()
+                        ->ordered()
+                        ->withCount(['questions' => fn ($q) => $q->active()]);
+                }
+            ])
+            ->withCount(['topics' => fn ($q) => $q->active()])
+            ->get();
+
         // Resolve Category from real database records
         $category = null;
         $topic = null;
 
         if ($selectedCategorySlug) {
-            $category = Category::active()
-                ->where(function ($q) use ($selectedCategorySlug) {
-                    $q->where('slug', $selectedCategorySlug);
-                    if (is_numeric($selectedCategorySlug)) {
-                        $q->orWhere('id', (int) $selectedCategorySlug);
-                    }
-                })->first();
+            $category = $navCategories->first(function ($c) use ($selectedCategorySlug) {
+                return $c->slug === $selectedCategorySlug
+                    || (is_numeric($selectedCategorySlug) && $c->id === (int) $selectedCategorySlug);
+            });
+
+            if (!$category) {
+                $category = Category::active()
+                    ->where(function ($q) use ($selectedCategorySlug) {
+                        $q->where('slug', $selectedCategorySlug);
+                        if (is_numeric($selectedCategorySlug)) {
+                            $q->orWhere('id', (int) $selectedCategorySlug);
+                        }
+                    })->first();
+            }
         }
 
         // If no explicit category was passed, or topic belongs to another category, resolve via topic
         if ($selectedTopicSlug) {
-            $matchedTopicQuery = Topic::active()
-                ->where(function ($q) use ($selectedTopicSlug) {
-                    $q->where('slug', $selectedTopicSlug)
-                        ->orWhere('name', 'LIKE', '%' . trim($selectedTopicSlug) . '%');
-                    if (is_numeric($selectedTopicSlug)) {
-                        $q->orWhere('id', (int) $selectedTopicSlug);
-                    }
+            if ($category && $category->relationLoaded('topics')) {
+                $topic = $category->topics->first(function ($t) use ($selectedTopicSlug) {
+                    return $t->slug === $selectedTopicSlug
+                        || strcasecmp($t->name, $selectedTopicSlug) === 0
+                        || (is_numeric($selectedTopicSlug) && $t->id === (int) $selectedTopicSlug);
                 });
-
-            if ($category) {
-                // Check if topic exists in this category
-                $topic = (clone $matchedTopicQuery)->where('category_id', $category->id)->first();
             }
 
             if (!$topic) {
-                // Find topic across all categories
-                $topic = $matchedTopicQuery->with('category')->first();
-                if ($topic && $topic->category) {
-                    $category = $topic->category;
+                foreach ($navCategories as $navCat) {
+                    $matched = $navCat->topics->first(function ($t) use ($selectedTopicSlug) {
+                        return $t->slug === $selectedTopicSlug
+                            || strcasecmp($t->name, $selectedTopicSlug) === 0
+                            || (is_numeric($selectedTopicSlug) && $t->id === (int) $selectedTopicSlug);
+                    });
+
+                    if ($matched) {
+                        $topic = $matched;
+                        $category = $navCat;
+                        break;
+                    }
+                }
+            }
+
+            if (!$topic) {
+                $matchedTopicQuery = Topic::active()
+                    ->where(function ($q) use ($selectedTopicSlug) {
+                        $q->where('slug', $selectedTopicSlug)
+                            ->orWhere('name', 'LIKE', '%' . trim($selectedTopicSlug) . '%');
+                        if (is_numeric($selectedTopicSlug)) {
+                            $q->orWhere('id', (int) $selectedTopicSlug);
+                        }
+                    });
+
+                if ($category) {
+                    $topic = (clone $matchedTopicQuery)->where('category_id', $category->id)->first();
+                }
+
+                if (!$topic) {
+                    $topic = $matchedTopicQuery->with('category')->first();
+                    if ($topic && $topic->category) {
+                        $category = $topic->category;
+                    }
                 }
             }
         }
 
         if (!$category) {
-            $category = Category::active()->ordered()->first();
+            $category = $navCategories->first();
         }
 
         $categoryName = $category?->name ?? 'Aptitude Practice';
@@ -73,11 +117,15 @@ class McqController
         // Resolve Sidebar Topics for this Category
         $sidebarTopics = collect();
         if ($category) {
-            $sidebarTopics = Topic::where('category_id', $category->id)
-                ->active()
-                ->ordered()
-                ->withCount(['questions' => fn ($q) => $q->active()])
-                ->get();
+            if ($category->relationLoaded('topics') && $category->topics->isNotEmpty()) {
+                $sidebarTopics = $category->topics;
+            } else {
+                $sidebarTopics = Topic::where('category_id', $category->id)
+                    ->active()
+                    ->ordered()
+                    ->withCount(['questions' => fn ($q) => $q->active()])
+                    ->get();
+            }
         }
 
         // Fallback topic if not resolved yet
@@ -120,6 +168,7 @@ class McqController
             'topicName' => $topicName,
             'topicSlug' => $topicSlug,
             'sidebarTopics' => $sidebarTopics,
+            'navCategories' => $navCategories,
             'currentSection' => $currentSection,
             'totalQuestions' => $totalQuestions,
             'bookmarkedIds' => $bookmarkedIds,

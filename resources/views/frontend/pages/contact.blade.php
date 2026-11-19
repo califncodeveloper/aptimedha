@@ -75,13 +75,66 @@
                     </div>
                 </div>
 
-                {{-- Direct Contact Box --}}
-                <div class="p-5 bg-teal-50/60 rounded-xl border border-teal-200/60 text-xs text-[#243247] space-y-2">
-                    <p class="font-bold text-[#153B70] flex items-center gap-1.5">
-                        <i data-lucide="mail" class="w-4 h-4 text-[#087F82]"></i> Direct Email:
-                    </p>
-                    <p class="text-sm font-semibold text-[#087F82]">aptimedha@gmail.com</p>
-                    <p class="text-gray-500 text-[11px]">We aim to review and reply to inquiries within 1-2 business days.</p>
+                {{-- Direct Contact & Support Box --}}
+                @php
+                    $siteSettings = $siteSettings ?? \App\Services\SettingService::all();
+                @endphp
+                <div class="p-5 bg-teal-50/60 rounded-xl border border-teal-200/60 text-xs text-[#243247] space-y-3">
+                    <div>
+                        <p class="font-bold text-[#153B70] flex items-center gap-1.5">
+                            <i data-lucide="mail" class="w-4 h-4 text-[#087F82]"></i> Direct Email:
+                        </p>
+                        <p class="text-sm font-semibold text-[#087F82] mt-0.5">
+                            <a href="mailto:{{ $siteSettings['contact_email'] ?? 'aptimedha@gmail.com' }}" class="hover:underline">
+                                {{ $siteSettings['contact_email'] ?? 'aptimedha@gmail.com' }}
+                            </a>
+                        </p>
+                    </div>
+
+                    @if(!empty($siteSettings['whatsapp_number']) || !empty($siteSettings['whatsapp_url']))
+                    <div class="pt-2 border-t border-teal-200/50">
+                        <p class="font-bold text-[#153B70] flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-[#087F82] fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                            <span>WhatsApp Support:</span>
+                        </p>
+                        <p class="text-sm font-semibold text-[#087F82] mt-0.5">
+                            {{ $siteSettings['whatsapp_number'] ?? '+91 98765 43210' }}
+                        </p>
+                        <a href="{{ $siteSettings['whatsapp_url'] ?? 'https://wa.me/919876543210' }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#087F82] hover:underline mt-1">
+                            <span>Chat on WhatsApp &rarr;</span>
+                        </a>
+                    </div>
+                    @endif
+
+                    <div class="pt-2 border-t border-teal-200/50">
+                        <p class="font-bold text-[#153B70] flex items-center gap-1.5 mb-1.5">
+                            <i data-lucide="share-2" class="w-4 h-4 text-[#087F82]"></i> Connect With Us:
+                        </p>
+                        <div class="flex items-center gap-2">
+                            @if(!empty($siteSettings['linkedin_url']))
+                                <a href="{{ $siteSettings['linkedin_url'] }}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-white border border-teal-200 hover:bg-[#087F82] hover:text-white transition-colors" title="LinkedIn">
+                                    <i data-lucide="linkedin" class="w-3.5 h-3.5"></i>
+                                </a>
+                            @endif
+                            @if(!empty($siteSettings['twitter_url']))
+                                <a href="{{ $siteSettings['twitter_url'] }}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-white border border-teal-200 hover:bg-[#087F82] hover:text-white transition-colors" title="Twitter / X">
+                                    <i data-lucide="twitter" class="w-3.5 h-3.5"></i>
+                                </a>
+                            @endif
+                            @if(!empty($siteSettings['github_url']))
+                                <a href="{{ $siteSettings['github_url'] }}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-white border border-teal-200 hover:bg-[#087F82] hover:text-white transition-colors" title="GitHub">
+                                    <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                                </a>
+                            @endif
+                            @if(!empty($siteSettings['whatsapp_url']))
+                                <a href="{{ $siteSettings['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-white border border-teal-200 hover:bg-[#25D366] hover:text-white transition-colors" title="WhatsApp">
+                                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <p class="text-gray-500 text-[11px] pt-1">We aim to review and reply to inquiries within 1-2 business days.</p>
                 </div>
             </div>
 

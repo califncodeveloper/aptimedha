@@ -78,8 +78,18 @@
         @endif
 
         {{-- Article Content --}}
-        <div class="prose max-w-none text-[#243247] leading-relaxed space-y-5 bg-white p-6 sm:p-10 rounded-2xl border border-gray-200/90 shadow-2xs">
-            {!! $blog->body !!}
+        @php
+            // Ensure all tables in the blog body are wrapped in a horizontally scrollable container for responsive layouts
+            $renderedBlogContent = preg_replace_callback(
+                '/(?:<div\s+[^>]*class=["\'][^"\']*\bblog-table-container\b[^"\']*["\'][^>]*>\s*)?(<table\b[^>]*>.*?<\/table>)(?:\s*<\/div>)?/is',
+                function ($matches) {
+                    return '<div class="blog-table-container overflow-x-auto">' . $matches[1] . '</div>';
+                },
+                $blog->body
+            );
+        @endphp
+        <div class="blog-article-content prose max-w-none text-[#243247] leading-relaxed space-y-5 bg-white p-6 sm:p-10 rounded-2xl border border-gray-200/90 shadow-2xs">
+            {!! $renderedBlogContent !!}
         </div>
     </article>
 </x-layouts.app>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Category;
 use App\Models\ImportBatch;
+use App\Models\Topic;
 use App\Services\Import\McqImageArchiveHandler;
 use App\Services\Import\McqImportProcessor;
 use App\Services\Import\McqImportValidator;
@@ -49,8 +51,20 @@ class McqImportController
             ->take(6)
             ->get();
 
+        $taxonomyCategories = Category::query()
+            ->with([
+                'subjects' => fn ($q) => $q->orderBy('display_order')->orderBy('name')->with([
+                    'topics' => fn ($t) => $t->orderBy('display_order')->orderBy('name'),
+                ]),
+                'topics' => fn ($q) => $q->orderBy('display_order')->orderBy('name'),
+            ])
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->get();
+
         return view('admin.mcqs.import', [
             'recentBatches' => $recentBatches,
+            'taxonomyCategories' => $taxonomyCategories,
         ]);
     }
 
@@ -305,13 +319,14 @@ class McqImportController
     }
 
     /**
-     * Download canonical import template (.csv) with image reference columns.
+     * Download dynamic import template (.csv) reflecting currently available taxonomy in database.
      */
     public function downloadTemplate(): Response
     {
         $headers = [
-            'Question Topic',
-            'Question Subtopic',
+            'Category',
+            'Subject',
+            'Topic',
             'Question Number',
             'Question Text',
             'Option A',
@@ -320,6 +335,7 @@ class McqImportController
             'Option D',
             'Correct Option',
             'Explanation',
+            'Difficulty',
             'Question Image',
             'Option A Image',
             'Option B Image',
@@ -328,80 +344,92 @@ class McqImportController
             'Explanation Image',
         ];
 
-        $sampleRows = [
-            [
-                'Arithmetic Aptitude',
-                'Number System',
-                '1',
-                'How many positive factors does 36 have?',
-                '10',
-                '11',
-                '9',
-                '8',
-                'C',
-                '36 = 2^2 × 3^2. The factor count is (2+1)(2+1) = 9.',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-            ],
-            [
-                'Data Interpretation',
-                'Table Charts',
-                '1',
-                'Using the provided table figure, what is the combined sum for categories A and B?',
-                '40',
-                '39',
-                '41',
-                '42',
-                'A',
-                'Category A = 16, Category B = 24. Sum = 40.',
-                'images/q1_table.png',
-                '',
-                '',
-                '',
-                '',
-                'images/q1_explanation.png',
-            ],
-            [
-                'Spatial Ability',
-                'Pattern Completion',
-                '1',
-                'Which of the four options completes the matrix shown in the question figure?',
-                'Figure A',
-                'Figure B',
-                'Figure C',
-                'Figure D',
-                'B',
-                'Option B continues the alternating rotational pattern of 90 degrees clockwise.',
-                'images/q2_pattern.png',
-                'images/q2_opt_a.png',
-                'images/q2_opt_b.png',
-                'images/q2_opt_c.png',
-                'images/q2_opt_d.png',
-                '',
-            ],
-            [
-                'Verbal Ability',
-                'Synonyms and Antonyms',
-                '1',
-                'Which word is closest in meaning to "Rapid"?',
-                'Silent',
-                'Fast',
-                'Purchase',
-                'Begin',
-                'B',
-                'Rapid means occurring within a short time or at great speed.',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-            ],
-        ];
+        // Dynamically fetch active topics with their categories and subjects from database
+        $dbTopics = Topic::with(['category', 'subject'])
+            ->where('is_active', true)
+            ->orderBy('category_id')
+            ->orderBy('subject_id')
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->take(6)
+            ->get();
+
+        $sampleRows = [];
+
+        if ($dbTopics->isNotEmpty()) {
+            $qNum = 1;
+            foreach ($dbTopics as $t) {
+                $catName = $t->category?->name ?? 'General';
+                $subName = $t->subject?->name ?? '';
+                $topName = $t->name;
+
+                $sampleRows[] = [
+                    $catName,
+                    $subName,
+                    $topName,
+                    (string) $qNum,
+                    "Sample question text for {$topName}?",
+                    'Option A',
+                    'Option B',
+                    'Option C',
+                    'Option D',
+                    'A',
+                    "Explanation and step-by-step solution for {$topName}.",
+                    'medium',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                ];
+                $qNum++;
+            }
+        } else {
+            // Fallback rows if database taxonomy is not yet seeded
+            $sampleRows = [
+                [
+                    'Arithmetic Aptitude',
+                    'Number & Algebra',
+                    'Number System',
+                    '1',
+                    'How many positive factors does 36 have?',
+                    '10',
+                    '11',
+                    '9',
+                    '8',
+                    'C',
+                    '36 = 2^2 × 3^2. The factor count is (2+1)(2+1) = 9.',
+                    'medium',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                ],
+                [
+                    'Data Interpretation',
+                    'Charts & Visual Data',
+                    'Table Charts',
+                    '1',
+                    'Using the provided table figure, what is the combined sum for categories A and B?',
+                    '40',
+                    '39',
+                    '41',
+                    '42',
+                    'A',
+                    'Category A = 16, Category B = 24. Sum = 40.',
+                    'medium',
+                    'images/q1_table.png',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'images/q1_explanation.png',
+                ],
+            ];
+        }
 
         $output = fopen('php://temp', 'r+');
         fputcsv($output, $headers);

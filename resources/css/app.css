@@ -2,6 +2,7 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../../resources/views/**/*.blade.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -198,6 +199,25 @@
         transform: scale(1.06);
     }
 
+    /* Custom Independent Scrollbar */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #087F82;
+    }
+
     /* Navbar Shrink Transitions */
     header.sticky {
         transition: padding 0.25s cubic-bezier(0.22, 1, 0.36, 1),
@@ -230,3 +250,199 @@
         }
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Blog Details Page Table Styling
+|--------------------------------------------------------------------------
+| Dedicated, professional styling for tables inside blog article content.
+| Scoped strictly to .blog-article-content to preserve admin & other tables.
+| Theme tokens: Border #DCE3EC, Navy #153B70, Background #F7F9FC, Text #243247.
+*/
+.blog-article-content .blog-table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1.75rem;
+    margin-bottom: 1.75rem;
+    border: 1px solid #DCE3EC;
+    border-radius: 0.75rem;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 3px 0 rgba(21, 59, 112, 0.04);
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+}
+
+.blog-article-content .blog-table-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.blog-article-content .blog-table-container::-webkit-scrollbar-track {
+    background: #F7F9FC;
+    border-radius: 9999px;
+}
+
+.blog-article-content .blog-table-container::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 9999px;
+}
+
+.blog-article-content .blog-table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #087F82;
+}
+
+/* Base table styling */
+.blog-article-content table {
+    width: 100%;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+    color: #243247;
+    margin: 0;
+    background-color: #FFFFFF;
+}
+
+/* Visible borders between rows and columns with appropriate padding */
+.blog-article-content table th,
+.blog-article-content table td {
+    padding: 0.875rem 1.125rem;
+    border-bottom: 1px solid #DCE3EC;
+    border-right: 1px solid #DCE3EC;
+    vertical-align: top;
+    text-align: left;
+}
+
+/* Remove outer right and bottom cell borders so they merge seamlessly with container border */
+.blog-article-content table tr > *:last-child {
+    border-right: none;
+}
+
+.blog-article-content table tr:last-child > * {
+    border-bottom: none;
+}
+
+/* Mobile responsive padding and text sizing */
+@media (max-width: 640px) {
+    .blog-article-content table th,
+    .blog-article-content table td {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Distinguishable table headers: bold text, subtle theme background */
+.blog-article-content table thead th,
+.blog-article-content table th {
+    background-color: #F7F9FC;
+    color: #153B70;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 2px solid #DCE3EC;
+}
+
+/* Round inner corners to match the container's rounded card aesthetic */
+.blog-article-content table tr:first-child > *:first-child {
+    border-top-left-radius: 0.75rem;
+}
+.blog-article-content table tr:first-child > *:last-child {
+    border-top-right-radius: 0.75rem;
+}
+.blog-article-content table tr:last-child > *:first-child {
+    border-bottom-left-radius: 0.75rem;
+}
+.blog-article-content table tr:last-child > *:last-child {
+    border-bottom-right-radius: 0.75rem;
+}
+
+/* Ensure body cells have comfortable text formatting */
+.blog-article-content table tbody td,
+.blog-article-content table td {
+    color: #243247;
+}
+
+/* Subtle alternating row backgrounds for enhanced readability */
+.blog-article-content table tbody tr:nth-child(even),
+.blog-article-content table tr:nth-child(even) {
+    background-color: #F8FAFD;
+}
+
+.blog-article-content table tbody tr:nth-child(odd),
+.blog-article-content table tr:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+/* Subtle row hover state */
+.blog-article-content table tbody tr:hover,
+.blog-article-content table tr:hover {
+    background-color: #F1F5F9;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Clean caption styling if present */
+.blog-article-content table caption {
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-align: left;
+    background-color: #F7F9FC;
+    border-bottom: 1px solid #DCE3EC;
+}
+
+/* Prevent unwanted margins from paragraphs inside table cells */
+.blog-article-content table td p:first-child,
+.blog-article-content table th p:first-child {
+    margin-top: 0;
+}
+
+.blog-article-content table td p:last-child,
+.blog-article-content table th p:last-child {
+    margin-bottom: 0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Website Header & Footer Brand Logo Sizes (Change 5)
+|--------------------------------------------------------------------------
+| Explicit responsive dimensions to ensure crisp visibility, correct aspect
+| ratio (3:1), and zero layout shift without depending on dynamic Tailwind scanning.
+*/
+.logo-header {
+    height: 2.5rem; /* 40px on mobile (< 640px) */
+}
+
+@media (min-width: 640px) {
+    .logo-header {
+        height: 2.75rem; /* 44px on tablet / small desktop (640px - 1023px) */
+    }
+}
+
+@media (min-width: 1024px) {
+    .logo-header {
+        height: 3rem; /* 48px on standard desktop (1024px - 1279px) */
+    }
+}
+
+@media (min-width: 1280px) {
+    .logo-header {
+        height: 3.125rem; /* 50px on widescreen desktop (1280px+) */
+    }
+}
+
+.logo-footer {
+    height: 2.75rem; /* 44px on mobile (< 640px) */
+}
+
+@media (min-width: 640px) {
+    .logo-footer {
+        height: 3rem; /* 48px on desktop (640px+) */
+    }
+}
+

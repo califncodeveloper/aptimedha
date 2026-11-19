@@ -18,6 +18,11 @@
                 <h2 class="text-xl font-bold text-[#153B70]">Inquiries & Feedback ({{ $messages->total() }})</h2>
                 <p class="text-xs text-gray-500">View and respond to inquiries submitted through the public contact form.</p>
             </div>
+            <a href="{{ route('admin.settings.index', ['tab' => 'contact']) }}"
+               class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-[#153B70] hover:border-[#087F82] hover:text-[#087F82] shadow-2xs transition-colors self-start sm:self-auto">
+                <i data-lucide="settings" class="w-4 h-4 text-[#087F82]"></i>
+                <span>Contact & Social Settings</span>
+            </a>
         </div>
 
         {{-- Filters & Search --}}

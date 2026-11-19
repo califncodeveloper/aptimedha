@@ -89,9 +89,19 @@
         @endif
 
         {{-- Rich-Text Content --}}
+        @php
+            // Ensure all tables in the blog body are wrapped in a horizontally scrollable container for responsive layouts
+            $renderedBlogContent = preg_replace_callback(
+                '/(?:<div\s+[^>]*class=["\'][^"\']*\bblog-table-container\b[^"\']*["\'][^>]*>\s*)?(<table\b[^>]*>.*?<\/table>)(?:\s*<\/div>)?/is',
+                function ($matches) {
+                    return '<div class="blog-table-container overflow-x-auto">' . $matches[1] . '</div>';
+                },
+                $post->body
+            );
+        @endphp
         <article class="bg-white rounded-2xl border border-gray-200/90 shadow-2xs p-4 sm:p-10 text-[#243247] leading-relaxed space-y-5 text-sm sm:text-base overflow-hidden break-words">
-            <div class="prose max-w-none text-[#243247] prose-headings:text-[#153B70] prose-headings:font-black prose-h2:text-2xl prose-h3:text-xl prose-a:text-[#087F82] prose-a:font-semibold prose-strong:text-[#153B70] prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[#153B70] prose-blockquote:border-l-4 prose-blockquote:border-[#087F82] prose-blockquote:bg-gray-50 prose-blockquote:p-4 prose-blockquote:rounded-r-lg">
-                {!! $post->body !!}
+            <div class="blog-article-content prose max-w-none text-[#243247] prose-headings:text-[#153B70] prose-headings:font-black prose-h2:text-2xl prose-h3:text-xl prose-a:text-[#087F82] prose-a:font-semibold prose-strong:text-[#153B70] prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[#153B70] prose-blockquote:border-l-4 prose-blockquote:border-[#087F82] prose-blockquote:bg-gray-50 prose-blockquote:p-4 prose-blockquote:rounded-r-lg">
+                {!! $renderedBlogContent !!}
             </div>
         </article>
 
@@ -183,4 +193,20 @@
             </a>
         </div>
     </div>
+
+    {{-- Progressive enhancement to ensure dynamically loaded tables are wrapped in responsive scroll container --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const articleContent = document.querySelector('.blog-article-content');
+            if (!articleContent) return;
+            articleContent.querySelectorAll('table').forEach(function (table) {
+                if (!table.closest('.blog-table-container')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'blog-table-container overflow-x-auto';
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(table);
+                }
+            });
+        });
+    </script>
 </x-layouts.app>

@@ -121,6 +121,8 @@ class McqImportValidator
         $missingImages = [];
         $isDuplicate = false;
 
+        $categoryCol = trim((string) ($data['category'] ?? ''));
+        $subjectCol = trim((string) ($data['subject'] ?? ''));
         $topicCol = trim((string) ($data['topic'] ?? ''));
         $subtopicCol = trim((string) ($data['subtopic'] ?? ''));
         $questionNumRaw = trim((string) ($data['question_number'] ?? ''));
@@ -132,8 +134,11 @@ class McqImportValidator
         $correctOpt = strtoupper(trim((string) ($data['correct_option'] ?? '')));
         $explanation = trim((string) ($data['explanation'] ?? ''));
 
+        $difficultyRaw = strtolower(trim((string) ($data['difficulty'] ?? '')));
+        $difficulty = in_array($difficultyRaw, ['easy', 'medium', 'hard'], true) ? $difficultyRaw : 'medium';
+
         // 1. Taxonomy Validation
-        $taxResult = $this->taxonomyMatcher->resolve($topicCol, $subtopicCol);
+        $taxResult = $this->taxonomyMatcher->resolve($data);
         $categoryId = null;
         $subjectId = null;
         $topicId = null;
@@ -322,9 +327,9 @@ class McqImportValidator
             'errors' => $errors,
             'warnings' => $warnings,
             'missing_images' => $missingImages,
-            'topic_name' => $topicModel?->name ?? $subtopicCol,
-            'category_name' => $topicModel?->category?->name ?? $topicCol,
-            'subject_name' => $topicModel?->subject?->name ?? null,
+            'topic_name' => $topicModel?->name ?? ($topicCol ?: $subtopicCol),
+            'category_name' => $topicModel?->category?->name ?? ($categoryCol ?: $topicCol),
+            'subject_name' => $topicModel?->subject?->name ?? ($subjectCol ?: null),
             'category_id' => $categoryId,
             'subject_id' => $subjectId,
             'topic_id' => $topicId,
@@ -336,6 +341,7 @@ class McqImportValidator
             'option_d' => $optD,
             'correct_option' => $correctOpt,
             'explanation' => $explanation ?: null,
+            'difficulty' => $difficulty,
             'figure_id' => $figureId,
             'question_image' => $questionImage,
             'option_a_image' => $optionAImage,

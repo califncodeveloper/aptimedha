@@ -14,15 +14,17 @@ class SpreadsheetReader
      * Maps normalized lower-case headers to internal property names.
      */
     protected const HEADER_MAP = [
-        'question topic' => 'topic',
-        'topic' => 'topic',
-        'category' => 'topic',
-        'question category' => 'topic',
+        'category' => 'category',
+        'question category' => 'category',
 
-        'question subtopic' => 'subtopic',
+        'subject' => 'subject',
+        'question subject' => 'subject',
+
+        'topic' => 'topic',
+        'question topic' => 'topic',
+
         'subtopic' => 'subtopic',
-        'subject' => 'subtopic',
-        'question subject' => 'subtopic',
+        'question subtopic' => 'subtopic',
 
         'question number' => 'question_number',
         'question no' => 'question_number',
@@ -63,6 +65,10 @@ class SpreadsheetReader
         'solution' => 'explanation',
         'answer explanation' => 'explanation',
 
+        'difficulty' => 'difficulty',
+        'difficulty level' => 'difficulty',
+        'level' => 'difficulty',
+
         'question_image' => 'question_image',
         'question image' => 'question_image',
 
@@ -89,11 +95,9 @@ class SpreadsheetReader
     ];
 
     /**
-     * Required normalized keys in an MCQ dataset.
+     * Core required keys in an MCQ dataset.
      */
     public const REQUIRED_KEYS = [
-        'topic',
-        'subtopic',
         'question_number',
         'question_text',
         'option_a',
@@ -252,6 +256,9 @@ class SpreadsheetReader
             foreach ($headerMap as $colIndex => $key) {
                 $mappedRow[$key] = trim((string) ($data[$colIndex] ?? ''));
             }
+            if (isset($mappedRow['topic']) && !isset($mappedRow['subtopic'])) {
+                $mappedRow['subtopic'] = $mappedRow['topic'];
+            }
 
             $rows[] = [
                 'row_number' => $rowNumber,
@@ -344,6 +351,9 @@ class SpreadsheetReader
             foreach ($headerMap as $colKey => $key) {
                 $mappedRow[$key] = $cells[$colKey] ?? '';
             }
+            if (isset($mappedRow['topic']) && !isset($mappedRow['subtopic'])) {
+                $mappedRow['subtopic'] = $mappedRow['topic'];
+            }
 
             $rows[] = [
                 'row_number' => $rNum,
@@ -428,10 +438,56 @@ class SpreadsheetReader
      */
     protected function mapHeaders(array $headerRow, ?array $colKeys = null): array
     {
-        $mapped = [];
+        $cleanedHeaders = [];
         foreach ($headerRow as $idx => $headerText) {
             $clean = strtolower(trim(preg_replace('/[\r\n\t]+/', ' ', (string) $headerText)));
             $colKey = $colKeys !== null ? ($colKeys[$idx] ?? $idx) : $idx;
+            $cleanedHeaders[$colKey] = $clean;
+        }
+
+        $hasExplicitCategory = false;
+        $hasSubtopicOrSubject = false;
+        foreach ($cleanedHeaders as $clean) {
+            if (in_array($clean, ['category', 'question category'], true)) {
+                $hasExplicitCategory = true;
+            }
+            if (in_array($clean, ['subtopic', 'question subtopic', 'subject', 'question subject'], true)) {
+                $hasSubtopicOrSubject = true;
+            }
+        }
+
+        $mapped = [];
+        foreach ($cleanedHeaders as $colKey => $clean) {
+            // Category columns
+            if (in_array($clean, ['category', 'question category'], true)) {
+                $mapped[$colKey] = 'category';
+                continue;
+            }
+
+            // Subject columns
+            if (in_array($clean, ['subject', 'question subject'], true)) {
+                $mapped[$colKey] = 'subject';
+                continue;
+            }
+
+            // Topic / Question Topic
+            if (in_array($clean, ['topic', 'question topic'], true)) {
+                if ($hasExplicitCategory) {
+                    $mapped[$colKey] = 'topic';
+                } elseif ($hasSubtopicOrSubject) {
+                    // Legacy mode: 'Question Topic' acts as Category
+                    $mapped[$colKey] = 'category';
+                } else {
+                    $mapped[$colKey] = 'topic';
+                }
+                continue;
+            }
+
+            // Subtopic / Question Subtopic
+            if (in_array($clean, ['subtopic', 'question subtopic'], true)) {
+                $mapped[$colKey] = 'topic';
+                continue;
+            }
 
             if (isset(self::HEADER_MAP[$clean])) {
                 $mapped[$colKey] = self::HEADER_MAP[$clean];
@@ -451,10 +507,21 @@ class SpreadsheetReader
     {
         $present = array_values($headerMap);
         $missing = [];
+
+        // Core required MCQ content fields
         foreach (self::REQUIRED_KEYS as $required) {
             if (!in_array($required, $present, true)) {
                 $missing[] = $required;
             }
+        }
+
+        // Taxonomy requirement: at least topic, or category+subtopic/topic
+        $hasTaxonomy = in_array('topic', $present, true)
+            || in_array('subtopic', $present, true)
+            || in_array('category', $present, true);
+
+        if (!$hasTaxonomy) {
+            $missing[] = 'topic';
         }
 
         return $missing;

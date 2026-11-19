@@ -891,4 +891,443 @@ class BulkMcqImportTest extends TestCase
         $this->assertStringContainsString("'=cmd", $content);
         $this->assertStringContainsString("'+2+5", $content);
     }
+
+    /**
+     * Test 20: Import questions for newly created category, subject, and topic using modern 3-column CSV.
+     */
+    public function test_import_questions_for_newly_created_topic_with_canonical_3_column_csv(): void
+    {
+        $newCategory = Category::create([
+            'name' => 'Cloud Technologies',
+            'slug' => 'cloud-technologies',
+            'is_active' => true,
+            'display_order' => 10,
+        ]);
+
+        $newSubject = Subject::create([
+            'category_id' => $newCategory->id,
+            'name' => 'AWS Services',
+            'slug' => 'aws-services',
+            'is_active' => true,
+            'display_order' => 1,
+        ]);
+
+        $newTopic = Topic::create([
+            'category_id' => $newCategory->id,
+            'subject_id' => $newSubject->id,
+            'name' => 'S3 Storage & Glacier',
+            'slug' => 's3-storage-and-glacier',
+            'is_active' => true,
+            'display_order' => 1,
+            'total_questions_count' => 0,
+        ]);
+
+        $headers = [
+            'Category',
+            'Subject',
+            'Topic',
+            'Question Number',
+            'Question Text',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Correct Option',
+            'Explanation',
+            'Difficulty',
+        ];
+
+        $rows = [
+            [
+                'Cloud Technologies',
+                'AWS Services',
+                'S3 Storage & Glacier',
+                '1',
+                'What is the maximum single object size supported by Amazon S3?',
+                '5 GB',
+                '5 TB',
+                '10 TB',
+                'Unlimited',
+                'B',
+                'An individual Amazon S3 object can range in size from 0 bytes to 5 TB.',
+                'hard',
+            ],
+            [
+                'Cloud Technologies',
+                'AWS Services',
+                'S3 Storage & Glacier',
+                '2',
+                'Which S3 storage class is best suited for long-term archiving with retrieval time in minutes to hours?',
+                'S3 Standard',
+                'S3 Intelligent-Tiering',
+                'S3 Glacier Flexible Retrieval',
+                'S3 One Zone-IA',
+                'C',
+                'S3 Glacier Flexible Retrieval offers low-cost storage for archive data with retrieval in minutes to hours.',
+                'medium',
+            ],
+        ];
+
+        $file = $this->createCsvUpload($headers, $rows, 'new_topic_questions.csv');
+
+        // Step 1: Preview
+        $preview = $this->actingAs($this->admin)->post(route('admin.mcqs.import'), ['file' => $file]);
+        $preview->assertOk();
+        $summary = $preview->viewData('summary');
+        $this->assertEquals(2, $summary['valid_count']);
+        $this->assertEquals(0, $summary['invalid_count']);
+
+        // Step 2: Confirm
+        $token = $preview->viewData('token');
+        $confirm = $this->actingAs($this->admin)->post(route('admin.mcqs.import.confirm'), ['token' => $token]);
+        $confirm->assertOk();
+
+        // Verify in DB
+        $this->assertDatabaseHas('questions', [
+            'category_id' => $newCategory->id,
+            'subject_id' => $newSubject->id,
+            'topic_id' => $newTopic->id,
+            'question_number' => 1,
+            'question_text' => 'What is the maximum single object size supported by Amazon S3?',
+            'correct_option' => 'B',
+            'difficulty' => 'hard',
+        ]);
+
+        $this->assertDatabaseHas('questions', [
+            'category_id' => $newCategory->id,
+            'subject_id' => $newSubject->id,
+            'topic_id' => $newTopic->id,
+            'question_number' => 2,
+            'question_text' => 'Which S3 storage class is best suited for long-term archiving with retrieval time in minutes to hours?',
+            'correct_option' => 'C',
+            'difficulty' => 'medium',
+        ]);
+
+        $this->assertEquals(2, $newTopic->fresh()->total_questions_count);
+    }
+
+    /**
+     * Test 21: Topic matching handles whitespace, capitalization, symbols (& vs and), and dashes robustly.
+     */
+    public function test_import_questions_for_newly_created_topic_with_whitespace_and_symbol_variations(): void
+    {
+        $newCategory = Category::create([
+            'name' => 'Advanced Mathematics',
+            'slug' => 'advanced-mathematics',
+            'is_active' => true,
+            'display_order' => 11,
+        ]);
+
+        $newTopic = Topic::create([
+            'category_id' => $newCategory->id,
+            'name' => 'Permutations and Combinations',
+            'slug' => 'permutations-and-combinations',
+            'is_active' => true,
+            'display_order' => 1,
+            'total_questions_count' => 0,
+        ]);
+
+        $headers = [
+            'Category',
+            'Topic',
+            'Question Number',
+            'Question Text',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Correct Option',
+            'Explanation',
+        ];
+
+        // Variation: extra spacing in Category, '&' instead of 'and' in Topic, extra whitespace
+        $rows = [
+            [
+                '  advanced   mathematics  ',
+                'Permutations  &  Combinations ',
+                '1',
+                'How many ways can 5 people sit in a row?',
+                '60',
+                '120',
+                '24',
+                '720',
+                'B',
+                '5! = 5 x 4 x 3 x 2 x 1 = 120.',
+            ],
+        ];
+
+        $file = $this->createCsvUpload($headers, $rows, 'variations.csv');
+
+        $preview = $this->actingAs($this->admin)->post(route('admin.mcqs.import'), ['file' => $file]);
+        $preview->assertOk();
+        $summary = $preview->viewData('summary');
+        $this->assertEquals(1, $summary['valid_count']);
+        $this->assertEquals(0, $summary['invalid_count']);
+
+        $token = $preview->viewData('token');
+        $confirm = $this->actingAs($this->admin)->post(route('admin.mcqs.import.confirm'), ['token' => $token]);
+        $confirm->assertOk();
+
+        $this->assertDatabaseHas('questions', [
+            'category_id' => $newCategory->id,
+            'topic_id' => $newTopic->id,
+            'question_number' => 1,
+            'question_text' => 'How many ways can 5 people sit in a row?',
+        ]);
+    }
+
+    /**
+     * Test 22: Import questions across multiple categories and subjects in a single file.
+     */
+    public function test_import_questions_across_multiple_categories_and_subjects(): void
+    {
+        $cat1 = Category::create([
+            'name' => 'Computer Science',
+            'slug' => 'computer-science',
+            'is_active' => true,
+        ]);
+        $sub1 = Subject::create([
+            'category_id' => $cat1->id,
+            'name' => 'Operating Systems',
+            'slug' => 'operating-systems',
+            'is_active' => true,
+        ]);
+        $top1 = Topic::create([
+            'category_id' => $cat1->id,
+            'subject_id' => $sub1->id,
+            'name' => 'Process Synchronization',
+            'slug' => 'process-synchronization',
+            'is_active' => true,
+        ]);
+
+        $cat2 = Category::create([
+            'name' => 'Mechanical Engineering',
+            'slug' => 'mechanical-engineering',
+            'is_active' => true,
+        ]);
+        $sub2 = Subject::create([
+            'category_id' => $cat2->id,
+            'name' => 'Thermodynamics',
+            'slug' => 'thermodynamics',
+            'is_active' => true,
+        ]);
+        $top2 = Topic::create([
+            'category_id' => $cat2->id,
+            'subject_id' => $sub2->id,
+            'name' => 'Carnot Cycle',
+            'slug' => 'carnot-cycle',
+            'is_active' => true,
+        ]);
+
+        $headers = [
+            'Category',
+            'Subject',
+            'Topic',
+            'Question Number',
+            'Question Text',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Correct Option',
+            'Explanation',
+        ];
+
+        $rows = [
+            [
+                'Computer Science',
+                'Operating Systems',
+                'Process Synchronization',
+                '1',
+                'Which synchronization tool is an integer variable accessed only through atomic operations wait() and signal()?',
+                'Mutex lock',
+                'Semaphore',
+                'Monitor',
+                'Spinlock',
+                'B',
+                'A semaphore is an integer variable accessed only via wait() and signal().',
+            ],
+            [
+                'Mechanical Engineering',
+                'Thermodynamics',
+                'Carnot Cycle',
+                '1',
+                'What is the thermal efficiency of a Carnot engine operating between 300K and 600K?',
+                '30%',
+                '40%',
+                '50%',
+                '60%',
+                'C',
+                'Efficiency = 1 - (Tc/Th) = 1 - (300/600) = 0.50 or 50%.',
+            ],
+        ];
+
+        $file = $this->createCsvUpload($headers, $rows, 'multi_category.csv');
+
+        $preview = $this->actingAs($this->admin)->post(route('admin.mcqs.import'), ['file' => $file]);
+        $preview->assertOk();
+        $summary = $preview->viewData('summary');
+        $this->assertEquals(2, $summary['valid_count']);
+
+        $token = $preview->viewData('token');
+        $this->actingAs($this->admin)->post(route('admin.mcqs.import.confirm'), ['token' => $token]);
+
+        $this->assertDatabaseHas('questions', [
+            'category_id' => $cat1->id,
+            'subject_id' => $sub1->id,
+            'topic_id' => $top1->id,
+            'question_number' => 1,
+        ]);
+
+        $this->assertDatabaseHas('questions', [
+            'category_id' => $cat2->id,
+            'subject_id' => $sub2->id,
+            'topic_id' => $top2->id,
+            'question_number' => 1,
+        ]);
+    }
+
+    /**
+     * Test 23: Invalid category / topic hierarchy mapping rejected with descriptive error.
+     */
+    public function test_invalid_category_topic_mapping_rejected(): void
+    {
+        $cat1 = Category::create([
+            'name' => 'Category Alpha',
+            'slug' => 'category-alpha',
+            'is_active' => true,
+        ]);
+        $cat2 = Category::create([
+            'name' => 'Category Beta',
+            'slug' => 'category-beta',
+            'is_active' => true,
+        ]);
+        $topInBeta = Topic::create([
+            'category_id' => $cat2->id,
+            'name' => 'Beta Leaf Topic',
+            'slug' => 'beta-leaf-topic',
+            'is_active' => true,
+        ]);
+
+        $headers = [
+            'Category',
+            'Topic',
+            'Question Number',
+            'Question Text',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Correct Option',
+            'Explanation',
+        ];
+
+        // Row claims topic is under Alpha, but in DB it belongs to Beta!
+        $rows = [
+            [
+                'Category Alpha',
+                'Beta Leaf Topic',
+                '1',
+                'Question with wrong category?',
+                'A',
+                'B',
+                'C',
+                'D',
+                'A',
+                'Exp',
+            ],
+        ];
+
+        $file = $this->createCsvUpload($headers, $rows, 'cat_mismatch.csv');
+
+        $preview = $this->actingAs($this->admin)->post(route('admin.mcqs.import'), ['file' => $file]);
+        $preview->assertOk();
+        $summary = $preview->viewData('summary');
+        $this->assertEquals(1, $summary['invalid_count']);
+
+        $rowResults = $preview->viewData('rows');
+        $this->assertStringContainsString('Category mismatch', implode('; ', $rowResults[0]['errors']));
+        $this->assertStringContainsString('Category Beta', implode('; ', $rowResults[0]['errors']));
+    }
+
+    /**
+     * Test 24: Unknown category and unknown subject rejected with descriptive errors.
+     */
+    public function test_unknown_category_and_unknown_subject_rejected(): void
+    {
+        $headers = [
+            'Category',
+            'Subject',
+            'Topic',
+            'Question Number',
+            'Question Text',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Correct Option',
+            'Explanation',
+        ];
+
+        $rows = [
+            [
+                'Fictional Universe Category',
+                'Nonexistent Subject',
+                'Number System',
+                '1',
+                'Statement?',
+                'A',
+                'B',
+                'C',
+                'D',
+                'A',
+                'Exp',
+            ],
+        ];
+
+        $file = $this->createCsvUpload($headers, $rows, 'unknown_cat.csv');
+
+        $preview = $this->actingAs($this->admin)->post(route('admin.mcqs.import'), ['file' => $file]);
+        $preview->assertOk();
+        $summary = $preview->viewData('summary');
+        $this->assertEquals(1, $summary['invalid_count']);
+
+        $rowResults = $preview->viewData('rows');
+        $this->assertStringContainsString('Unknown category', implode('; ', $rowResults[0]['errors']));
+    }
+
+    /**
+     * Test 25: Downloaded template dynamically includes newly created topics from database.
+     */
+    public function test_downloaded_template_dynamically_includes_newly_created_topics(): void
+    {
+        $newCat = Category::create([
+            'name' => 'Data Science & AI',
+            'slug' => 'data-science-and-ai',
+            'is_active' => true,
+        ]);
+
+        $newSub = Subject::create([
+            'category_id' => $newCat->id,
+            'name' => 'Machine Learning',
+            'slug' => 'machine-learning',
+            'is_active' => true,
+        ]);
+
+        $newTop = Topic::create([
+            'category_id' => $newCat->id,
+            'subject_id' => $newSub->id,
+            'name' => 'Deep Neural Networks',
+            'slug' => 'deep-neural-networks',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.mcqs.import.template'));
+        $response->assertOk();
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('Deep Neural Networks', $content);
+        $this->assertStringContainsString('Data Science & AI', $content);
+        $this->assertStringContainsString('Machine Learning', $content);
+    }
 }

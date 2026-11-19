@@ -106,56 +106,219 @@
         {{-- 2-Column Practice Layout matching Mockup --}}
         <div class="flex flex-col lg:flex-row gap-8 items-start">
             
-            {{-- Left Sidebar matching mockup --}}
-            <aside class="w-full lg:w-72 flex-shrink-0" x-data="{ mobileTopicMenu: false }">
-                <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs overflow-hidden sticky top-24">
-                    <div class="px-5 py-4 border-b border-gray-200/80 bg-gray-50/70 flex items-center justify-between cursor-pointer lg:cursor-default"
-                         @click="mobileTopicMenu = !mobileTopicMenu">
-                        <div class="flex-1">
-                            <h2 class="text-base font-bold text-[#153B70] flex items-center justify-between">
-                                <span>{{ $categoryName }}</span>
-                                <span class="text-xs font-normal text-gray-400">{{ $sidebarTopics->count() }} Topics</span>
-                            </h2>
-                            <p class="text-[11px] text-[#087F82] font-semibold mt-0.5 lg:hidden">
-                                Current: {{ $topicName }} (Tap to change)
+            {{-- Interactive Expandable Category & Subcategory Navigation Sidebar --}}
+            <aside class="w-full lg:w-80 flex-shrink-0"
+                   x-data="{ 
+                       mobilePanelOpen: false,
+                       filterQuery: '',
+                       expanded: {
+                           '{{ $categorySlug }}': true
+                       },
+                       toggle(slug) {
+                           this.expanded[slug] = !this.expanded[slug];
+                           this.$nextTick(() => {
+                               if (window.lucide) window.lucide.createIcons();
+                           });
+                       },
+                       isExpanded(slug) {
+                           if (this.filterQuery.trim() !== '') return true;
+                           return !!this.expanded[slug];
+                       },
+                       matchesTopic(topicName, catName) {
+                           if (!this.filterQuery.trim()) return true;
+                           const q = this.filterQuery.toLowerCase().trim();
+                           return topicName.toLowerCase().includes(q) || catName.toLowerCase().includes(q);
+                       },
+                       categoryHasMatches(topics, catName) {
+                           if (!this.filterQuery.trim()) return true;
+                           const q = this.filterQuery.toLowerCase().trim();
+                           if (catName.toLowerCase().includes(q)) return true;
+                           return topics.some(t => t.name.toLowerCase().includes(q));
+                       }
+                   }">
+
+                {{-- Mobile Collapsible Header Banner --}}
+                <div class="lg:hidden mb-4 bg-white rounded-2xl border border-gray-200/90 shadow-xs p-4 flex items-center justify-between cursor-pointer select-none transition-all active:scale-[0.99]"
+                     @click="mobilePanelOpen = !mobilePanelOpen">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#087F82] flex-shrink-0">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-[#153B70] uppercase tracking-wider">Practice Track</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#087F82]/10 text-[#087F82] truncate max-w-[140px]">
+                                    {{ $categoryName }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate mt-0.5 font-medium">
+                                Topic: <span class="text-[#087F82] font-semibold">{{ $topicName }}</span>
                             </p>
                         </div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 lg:hidden ml-2 transition-transform duration-200"
-                           :class="{ 'rotate-180': mobileTopicMenu }"></i>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0 text-xs font-semibold text-[#087F82] ml-2">
+                        <span x-text="mobilePanelOpen ? 'Hide' : 'Browse'"></span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200"
+                           :class="{ 'rotate-180': mobilePanelOpen }"></i>
+                    </div>
+                </div>
+
+                {{-- Main Navigation Panel (Desktop Sticky / Mobile Expandable) --}}
+                <div class="bg-white rounded-2xl border border-gray-200/90 shadow-xs overflow-hidden sticky top-24 max-h-[calc(100vh-120px)] flex flex-col"
+                     :class="{ 'hidden lg:flex': !mobilePanelOpen, 'flex': mobilePanelOpen }">
+                    
+                    {{-- Navigation Header with Search --}}
+                    <div class="p-4 border-b border-gray-200/80 bg-gray-50/70 flex-shrink-0 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-[#153B70]/10 text-[#153B70] flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-sm font-extrabold text-[#153B70] leading-tight">MCQ Categories</h2>
+                                    <p class="text-[11px] text-gray-500">Explore topics & practice</p>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-gray-200 text-gray-600 shadow-2xs">
+                                {{ ($navCategories ?? collect([$category]))->count() }} Tracks
+                            </span>
+                        </div>
+
+                        {{-- Quick Search/Filter Bar --}}
+                        <div class="relative">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5"></i>
+                            <input type="text"
+                                   x-model="filterQuery"
+                                   placeholder="Filter categories or topics..."
+                                   class="w-full pl-8 pr-7 py-1.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#087F82] focus:ring-2 focus:ring-[#087F82]/15 text-[#243247] placeholder-gray-400 transition-all">
+                            <button type="button"
+                                    x-show="filterQuery"
+                                    @click="filterQuery = ''"
+                                    class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    style="display: none;">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="p-2 space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto" :class="{ 'hidden lg:block': !mobileTopicMenu }">
-                        @forelse($sidebarTopics as $sTopic)
-                            <a href="{{ $categorySlug ? route('categories.topics.show', ['category' => $categorySlug, 'topic' => $sTopic->slug]) : route('mcq.index', ['topic' => $sTopic->slug]) }}"
-                               @class([
-                                   'flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all',
-                                   'bg-[#087F82] text-white shadow-xs' => $sTopic->slug === $topicSlug,
-                                   'text-[#243247] hover:bg-gray-100/80 hover:text-[#087F82]' => $sTopic->slug !== $topicSlug,
-                               ])>
-                                <span class="truncate mr-2">{{ $sTopic->name }}</span>
-                                <div class="flex items-center gap-1.5 flex-shrink-0">
-                                    <span class="text-xs px-2 py-0.5 rounded-md {{ $sTopic->slug === $topicSlug ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500' }}">
-                                        {{ $sTopic->questions_count }}
-                                    </span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 {{ $sTopic->slug === $topicSlug ? 'text-white' : 'text-gray-400' }}"></i>
+                    {{-- Scrollable Category Accordion List --}}
+                    <div class="p-3 space-y-2 overflow-y-auto flex-1 custom-scrollbar">
+                        @forelse($navCategories ?? collect([$category]) as $navCat)
+                            @php
+                                $isCurrentCategory = ($navCat->slug === $categorySlug);
+                                $navTopics = $navCat->topics ?? collect();
+                                $topicCount = $navCat->topics_count ?? $navTopics->count();
+                                $jsonTopics = $navTopics->map(fn($t) => ['name' => $t->name])->values();
+                            @endphp
+
+                            <div class="border rounded-xl overflow-hidden transition-all duration-150 {{ $isCurrentCategory ? 'border-[#087F82]/30 shadow-2xs' : 'border-gray-200/80 hover:border-gray-300' }}"
+                                 x-show="categoryHasMatches({{ json_encode($jsonTopics) }}, '{{ addslashes($navCat->name) }}')">
+                                
+                                {{-- Main Category Accordion Header --}}
+                                <button type="button"
+                                        @click="toggle('{{ $navCat->slug }}')"
+                                        class="w-full px-3.5 py-3 flex items-center justify-between text-left transition-colors duration-150 select-none {{ $isCurrentCategory ? 'bg-teal-50/60 border-l-4 border-l-[#087F82]' : 'bg-white border-l-4 border-l-transparent hover:bg-slate-50' }}">
+                                    
+                                    {{-- Left: Icon & Category Name --}}
+                                    <div class="flex items-center gap-2.5 min-w-0 mr-2">
+                                        <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                                             :class="isExpanded('{{ $navCat->slug }}') ? 'bg-[#087F82] text-white shadow-2xs' : 'bg-gray-100 text-gray-600'">
+                                            <i data-lucide="{{ $navCat->icon ?: 'folder' }}" class="w-3.5 h-3.5"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="block text-xs font-bold truncate {{ $isCurrentCategory ? 'text-[#153B70]' : 'text-[#243247]' }}">
+                                                {{ $navCat->name }}
+                                            </span>
+                                            @if($isCurrentCategory)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[#087F82] leading-none mt-0.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#087F82] animate-pulse"></span>
+                                                    Active Track
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Right: Subcategory Count & Chevron --}}
+                                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full {{ $isCurrentCategory ? 'bg-teal-100 text-[#087F82]' : 'bg-gray-100 text-gray-500' }}">
+                                            {{ $topicCount }} {{ Str::plural('Topic', $topicCount) }}
+                                        </span>
+                                        <i data-lucide="chevron-down"
+                                           class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                           :class="{ 'rotate-180 text-[#087F82]': isExpanded('{{ $navCat->slug }}') }"></i>
+                                    </div>
+                                </button>
+
+                                {{-- Subcategory (Topic) List --}}
+                                <div x-show="isExpanded('{{ $navCat->slug }}')"
+                                     x-cloak
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 -translate-y-1"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 -translate-y-1"
+                                     class="p-2 space-y-1 bg-slate-50/80 border-t border-gray-100">
+                                    
+                                    @forelse($navTopics as $sTopic)
+                                        @php
+                                            $isCurrentTopic = ($isCurrentCategory && $sTopic->slug === $topicSlug);
+                                            $qCount = $sTopic->questions_count ?? 0;
+                                        @endphp
+                                        <a href="{{ route('categories.topics.show', ['category' => $navCat->slug, 'topic' => $sTopic->slug]) }}"
+                                           x-show="matchesTopic('{{ addslashes($sTopic->name) }}', '{{ addslashes($navCat->name) }}')"
+                                           @class([
+                                               'group flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-150 select-none',
+                                               'bg-[#087F82] text-white shadow-xs font-bold' => $isCurrentTopic,
+                                               'text-[#243247] hover:bg-white hover:text-[#087F82] hover:shadow-2xs' => !$isCurrentTopic,
+                                           ])>
+                                            
+                                            {{-- Left: Indicator dot / check and Topic Name --}}
+                                            <div class="flex items-center gap-2 min-w-0 mr-2">
+                                                @if($isCurrentTopic)
+                                                    <i data-lucide="check" class="w-3.5 h-3.5 text-white flex-shrink-0"></i>
+                                                @else
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-[#087F82] transition-colors flex-shrink-0"></span>
+                                                @endif
+                                                <span class="truncate" title="{{ $sTopic->name }}">
+                                                    {{ $sTopic->name }}
+                                                </span>
+                                            </div>
+
+                                            {{-- Right: Question Count & Hover Chevron --}}
+                                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {{ $isCurrentTopic ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-teal-50 group-hover:text-[#087F82]' }}">
+                                                    {{ $qCount }}
+                                                </span>
+                                                <i data-lucide="chevron-right"
+                                                   class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 {{ $isCurrentTopic ? 'text-white' : 'text-gray-300 group-hover:text-[#087F82]' }}"></i>
+                                            </div>
+                                        </a>
+                                    @empty
+                                        <div class="px-3 py-2.5 text-center text-[11px] text-gray-400 italic">
+                                            No subcategories available yet.
+                                        </div>
+                                    @endforelse
                                 </div>
-                            </a>
+                            </div>
                         @empty
-                            <div class="p-4 text-center text-xs text-gray-400">
-                                No topics in this category yet.
+                            <div class="p-6 text-center text-xs text-gray-400">
+                                No categories found.
                             </div>
                         @endforelse
                     </div>
 
-                    @if($categorySlug)
-                        <div class="p-4 border-t border-gray-100 bg-[#F7F9FC]" :class="{ 'hidden lg:block': !mobileTopicMenu }">
-                            <a href="{{ route('categories.show', $categorySlug) }}"
-                               class="inline-flex items-center text-xs font-bold text-[#153B70] hover:text-[#087F82] transition-colors">
-                                <i data-lucide="grid" class="w-3.5 h-3.5 mr-1.5"></i>
-                                View All Categories
-                            </a>
-                        </div>
-                    @endif
+                    {{-- Navigation Panel Footer --}}
+                    <div class="p-3 border-t border-gray-200/70 bg-gray-50/50 flex items-center justify-between flex-shrink-0">
+                        <a href="{{ route('categories.index') }}"
+                           class="inline-flex items-center text-xs font-bold text-[#153B70] hover:text-[#087F82] transition-colors group">
+                            <i data-lucide="compass" class="w-3.5 h-3.5 mr-1.5 text-[#087F82] group-hover:rotate-45 transition-transform"></i>
+                            <span>All Tracks Overview</span>
+                        </a>
+                        <span class="text-[10px] font-medium text-gray-400">
+                            AptiMedha Practice
+                        </span>
+                    </div>
                 </div>
             </aside>
 

@@ -255,7 +255,7 @@ class McqImportProcessor
                         'option_d' => $row['option_d'],
                         'correct_option' => $row['correct_option'],
                         'explanation' => $row['explanation'],
-                        'difficulty' => 'medium',
+                        'difficulty' => $row['difficulty'] ?? 'medium',
                         'figure_id' => $row['figure_id'],
                         'question_image' => $rowImageUrls['question_image'],
                         'option_a_image' => $rowImageUrls['option_a_image'],
